@@ -24,7 +24,7 @@ const Header: React.FC = () => {
           {isOpen ? <X size={32} /> : <Menu size={32} />}
         </button>
 
-        <Logo className="scale-75 md:scale-100 origin-left md:origin-left order-2 md:order-1" />
+        <Logo className="scale-75 md:scale-100 origin-right md:origin-left order-2 md:order-1" />
 
         {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-8 md:order-2">
