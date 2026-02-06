@@ -1,0 +1,7 @@
+{
+  "name": "Barsanulfo & Martins Advogados",
+  "description": "Website profissional para escritório de advocacia especializado em Direito do Trabalho, com foco em conversão e autoridade.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}

@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard - Leads | Barsa Advocacia</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Oxygen, Ubuntu, Cantarell, sans-serif;
+        background: #0a0a0a;
+        color: #ffffff;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+      }
+
+      header {
+        background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+        padding: 30px;
+        border-radius: 12px;
+        margin-bottom: 30px;
+        border: 1px solid #d4af37;
+      }
+
+      h1 {
+        color: #d4af37;
+        font-size: 32px;
+        margin-bottom: 10px;
+      }
+
+      .subtitle {
+        color: #888;
+        font-size: 14px;
+      }
+
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+      }
+
+      .stat-card {
+        background: #1a1a1a;
+        padding: 25px;
+        border-radius: 12px;
+        border: 1px solid #333;
+        transition: all 0.3s;
+      }
+
+      .stat-card:hover {
+        border-color: #d4af37;
+        transform: translateY(-2px);
+      }
+
+      .stat-label {
+        color: #888;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 8px;
+      }
+
+      .stat-value {
+        color: #d4af37;
+        font-size: 36px;
+        font-weight: bold;
+      }
+
+      .leads-section {
+        background: #1a1a1a;
+        padding: 30px;
+        border-radius: 12px;
+        border: 1px solid #333;
+      }
+
+      .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+
+      .section-title {
+        font-size: 24px;
+        color: #d4af37;
+      }
+
+      .refresh-btn {
+        background: #d4af37;
+        color: #000;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: all 0.3s;
+      }
+
+      .refresh-btn:hover {
+        background: #f0c040;
+        transform: scale(1.05);
+      }
+
+      .leads-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .leads-table th {
+        background: #0a0a0a;
+        padding: 15px;
+        text-align: left;
+        color: #d4af37;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        border-bottom: 2px solid #d4af37;
+      }
+
+      .leads-table td {
+        padding: 15px;
+        border-bottom: 1px solid #333;
+      }
+
+      .leads-table tr:hover {
+        background: #222;
+      }
+
+      .status-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: bold;
+        text-transform: uppercase;
+      }
+
+      .status-NEW {
+        background: #3b82f6;
+        color: white;
+      }
+
+      .status-CONTACTED {
+        background: #f59e0b;
+        color: white;
+      }
+
+      .status-QUALIFIED {
+        background: #8b5cf6;
+        color: white;
+      }
+
+      .status-CONVERTED {
+        background: #10b981;
+        color: white;
+      }
+
+      .status-LOST {
+        background: #ef4444;
+        color: white;
+      }
+
+      .type-badge {
+        background: #333;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 11px;
+        color: #d4af37;
+      }
+
+      .loading {
+        text-align: center;
+        padding: 40px;
+        color: #888;
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #666;
+      }
+
+      .empty-state svg {
+        width: 80px;
+        height: 80px;
+        margin-bottom: 20px;
+        opacity: 0.3;
+      }
+
+      .message-preview {
+        max-width: 300px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        color: #888;
+        font-size: 14px;
+      }
+
+      .date {
+        color: #666;
+        font-size: 13px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>⚖️ Dashboard de Leads</h1>
+        <p class="subtitle">Barsanulfo & Martins Advogados Associados</p>
+      </header>
+
+      <div class="stats" id="stats">
+        <div class="stat-card">
+          <div class="stat-label">Total de Leads</div>
+          <div class="stat-value" id="totalLeads">-</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Últimos 7 dias</div>
+          <div class="stat-value" id="recentLeads">-</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Novos</div>
+          <div class="stat-value" id="newLeads">-</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Convertidos</div>
+          <div class="stat-value" id="convertedLeads">-</div>
+        </div>
+      </div>
+
+      <div class="leads-section">
+        <div class="section-header">
+          <h2 class="section-title">📋 Todos os Leads</h2>
+          <button class="refresh-btn" onclick="loadData()">🔄 Atualizar</button>
+        </div>
+
+        <div id="leadsContainer">
+          <div class="loading">Carregando...</div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const API_URL = "http://localhost:3000/api";
+
+      async function loadData() {
+        try {
+          // Carregar estatísticas
+          const statsResponse = await fetch(`${API_URL}/leads/stats`);
+          const statsData = await statsResponse.json();
+
+          if (statsData.success) {
+            document.getElementById("totalLeads").textContent =
+              statsData.stats.total;
+            document.getElementById("recentLeads").textContent =
+              statsData.stats.recent;
+
+            // Contar por status
+            const newCount =
+              statsData.stats.byStatus.find((s) => s.status === "NEW")
+                ?._count || 0;
+            const convertedCount =
+              statsData.stats.byStatus.find((s) => s.status === "CONVERTED")
+                ?._count || 0;
+
+            document.getElementById("newLeads").textContent = newCount;
+            document.getElementById("convertedLeads").textContent =
+              convertedCount;
+          }
+
+          // Carregar leads
+          const leadsResponse = await fetch(`${API_URL}/leads`);
+          const leadsData = await leadsResponse.json();
+
+          const container = document.getElementById("leadsContainer");
+
+          if (leadsData.success && leadsData.leads.length > 0) {
+            container.innerHTML = `
+                        <table class="leads-table">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Contato</th>
+                                    <th>Tipo</th>
+                                    <th>Mensagem</th>
+                                    <th>Status</th>
+                                    <th>Data</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${leadsData.leads
+                                  .map(
+                                    (lead) => `
+                                    <tr>
+                                        <td><strong>${lead.name}</strong></td>
+                                        <td>
+                                            📧 ${lead.email}<br>
+                                            📱 ${lead.phone}
+                                        </td>
+                                        <td><span class="type-badge">${getTypeLabel(
+                                          lead.type
+                                        )}</span></td>
+                                        <td><div class="message-preview" title="${
+                                          lead.message
+                                        }">${lead.message}</div></td>
+                                        <td><span class="status-badge status-${
+                                          lead.status
+                                        }">${lead.status}</span></td>
+                                        <td class="date">${formatDate(
+                                          lead.createdAt
+                                        )}</td>
+                                    </tr>
+                                `
+                                  )
+                                  .join("")}
+                            </tbody>
+                        </table>
+                    `;
+          } else {
+            container.innerHTML = `
+                        <div class="empty-state">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+                            </svg>
+                            <h3>Nenhum lead ainda</h3>
+                            <p>Os leads do formulário de contato aparecerão aqui.</p>
+                        </div>
+                    `;
+          }
+        } catch (error) {
+          console.error("Erro ao carregar dados:", error);
+          document.getElementById("leadsContainer").innerHTML = `
+                    <div class="empty-state">
+                        <h3>❌ Erro ao carregar dados</h3>
+                        <p>Verifique se o backend está rodando.</p>
+                    </div>
+                `;
+        }
+      }
+
+      function getTypeLabel(type) {
+        const labels = {
+          rescisao: "Rescisão Indireta",
+          horas: "Horas Extras",
+          assedio: "Assédio Moral",
+          outro: "Outros",
+        };
+        return labels[type] || type;
+      }
+
+      function formatDate(dateString) {
+        const date = new Date(dateString);
+        return date.toLocaleString("pt-BR", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+      }
+
+      // Carregar dados ao abrir a página
+      loadData();
+
+      // Atualizar a cada 30 segundos
+      setInterval(loadData, 30000);
+    </script>
+  </body>
+</html>
