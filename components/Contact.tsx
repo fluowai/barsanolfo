@@ -149,7 +149,7 @@ const Contact: React.FC = () => {
                   </div>
                   <div>
                     <p className="text-[10px] md:text-xs uppercase font-bold tracking-widest opacity-60">E-mail</p>
-                    <p className="text-lg md:text-xl font-bold break-all">contato@bmadvogados.com.br</p>
+                    <p className="text-sm md:text-xl font-bold break-all">contato@bmadvogados.com.br</p>
                   </div>
                 </div>
                 

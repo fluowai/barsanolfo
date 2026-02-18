@@ -9,7 +9,7 @@ const Footer: React.FC = () => {
       <div className="container mx-auto px-6">
         <div className="grid md:grid-cols-4 gap-12 mb-16">
           <div className="col-span-1 md:col-span-1 space-y-6">
-            <Logo />
+            <Logo className="h-16 md:h-24" />
             <p className="text-white/40 text-sm leading-relaxed">
               Escritório especializado em Direito do Trabalho, defendendo os interesses de quem constrói o futuro com as próprias mãos.
             </p>

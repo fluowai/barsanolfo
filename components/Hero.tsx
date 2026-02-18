@@ -20,8 +20,8 @@ const Hero: React.FC = () => {
           <div className="inline-block px-4 py-1 border border-[#d4af37] text-[#d4af37] text-xs uppercase tracking-[0.3em] font-bold rounded-full mb-4">
             Especialistas em Direito do Trabalho
           </div>
-          <h1 className="text-4xl md:text-7xl font-bold leading-tight text-white mb-2">
-            Defendemos Seus <br />
+          <h1 className="text-3xl md:text-7xl font-bold leading-tight text-white mb-2">
+            Defendemos Seus <br className="hidden md:block" />
             <span className="gold-gradient">Direitos com Força e Estratégia.</span>
           </h1>
           <p className="text-lg md:text-xl text-white/70 font-light leading-relaxed max-w-lg">
