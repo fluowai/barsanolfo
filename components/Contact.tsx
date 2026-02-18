@@ -139,7 +139,7 @@ const Contact: React.FC = () => {
                   </div>
                   <div>
                     <p className="text-[10px] md:text-xs uppercase font-bold tracking-widest opacity-60">Ligue para nós</p>
-                    <p className="text-lg md:text-xl font-bold tracking-tighter">(11) 98765-4321</p>
+                    <p className="text-lg md:text-xl font-bold tracking-tighter">(62) 99904-1023</p>
                   </div>
                 </div>
                 
@@ -149,7 +149,7 @@ const Contact: React.FC = () => {
                   </div>
                   <div>
                     <p className="text-[10px] md:text-xs uppercase font-bold tracking-widest opacity-60">E-mail</p>
-                    <p className="text-sm md:text-xl font-bold break-all">contato@bmadvogados.com.br</p>
+                    <p className="text-[11px] md:text-xl font-bold break-all">contato@barsanulfoemartins.com.br</p>
                   </div>
                 </div>
                 
@@ -159,7 +159,7 @@ const Contact: React.FC = () => {
                   </div>
                   <div>
                     <p className="text-[10px] md:text-xs uppercase font-bold tracking-widest opacity-60">Escritório</p>
-                    <p className="text-base md:text-lg font-bold">Av. Paulista, 1000 - São Paulo/SP</p>
+                    <p className="text-sm md:text-lg font-bold">Rua 16 A, 1078, Setor Aeroporto, Goiânia - GO</p>
                   </div>
                 </div>
               </div>

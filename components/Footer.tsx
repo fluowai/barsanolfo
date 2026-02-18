@@ -38,9 +38,9 @@ const Footer: React.FC = () => {
 
           <div>
             <h4 className="text-white font-bold uppercase tracking-widest text-xs mb-8">Informações</h4>
-            <p className="text-white/40 text-sm mb-4">OAB/SP: 000.000</p>
-            <p className="text-white/40 text-sm mb-4">CNPJ: 00.000.000/0001-00</p>
-            <p className="text-[#d4af37] text-sm font-bold">Atendimento 24h via WhatsApp para Emergências.</p>
+            <p className="text-white/40 text-sm mb-4">Goiânia - GO</p>
+            <p className="text-white/40 text-sm mb-4">Rua 16 A, 1078, Setor Aeroporto</p>
+            <p className="text-[#d4af37] text-sm font-bold">Atendimento: (62) 99904-1023</p>
           </div>
         </div>
         
