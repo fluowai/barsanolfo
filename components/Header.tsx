@@ -18,8 +18,19 @@ const Header: React.FC = () => {
 
   return (
     <header className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-[#0a0a0a]/95 backdrop-blur-md py-3 shadow-2xl' : 'bg-transparent py-5'}`}>
-      <div className="container mx-auto px-6 flex justify-between items-center">
-        <Logo className="" />
+      <div className="container mx-auto px-6 flex justify-between items-center relative">
+        {/* Mobile Toggle (Left) */}
+        <button className="md:hidden text-white relative z-10" onClick={() => setIsOpen(!isOpen)}>
+          {isOpen ? <X size={28} /> : <Menu size={28} />}
+        </button>
+
+        {/* Logo (Center on Mobile, Left on Desktop) */}
+        <div className="absolute left-1/2 -translate-x-1/2 md:relative md:left-0 md:translate-x-0 transition-all">
+          <Logo className="" />
+        </div>
+
+        {/* Placeholder/Balancer for Mobile Right Side */}
+        <div className="w-7 md:hidden"></div>
 
         {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-8">
@@ -39,11 +50,6 @@ const Header: React.FC = () => {
             Falar agora
           </a>
         </nav>
-
-        {/* Mobile Toggle */}
-        <button className="md:hidden text-white" onClick={() => setIsOpen(!isOpen)}>
-          {isOpen ? <X size={32} /> : <Menu size={32} />}
-        </button>
       </div>
 
       {/* Mobile Nav */}
