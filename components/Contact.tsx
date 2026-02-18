@@ -100,17 +100,17 @@ const Contact: React.FC = () => {
     return (
       <section id="contato" className="py-24 bg-[#121212] relative">
         <div className="container mx-auto px-6">
-          <div className="max-w-4xl mx-auto bg-[#1a1a1a] p-16 text-center border border-[#d4af37]/30 shadow-2xl">
+          <div className="max-w-4xl mx-auto bg-[#1a1a1a] p-8 md:p-16 text-center border border-[#d4af37]/30 shadow-2xl">
             <div className="flex justify-center mb-6">
-              <CheckCircle2 size={80} className="text-[#d4af37]" />
+              <CheckCircle2 size={60} md:size={80} className="text-[#d4af37]" />
             </div>
-            <h2 className="text-4xl font-bold mb-4 font-serif">Mensagem Enviada!</h2>
-            <p className="text-white/70 text-lg mb-8">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 font-serif">Mensagem Enviada!</h2>
+            <p className="text-white/70 text-base md:text-lg mb-8">
               Agradecemos seu contato. Uma de nossas advogadas entrará em contato em breve para realizar sua triagem.
             </p>
             <button 
               onClick={() => setIsSubmitted(false)}
-              className="gold-bg px-8 py-3 text-black font-bold uppercase tracking-widest hover:brightness-110 transition-all"
+              className="gold-bg px-8 py-3 text-black font-bold uppercase tracking-widest hover:brightness-110 transition-all text-xs md:text-sm"
             >
               Enviar outra mensagem
             </button>
@@ -126,56 +126,56 @@ const Contact: React.FC = () => {
         <div className="bg-[#1a1a1a] shadow-2xl overflow-hidden border border-white/5">
           <div className="flex flex-col lg:flex-row">
             {/* Contact Info */}
-            <div className="lg:w-2/5 gold-bg p-12 text-black">
-              <h2 className="text-4xl font-bold mb-8 font-serif">Vamos Resolver Seu Caso?</h2>
-              <p className="text-black/80 mb-12 text-lg">
+            <div className="lg:w-2/5 gold-bg p-8 md:p-12 text-black">
+              <h2 className="text-3xl md:text-4xl font-bold mb-6 md:mb-8 font-serif">Vamos Resolver Seu Caso?</h2>
+              <p className="text-black/80 mb-8 md:mb-12 text-base md:text-lg">
                 Não deixe seus direitos prescreverem. Entre em contato agora para uma triagem inicial gratuita e sigilosa.
               </p>
               
-              <div className="space-y-8">
-                <div className="flex items-center gap-6">
-                  <div className="w-12 h-12 bg-black/10 rounded-full flex items-center justify-center">
-                    <Phone size={24} />
+              <div className="space-y-6 md:space-y-8">
+                <div className="flex items-center gap-4 md:gap-6">
+                  <div className="w-10 h-10 md:w-12 md:h-12 bg-black/10 rounded-full flex items-center justify-center">
+                    <Phone size={20} md:size={24} />
                   </div>
                   <div>
-                    <p className="text-xs uppercase font-bold tracking-widest opacity-60">Ligue para nós</p>
-                    <p className="text-xl font-bold tracking-tighter">(11) 98765-4321</p>
+                    <p className="text-[10px] md:text-xs uppercase font-bold tracking-widest opacity-60">Ligue para nós</p>
+                    <p className="text-lg md:text-xl font-bold tracking-tighter">(11) 98765-4321</p>
                   </div>
                 </div>
                 
-                <div className="flex items-center gap-6">
-                  <div className="w-12 h-12 bg-black/10 rounded-full flex items-center justify-center">
-                    <Mail size={24} />
+                <div className="flex items-center gap-4 md:gap-6">
+                  <div className="w-10 h-10 md:w-12 md:h-12 bg-black/10 rounded-full flex items-center justify-center">
+                    <Mail size={20} md:size={24} />
                   </div>
                   <div>
-                    <p className="text-xs uppercase font-bold tracking-widest opacity-60">E-mail</p>
-                    <p className="text-xl font-bold break-all">contato@bmadvogados.com.br</p>
+                    <p className="text-[10px] md:text-xs uppercase font-bold tracking-widest opacity-60">E-mail</p>
+                    <p className="text-lg md:text-xl font-bold break-all">contato@bmadvogados.com.br</p>
                   </div>
                 </div>
                 
-                <div className="flex items-center gap-6">
-                  <div className="w-12 h-12 bg-black/10 rounded-full flex items-center justify-center">
-                    <MapPin size={24} />
+                <div className="flex items-center gap-4 md:gap-6">
+                  <div className="w-10 h-10 md:w-12 md:h-12 bg-black/10 rounded-full flex items-center justify-center">
+                    <MapPin size={20} md:size={24} />
                   </div>
                   <div>
-                    <p className="text-xs uppercase font-bold tracking-widest opacity-60">Escritório</p>
-                    <p className="text-lg font-bold">Av. Paulista, 1000 - São Paulo/SP</p>
+                    <p className="text-[10px] md:text-xs uppercase font-bold tracking-widest opacity-60">Escritório</p>
+                    <p className="text-base md:text-lg font-bold">Av. Paulista, 1000 - São Paulo/SP</p>
                   </div>
                 </div>
               </div>
 
-              <div className="mt-16 pt-12 border-t border-black/10">
-                <h4 className="font-bold mb-4 uppercase text-xs tracking-widest">Siga-nos</h4>
+              <div className="mt-12 md:mt-16 pt-8 md:pt-12 border-t border-black/10">
+                <h4 className="font-bold mb-4 uppercase text-[10px] md:text-xs tracking-widest">Siga-nos</h4>
                 <div className="flex gap-4">
-                  <div className="w-10 h-10 border border-black/20 rounded-full flex items-center justify-center hover:bg-black hover:text-white transition-all cursor-pointer">In</div>
-                  <div className="w-10 h-10 border border-black/20 rounded-full flex items-center justify-center hover:bg-black hover:text-white transition-all cursor-pointer">Ig</div>
-                  <div className="w-10 h-10 border border-black/20 rounded-full flex items-center justify-center hover:bg-black hover:text-white transition-all cursor-pointer">Fb</div>
+                  <div className="w-8 h-8 md:w-10 md:h-10 border border-black/20 rounded-full flex items-center justify-center hover:bg-black hover:text-white transition-all cursor-pointer text-xs">In</div>
+                  <div className="w-8 h-8 md:w-10 md:h-10 border border-black/20 rounded-full flex items-center justify-center hover:bg-black hover:text-white transition-all cursor-pointer text-xs">Ig</div>
+                  <div className="w-8 h-8 md:w-10 md:h-10 border border-black/20 rounded-full flex items-center justify-center hover:bg-black hover:text-white transition-all cursor-pointer text-xs">Fb</div>
                 </div>
               </div>
             </div>
 
             {/* Form */}
-            <div className="lg:w-3/5 p-12 bg-[#1a1a1a]">
+            <div className="lg:w-3/5 p-8 md:p-12 bg-[#1a1a1a]">
               <form className="space-y-6" onSubmit={handleSubmit}>
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="space-y-2">

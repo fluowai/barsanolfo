@@ -13,28 +13,28 @@ const About: React.FC = () => {
           
           <div className="space-y-6">
             <h4 className="text-[#d4af37] font-bold uppercase tracking-[0.2em] text-sm">O Escritório</h4>
-            <h2 className="text-4xl md:text-5xl font-bold leading-tight">Barsanulfo & Martins <br /><span className="text-white/50">Advogados Associados</span></h2>
+            <h2 className="text-3xl md:text-5xl font-bold leading-tight">Barsanulfo & Martins <br /><span className="text-white/50">Advogados Associados</span></h2>
             <div className="w-20 h-1 gold-bg mb-8"></div>
             
-            <p className="text-white/70 text-lg leading-relaxed">
+            <p className="text-white/70 text-base md:text-lg leading-relaxed">
               Nascemos com a missão de humanizar o atendimento jurídico e trazer resultados efetivos para o trabalhador. Em um mercado muitas vezes frio e burocrático, escolhemos a proximidade e a combatividade.
             </p>
-            <p className="text-white/70 text-lg leading-relaxed">
+            <p className="text-white/70 text-base md:text-lg leading-relaxed">
               Nossa sede é focada em oferecer uma infraestrutura moderna e um atendimento acolhedor, garantindo que cada cliente se sinta protegido desde o primeiro contato até a resolução final da sua causa.
             </p>
             
-            <div className="grid grid-cols-3 gap-8 pt-6">
+            <div className="grid grid-cols-3 gap-4 md:gap-8 pt-6">
               <div>
-                <h5 className="text-3xl font-bold gold-gradient font-serif">15+</h5>
-                <p className="text-xs uppercase text-white/50 tracking-widest mt-2">Anos de Experiência</p>
+                <h5 className="text-2xl md:text-3xl font-bold gold-gradient font-serif">15+</h5>
+                <p className="text-[10px] md:text-xs uppercase text-white/50 tracking-widest mt-2 whitespace-nowrap">Anos de Exp.</p>
               </div>
               <div>
-                <h5 className="text-3xl font-bold gold-gradient font-serif">2k+</h5>
-                <p className="text-xs uppercase text-white/50 tracking-widest mt-2">Causas Ganhas</p>
+                <h5 className="text-2xl md:text-3xl font-bold gold-gradient font-serif">2k+</h5>
+                <p className="text-[10px] md:text-xs uppercase text-white/50 tracking-widest mt-2 whitespace-nowrap">Causas Ganhas</p>
               </div>
               <div>
-                <h5 className="text-3xl font-bold gold-gradient font-serif">100%</h5>
-                <p className="text-xs uppercase text-white/50 tracking-widest mt-2">Foco no Cliente</p>
+                <h5 className="text-2xl md:text-3xl font-bold gold-gradient font-serif">100%</h5>
+                <p className="text-[10px] md:text-xs uppercase text-white/50 tracking-widest mt-2 whitespace-nowrap">Foco Cliente</p>
               </div>
             </div>
           </div>

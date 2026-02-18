@@ -2,12 +2,12 @@
 import React from 'react';
 
 const Logo: React.FC<{ className?: string }> = ({ className = "" }) => {
-  // Maximizing height for desktop to make it very large and prominent
-  const defaultHeight = className.includes('h-') ? '' : 'h-20 md:h-48';
+  // Balanced height for mobile (h-12) and maintain prominence for desktop (h-48)
+  const defaultHeight = className.includes('h-') ? '' : 'h-12 md:h-48';
   
   return (
     <div className={`relative flex items-center ${defaultHeight} ${className}`}>
-      {/* Subtle neutral glow for the white logo to add depth */}
+      {/* Subtle neutral glow for the white logo */}
       <div className="absolute inset-0 bg-white/5 blur-3xl rounded-full scale-125 pointer-events-none"></div>
       
       <img 

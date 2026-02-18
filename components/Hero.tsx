@@ -20,23 +20,23 @@ const Hero: React.FC = () => {
           <div className="inline-block px-4 py-1 border border-[#d4af37] text-[#d4af37] text-xs uppercase tracking-[0.3em] font-bold rounded-full mb-4">
             Especialistas em Direito do Trabalho
           </div>
-          <h1 className="text-5xl md:text-7xl font-bold leading-tight text-white">
+          <h1 className="text-4xl md:text-7xl font-bold leading-tight text-white mb-2">
             Defendemos Seus <br />
             <span className="gold-gradient">Direitos com Força e Estratégia.</span>
           </h1>
-          <p className="text-xl text-white/70 font-light leading-relaxed max-w-lg">
+          <p className="text-lg md:text-xl text-white/70 font-light leading-relaxed max-w-lg">
             A Barsanulfo & Martins Advogados Associados é sua aliada contra injustiças laborais. Combatividade e seriedade para garantir o que é seu por direito.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 pt-6">
+          <div className="flex flex-col sm:flex-row gap-4 pt-4 md:pt-6">
             <a 
               href="#contato" 
-              className="px-8 py-4 gold-bg text-black font-bold uppercase tracking-widest text-center transition-transform transform hover:scale-105"
+              className="px-6 py-3 sm:px-8 sm:py-4 gold-bg text-black font-bold uppercase tracking-widest text-sm sm:text-base text-center transition-transform transform hover:scale-105"
             >
               Consultoria Gratuita
             </a>
             <a 
               href="#atuacao" 
-              className="px-8 py-4 border border-white/20 text-white font-bold uppercase tracking-widest text-center hover:bg-white/10 transition-all"
+              className="px-6 py-3 sm:px-8 sm:py-4 border border-white/20 text-white font-bold uppercase tracking-widest text-sm sm:text-base text-center hover:bg-white/10 transition-all"
             >
               Nossas Áreas
             </a>
