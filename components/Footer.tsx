@@ -8,7 +8,7 @@ const Footer: React.FC = () => {
     <footer className="bg-black pt-20 pb-10 border-t border-white/5">
       <div className="container mx-auto px-6">
         <div className="flex flex-col items-center mb-16 text-center">
-          <Logo className="h-20 md:h-32 mb-6" />
+          <Logo className="mb-6" />
           <p className="text-white/40 text-sm leading-relaxed max-w-lg">
             Escritório especializado em Direito do Trabalho, defendendo os interesses de quem constrói o futuro com as próprias mãos.
           </p>

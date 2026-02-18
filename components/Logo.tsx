@@ -2,19 +2,18 @@
 import React from 'react';
 
 const Logo: React.FC<{ className?: string }> = ({ className = "" }) => {
-  // Even larger height for mobile (h-24) to meet user demand for higher visibility. 
-  // Desktop remains h-48 for massive prominence.
-  const defaultHeight = className.includes('h-') ? '' : 'h-24 md:h-48';
+  // Drastically increased height values to compensate for image padding.
+  // Mobile: h-32 (approx 128px)
+  // Desktop: h-80 (approx 320px)
+  const defaultHeight = className.includes('h-') ? '' : 'h-32 md:h-80';
   
   return (
-    <div className={`relative flex items-center ${defaultHeight} ${className}`}>
-      {/* Subtle neutral glow for the white logo */}
-      <div className="absolute inset-0 bg-white/5 blur-3xl rounded-full scale-125 pointer-events-none"></div>
-      
+    <div className={`relative flex items-center justify-center ${defaultHeight} ${className}`}>
+      {/* Container for the logo with scaling to zoom in and remove the effect of whitespace padding in the PNG */}
       <img 
         src="/assets/logo-bm.png.png" 
         alt="Barsanulfo & Martins Logo" 
-        className="relative h-full w-auto object-contain transition-all duration-300 brightness-110 drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]"
+        className="relative h-full w-auto object-contain transition-all duration-300 scale-[1.6] md:scale-[1.8]"
       />
     </div>
   );
