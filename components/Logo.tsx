@@ -2,8 +2,9 @@
 import React from 'react';
 
 const Logo: React.FC<{ className?: string }> = ({ className = "" }) => {
-  // Further increased height for mobile (h-20) to be clearly visible and maintain prominence for desktop (h-48)
-  const defaultHeight = className.includes('h-') ? '' : 'h-20 md:h-48';
+  // Even larger height for mobile (h-24) to meet user demand for higher visibility. 
+  // Desktop remains h-48 for massive prominence.
+  const defaultHeight = className.includes('h-') ? '' : 'h-24 md:h-48';
   
   return (
     <div className={`relative flex items-center ${defaultHeight} ${className}`}>

@@ -20,8 +20,15 @@ const Header: React.FC = () => {
     <header className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-[#0a0a0a]/95 backdrop-blur-md py-3 shadow-2xl' : 'bg-transparent py-5'}`}>
       <div className="container mx-auto px-6 flex justify-between items-center relative">
         {/* Mobile Toggle (Left) */}
-        <button className="md:hidden text-white relative z-10" onClick={() => setIsOpen(!isOpen)}>
-          {isOpen ? <X size={28} /> : <Menu size={28} />}
+        <button className="md:hidden text-white relative z-50 flex items-center gap-2" onClick={() => setIsOpen(!isOpen)}>
+          {isOpen ? (
+            <>
+              <X size={28} />
+              <span className="text-[10px] uppercase tracking-widest font-bold">Fechar</span>
+            </>
+          ) : (
+            <Menu size={28} />
+          )}
         </button>
 
         {/* Logo (Center on Mobile, Left on Desktop) */}
