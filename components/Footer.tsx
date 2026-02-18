@@ -7,13 +7,14 @@ const Footer: React.FC = () => {
   return (
     <footer className="bg-black pt-20 pb-10 border-t border-white/5">
       <div className="container mx-auto px-6">
-        <div className="grid md:grid-cols-4 gap-12 mb-16">
-          <div className="col-span-1 md:col-span-1 space-y-6">
-            <Logo className="h-16 md:h-24" />
-            <p className="text-white/40 text-sm leading-relaxed">
-              Escritório especializado em Direito do Trabalho, defendendo os interesses de quem constrói o futuro com as próprias mãos.
-            </p>
-          </div>
+        <div className="flex flex-col items-center mb-16 text-center">
+          <Logo className="h-20 md:h-32 mb-6" />
+          <p className="text-white/40 text-sm leading-relaxed max-w-lg">
+            Escritório especializado em Direito do Trabalho, defendendo os interesses de quem constrói o futuro com as próprias mãos.
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-12 mb-16">
           
           <div>
             <h4 className="text-white font-bold uppercase tracking-widest text-xs mb-8">Navegação</h4>
