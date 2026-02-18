@@ -14,7 +14,7 @@ const Services: React.FC = () => {
         <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
           <h4 className="text-[#d4af37] font-bold uppercase tracking-[0.2em] text-sm">Áreas de Especialidade</h4>
           <h2 className="text-4xl md:text-5xl font-bold">Soluções Jurídicas Para o <span className="gold-gradient">Trabalhador</span></h2>
-          <p className="text-white/60">Atuamos com maestria em todas as vertentes do Direito do Trabalho, protegendo quem move a economia do país.</p>
+          <p className="text-white/60">Atuamos com maestria em todas as vertentes do Direito do Trabalho, protegendo quem move a economy do país.</p>
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Users, Bot, Settings as SettingsIcon, Plus, Trash2, Edit, Save, X } from 'lucide-react';
+import { Users, Bot, Plus, Trash2, Save, X } from 'lucide-react';
 
 interface TeamMember {
   id: string;
@@ -20,7 +20,7 @@ export default function Settings() {
   const [activeTab, setActiveTab] = useState<'team' | 'ai'>('team');
   const [team, setTeam] = useState<TeamMember[]>([]);
   const [aiConfigs, setAIConfigs] = useState<AIConfig[]>([]);
-  const [loading, setLoading] = useState(false);
+
 
   // Form states
   const [showTeamForm, setShowTeamForm] = useState(false);
@@ -34,23 +34,23 @@ export default function Settings() {
   }, [activeTab]);
 
   const fetchTeam = async () => {
-    setLoading(true);
+
     try {
       const res = await fetch('http://localhost:3000/api/team');
       const data = await res.json();
       if (data.success) setTeam(data.users);
     } catch (err) { console.error(err); }
-    setLoading(false);
+
   };
 
   const fetchAIConfigs = async () => {
-    setLoading(true);
+
     try {
       const res = await fetch('http://localhost:3000/api/ai-config');
       const data = await res.json();
       if (data.success) setAIConfigs(data.configs);
     } catch (err) { console.error(err); }
-    setLoading(false);
+
   };
 
   const handleCreateMember = async () => {

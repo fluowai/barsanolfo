@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Search, Plus, Edit, Trash2, Eye, X } from 'lucide-react';
+import { Search, Plus, Edit, Trash2, X } from 'lucide-react';
 import './Clients.css';
 
 interface Client {

@@ -11,10 +11,10 @@ const Team: React.FC = () => {
           <div className="max-w-2xl space-y-4 animate-fade-in-up">
             <div className="inline-flex items-center gap-3 mb-2">
               <span className="w-12 h-[2px] bg-gradient-to-r from-[#d4af37] to-transparent"></span>
-              <h4 className="text-[#d4af37] font-bold uppercase tracking-[0.3em] text-xs">Nossa Equipe</h4>
+              <h4 className="text-[#d4af37] font-bold uppercase tracking-[0.3em] text-xs">Os Profissionais</h4>
             </div>
-            <h2 className="text-4xl md:text-6xl font-bold leading-tight">
-              Corpo Jurídico de <br/><span className="gold-gradient italic">Elite</span>
+            <h2 className="text-4xl md:text-6xl font-bold leading-tight text-white">
+              Barsanulfo & Martins <br /><span className="text-[#d4af37]">Advogados Associados</span>
             </h2>
           </div>
           <p className="text-white/50 max-w-sm text-sm leading-relaxed animate-fade-in-up animation-delay-200 border-l-2 border-[#d4af37]/30 pl-4">
@@ -41,7 +41,7 @@ const Team: React.FC = () => {
                   <img 
                     src={member.image} 
                     alt={member.name} 
-                    className="w-full h-80 md:h-full object-cover object-top md:grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105" 
+                    className="w-full h-96 md:h-full object-cover object-top transition-all duration-700 group-hover:scale-105" 
                   />
                   {/* Overlay with social icons on hover */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-end justify-center pb-4">
@@ -62,10 +62,9 @@ const Team: React.FC = () => {
                 
                 {/* Content Section */}
                 <div className="md:w-1/2 p-6 lg:p-8 flex flex-col justify-center">
-                  {/* Badge */}
                   <div className="inline-flex items-center gap-2 mb-4">
                     <span className="px-3 py-1 text-[10px] uppercase tracking-wider font-bold bg-gradient-to-r from-[#d4af37]/20 to-[#f1c40f]/10 text-[#d4af37] rounded-full border border-[#d4af37]/30">
-                      Sócia-Fundadora
+                      {member.role.split('|')[0]?.trim()}
                     </span>
                   </div>
                   

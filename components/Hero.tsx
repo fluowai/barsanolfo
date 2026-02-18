@@ -4,10 +4,10 @@ import { ChevronDown } from 'lucide-react';
 
 const Hero: React.FC = () => {
   return (
-    <section id="home" className="relative min-h-screen flex items-center pt-28 md:pt-20 overflow-hidden">
+    <section id="home" className="relative min-h-screen flex items-center pt-20 overflow-hidden">
       {/* Background Overlay */}
       <div className="absolute inset-0 z-0">
-        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/90 to-transparent"></div>
         <img 
           src="https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&q=80&w=2000" 
           alt="Escritório Advocacia" 
@@ -16,18 +16,18 @@ const Hero: React.FC = () => {
       </div>
 
       <div className="container mx-auto px-6 relative z-10 grid md:grid-cols-2 gap-12 items-center">
-        <div className="max-w-2xl space-y-6 text-center md:text-left">
-          <div className="inline-block px-4 py-1 border border-[#d4af37] text-[#d4af37] text-[10px] md:text-xs uppercase tracking-[0.3em] font-bold rounded-full mb-4 md:mb-4 mt-8 md:mt-0">
+        <div className="max-w-2xl space-y-6">
+          <div className="inline-block px-4 py-1 border border-[#d4af37] text-[#d4af37] text-xs uppercase tracking-[0.3em] font-bold rounded-full mb-4">
             Especialistas em Direito do Trabalho
           </div>
-          <h1 className="text-4xl md:text-7xl font-bold leading-tight">
+          <h1 className="text-5xl md:text-7xl font-bold leading-tight text-white">
             Defendemos Seus <br />
             <span className="gold-gradient">Direitos com Força e Estratégia.</span>
           </h1>
-          <p className="text-lg md:text-xl text-white/70 font-light leading-relaxed max-w-lg mx-auto md:mx-0">
+          <p className="text-xl text-white/70 font-light leading-relaxed max-w-lg">
             A Barsanulfo & Martins Advogados Associados é sua aliada contra injustiças laborais. Combatividade e seriedade para garantir o que é seu por direito.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 pt-6 justify-center md:justify-start">
+          <div className="flex flex-col sm:flex-row gap-4 pt-6">
             <a 
               href="#contato" 
               className="px-8 py-4 gold-bg text-black font-bold uppercase tracking-widest text-center transition-transform transform hover:scale-105"

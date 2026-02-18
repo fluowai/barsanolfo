@@ -17,17 +17,12 @@ const Header: React.FC = () => {
   }, []);
 
   return (
-    <header className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-black/90 backdrop-blur-md py-3 shadow-2xl' : 'bg-transparent py-5'}`}>
+    <header className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-[#0a0a0a]/95 backdrop-blur-md py-3 shadow-2xl' : 'bg-transparent py-5'}`}>
       <div className="container mx-auto px-6 flex justify-between items-center">
-        {/* Mobile Toggle (Left on Mobile) */}
-        <button className="md:hidden text-white order-1" onClick={() => setIsOpen(!isOpen)}>
-          {isOpen ? <X size={32} /> : <Menu size={32} />}
-        </button>
-
-        <Logo className="scale-75 md:scale-100 origin-right md:origin-left order-2 md:order-1" />
+        <Logo className="" />
 
         {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-8 md:order-2">
+        <nav className="hidden md:flex items-center gap-8">
           {NAV_ITEMS.map((item) => (
             <a
               key={item.href}
@@ -44,6 +39,11 @@ const Header: React.FC = () => {
             Falar agora
           </a>
         </nav>
+
+        {/* Mobile Toggle */}
+        <button className="md:hidden text-white" onClick={() => setIsOpen(!isOpen)}>
+          {isOpen ? <X size={32} /> : <Menu size={32} />}
+        </button>
       </div>
 
       {/* Mobile Nav */}

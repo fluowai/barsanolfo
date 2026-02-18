@@ -9,10 +9,16 @@ export const NAV_ITEMS: NavItem[] = [
   { label: 'Atuação', href: '#atuacao' },
   { label: 'Equipe', href: '#equipe' },
   { label: 'Contato', href: '#contato' },
-  { label: 'Área Restrita', href: 'http://localhost:3002' },
+  { label: 'Área Restrita', href: '/login' },
 ];
 
 export const SERVICES: Service[] = [
+  {
+    id: 'direitogestante',
+    title: 'Direito da Gestante',
+    description: 'Proteção integral à maternidade, garantindo estabilidade, licença e todos os direitos da mãe trabalhadora.',
+    icon: 'ShieldAlert',
+  },
   {
     id: 'rescisao',
     title: 'Rescisão Indireta',
@@ -54,14 +60,14 @@ export const SERVICES: Service[] = [
 export const TEAM: TeamMember[] = [
   {
     name: 'Dra. Maria José Martins de Oliveira Almeida',
-    role: 'Sócia-Fundadora | OAB/GO 43.681',
+    role: 'Sócia | OAB/GO 43.681',
     bio: 'Advogada há 14 anos, formada pela UFG, especialista em Direito do Trabalho e Previdenciário. Atua com qualidade, proximidade e tecnologia na gestão da advocacia.',
-    image: '/dra_maria_jose.jpg',
+    image: '/assets/prof-maria-jose.jpg',
   },
   {
     name: 'Dra. Amanda Barsanulfo Martins de Oliveira Brandão',
-    role: 'Sócia-Fundadora | OAB/GO 69.838',
+    role: 'Sócia | OAB/GO 69.838',
     bio: 'Advogada formada pela Universo, pós-graduada em Direito do Trabalho. Atua nas áreas trabalhista e cível com foco em negociações complexas e defesa de direitos.',
-    image: '/dra_amanda.jpg',
+    image: '/assets/prof-amanda.jpg.jpeg',
   },
 ];

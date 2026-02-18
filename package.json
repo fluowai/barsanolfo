@@ -1,11 +1,12 @@
 {
-  "name": "barsanulfo-&-martins-advogados",
+  "name": "barsanulfo-e-martins-advogados",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && cd frontend-painel && vite build",
+    "postinstall": "cd frontend-painel && npm install",
     "preview": "vite preview"
   },
   "dependencies": {
