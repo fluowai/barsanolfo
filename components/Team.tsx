@@ -4,7 +4,7 @@ import { TEAM } from '../constants';
 
 const Team: React.FC = () => {
   return (
-    <section id="equipe" className="py-24 bg-[#0d0d0d] overflow-hidden">
+    <section id="equipe" className="py-24 bg-[#0d0d0d] overflow-hidden scroll-mt-64 md:scroll-mt-80">
       <div className="container mx-auto px-6">
         {/* Header Section com animação */}
         <div className="flex flex-col md:flex-row justify-between items-end mb-20 gap-8">

@@ -3,7 +3,7 @@ import React from 'react';
 
 const About: React.FC = () => {
   return (
-    <section id="escritorio" className="py-24 bg-[#0a0a0a]">
+    <section id="escritorio" className="py-24 bg-[#0a0a0a] scroll-mt-64 md:scroll-mt-80">
       <div className="container mx-auto px-6">
         <div className="grid md:grid-cols-2 gap-16 items-center">
           <div className="grid grid-cols-2 gap-4">

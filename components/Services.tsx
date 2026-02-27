@@ -9,7 +9,7 @@ const iconMap: Record<string, LucideIcon> = {
 
 const Services: React.FC = () => {
   return (
-    <section id="atuacao" className="py-24 bg-[#121212] relative overflow-hidden">
+    <section id="atuacao" className="py-24 bg-[#121212] relative overflow-hidden scroll-mt-64 md:scroll-mt-80">
       <div className="container mx-auto px-6">
         <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
           <h4 className="text-[#d4af37] font-bold uppercase tracking-[0.2em] text-sm">Áreas de Especialidade</h4>
