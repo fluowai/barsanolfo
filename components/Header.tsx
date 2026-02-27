@@ -17,7 +17,7 @@ const Header: React.FC = () => {
   }, []);
 
   return (
-    <header className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-[#0a0a0a]/95 backdrop-blur-md py-4 shadow-2xl' : 'bg-transparent py-8'}`}>
+    <header className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-[#0a0a0a]/95 backdrop-blur-md py-6 shadow-2xl' : 'bg-transparent py-12'}`}>
       <div className="container mx-auto px-6 flex justify-between items-center relative">
         {/* Mobile Toggle (Left) */}
         <button className="md:hidden text-white relative z-50 flex items-center gap-2" onClick={() => setIsOpen(!isOpen)}>
