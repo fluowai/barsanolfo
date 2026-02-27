@@ -53,7 +53,7 @@ export default function Sidebar() {
             <img 
               src="/assets/logo.png" 
               alt="Logo" 
-              className="h-8 w-auto object-contain"
+              className="h-12 w-auto object-contain"
             />
             <div>
               <h1 className="sidebar-title">Barsa</h1>
