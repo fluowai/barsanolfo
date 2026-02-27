@@ -2,7 +2,7 @@
 import React from 'react';
 
 const Logo: React.FC<{ className?: string }> = ({ className = "" }) => {
-  const defaultHeight = className.includes('h-') ? '' : 'h-48 md:h-[400px]';
+  const defaultHeight = className.includes('h-') ? '' : 'h-32 md:h-64';
   
   return (
     <div className={`relative flex items-center justify-center ${defaultHeight} ${className}`}>
