@@ -121,7 +121,7 @@ const Contact: React.FC = () => {
   }
 
   return (
-    <section id="contato" className="py-24 bg-[#121212] relative">
+    <section id="contato" className="py-24 bg-[#121212] relative scroll-mt-64 md:scroll-mt-80">
       <div className="container mx-auto px-6">
         <div className="bg-[#1a1a1a] shadow-2xl overflow-hidden border border-white/5">
           <div className="flex flex-col lg:flex-row">
