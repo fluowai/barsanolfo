@@ -98,7 +98,7 @@ const Contact: React.FC = () => {
 
   if (isSubmitted) {
     return (
-      <section id="contato" className="py-24 bg-[#121212] relative">
+      <section id="contato" className="py-24 bg-[#121212] relative scroll-mt-64 md:scroll-mt-80">
         <div className="container mx-auto px-6">
           <div className="max-w-4xl mx-auto bg-[#1a1a1a] p-8 md:p-16 text-center border border-[#d4af37]/30 shadow-2xl">
             <div className="flex justify-center mb-6">
