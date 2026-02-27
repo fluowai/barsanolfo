@@ -19,7 +19,7 @@ const Header: React.FC = () => {
   return (
     <header className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-black/90 backdrop-blur-md py-3 shadow-2xl' : 'bg-transparent py-5'}`}>
       <div className="container mx-auto px-6 flex justify-between items-center">
-        <Logo className="scale-75 md:scale-100 origin-left" />
+        <Logo className="origin-left" />
 
         {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-8">
