@@ -14,6 +14,8 @@ import {
 import { useMobileMenu } from '../contexts/MobileMenuContext';
 import './Sidebar.css';
 
+import Logo from './Logo';
+
 export default function Sidebar() {
   const { isOpen, closeMenu } = useMobileMenu();
 
@@ -50,11 +52,7 @@ export default function Sidebar() {
       <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
         <div className="sidebar-header">
           <div className="sidebar-logo">
-            <img 
-              src="/assets/logo.png" 
-              alt="Logo" 
-              className="h-12 w-auto object-contain"
-            />
+            <Logo imgClassName="h-10 w-auto" />
             <div>
               <h1 className="sidebar-title">Barsa</h1>
               <p className="sidebar-subtitle">Advocacia</p>

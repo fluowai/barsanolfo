@@ -1,3 +1,5 @@
+import Logo from '../components/Logo';
+
 export default function Login() {
   return (
     <div style={{ 
@@ -13,8 +15,12 @@ export default function Login() {
         padding: '40px',
         background: 'var(--darker)',
         borderRadius: '12px',
-        border: '1px solid var(--border)'
+        border: '1px solid var(--border)',
+        textAlign: 'center'
       }}>
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
+          <Logo imgClassName="h-20 w-auto" />
+        </div>
         <h1 style={{ color: 'var(--gold)', marginBottom: '10px' }}>Login</h1>
         <p style={{ color: 'var(--text-muted)', marginBottom: '30px' }}>Painel Administrativo</p>
         

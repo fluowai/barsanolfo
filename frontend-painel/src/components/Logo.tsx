@@ -1,9 +1,13 @@
-
 import React from 'react';
 
-const Logo: React.FC<{ className?: string; imgClassName?: string }> = ({ 
+interface LogoProps {
+  className?: string;
+  imgClassName?: string;
+}
+
+const Logo: React.FC<LogoProps> = ({ 
   className = "flex items-center", 
-  imgClassName = "h-32 md:h-64 w-auto" 
+  imgClassName = "h-12 w-auto" 
 }) => {
   return (
     <div className={className}>
