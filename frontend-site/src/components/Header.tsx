@@ -17,7 +17,7 @@ const Header: React.FC = () => {
   }, []);
 
   return (
-    <header className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-black/90 backdrop-blur-md py-3 shadow-2xl' : 'bg-transparent py-5'}`}>
+    <header className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-black/90 backdrop-blur-md py-6 shadow-2xl' : 'bg-transparent py-12'}`}>
       <div className="container mx-auto px-6 flex justify-between items-center">
         <Logo className="origin-left" />
 
