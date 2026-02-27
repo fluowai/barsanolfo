@@ -8,7 +8,7 @@ const Logo: React.FC<{ className?: string }> = ({ className = "" }) => {
     <div className={`relative flex items-center justify-center ${defaultHeight} ${className}`}>
       {/* Local logo image from public/assets folder */}
       <img 
-        src="/assets/logo-bm.png.png" 
+        src="/assets/logo.png" 
         alt="Barsanulfo & Martins Logo" 
         className="relative h-full w-auto object-contain transition-all duration-300"
       />

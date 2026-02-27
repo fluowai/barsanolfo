@@ -50,7 +50,11 @@ export default function Sidebar() {
       <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
         <div className="sidebar-header">
           <div className="sidebar-logo">
-            <Scale size={32} className="logo-icon" />
+            <img 
+              src="/assets/logo.png" 
+              alt="Logo" 
+              className="h-8 w-auto object-contain"
+            />
             <div>
               <h1 className="sidebar-title">Barsa</h1>
               <p className="sidebar-subtitle">Advocacia</p>
