@@ -18,11 +18,11 @@ const Header: React.FC = () => {
 
   return (
     <header className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-black/90 backdrop-blur-md py-4 shadow-2xl' : 'bg-transparent py-8'}`}>
-      <div className="container mx-auto px-6 flex justify-between items-center">
-        <Logo className="origin-left" />
+      <div className="container mx-auto px-6 flex justify-between items-start">
+        <Logo className="origin-left mt-2" />
 
         {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-8">
+        <nav className="hidden md:flex items-center gap-8 mt-12">
           {NAV_ITEMS.map((item) => (
             <a
               key={item.href}
