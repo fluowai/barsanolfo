@@ -20,8 +20,8 @@ model Lead {
   message   String
   source    String   @default("WEBSITE")
   status    String   @default("NEW") // NEW, CONTACTED, QUALIFIED, CONVERTED, LOST
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("leads")
 }
@@ -30,12 +30,12 @@ model Lead {
 model User {
   id           String   @id @default(uuid())
   email        String   @unique
-  passwordHash String
+  passwordHash String @map("password_hash")
   name         String
   role         String   @default("LAWYER") // ADMIN, LAWYER, SECRETARY
   avatar       String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
 
   // Relações
   cases        Case[]
@@ -54,8 +54,8 @@ model Client {
   phone     String
   address   String?
   notes     String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   // Relações
   cases     Case[]
@@ -72,11 +72,11 @@ model Case {
   court        String?
   status       String     @default("ACTIVE") // ACTIVE, SUSPENDED, ARCHIVED, CLOSED
   value        Float?
-  filedDate    DateTime?
-  clientId     String
-  lawyerId     String
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
+  filedDate    DateTime? @map("filed_date")
+  clientId     String    @map("client_id")
+  lawyerId     String    @map("lawyer_id")
+  createdAt    DateTime   @default(now()) @map("created_at")
+  updatedAt    DateTime   @updatedAt @map("updated_at")
 
   // Relações
   client       Client     @relation(fields: [clientId], references: [id])
@@ -91,11 +91,11 @@ model Case {
 // MOVIMENTAÇÕES PROCESSUAIS
 model CaseMovement {
   id          String   @id @default(uuid())
-  caseId      String
+  caseId      String   @map("case_id")
   date        DateTime
   description String
   type        String?
-  createdAt   DateTime @default(now())
+  createdAt   DateTime @default(now()) @map("created_at")
 
   case        Case     @relation(fields: [caseId], references: [id])
 
@@ -105,11 +105,11 @@ model CaseMovement {
 // PRAZOS
 model Deadline {
   id          String   @id @default(uuid())
-  caseId      String
+  caseId      String   @map("case_id")
   description String
-  dueDate     DateTime
+  dueDate     DateTime @map("due_date")
   completed   Boolean  @default(false)
-  createdAt   DateTime @default(now())
+  createdAt   DateTime @default(now()) @map("created_at")
 
   case        Case     @relation(fields: [caseId], references: [id])
 
@@ -119,12 +119,12 @@ model Deadline {
 // AUDIÊNCIAS
 model Hearing {
   id        String   @id @default(uuid())
-  caseId    String
+  caseId    String   @map("case_id")
   date      DateTime
   location  String?
   type      String
   notes     String?
-  createdAt DateTime @default(now())
+  createdAt DateTime @default(now()) @map("created_at")
 
   case      Case     @relation(fields: [caseId], references: [id])
 
@@ -136,12 +136,12 @@ model Task {
   id          String   @id @default(uuid())
   title       String
   description String?
-  dueDate     DateTime?
+  dueDate     DateTime? @map("due_date")
   status      String   @default("TODO") // TODO, IN_PROGRESS, DONE, CANCELLED
   priority    String   @default("MEDIUM") // LOW, MEDIUM, HIGH, URGENT
-  assignedTo  String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  assignedTo  String   @map("assigned_to")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
 
   user        User     @relation(fields: [assignedTo], references: [id])
 
@@ -151,12 +151,12 @@ model Task {
 // FINANCEIRO - CONTRATOS
 model Contract {
   id            String   @id @default(uuid())
-  clientId      String
+  clientId      String   @map("client_id")
   type          String   // FIXED_FEE, PERCENTAGE, etc
   value         Float
-  paymentMethod String?
-  signedDate    DateTime?
-  createdAt     DateTime @default(now())
+  paymentMethod String?  @map("payment_method")
+  signedDate    DateTime? @map("signed_date")
+  createdAt     DateTime @default(now()) @map("created_at")
 
   client        Client   @relation(fields: [clientId], references: [id])
   invoices      Invoice[]
@@ -167,12 +167,12 @@ model Contract {
 // FATURAS
 model Invoice {
   id         String    @id @default(uuid())
-  contractId String
+  contractId String    @map("contract_id")
   amount     Float
-  dueDate    DateTime
-  paidDate   DateTime?
+  dueDate    DateTime  @map("due_date")
+  paidDate   DateTime? @map("paid_date")
   status     String    @default("PENDING") // PENDING, PAID, OVERDUE, CANCELLED
-  createdAt  DateTime  @default(now())
+  createdAt  DateTime  @default(now()) @map("created_at")
 
   contract   Contract  @relation(fields: [contractId], references: [id])
 
@@ -196,9 +196,9 @@ model AIConfig {
   provider  String   // GEMINI, OPENAI, etc
   apiKey    String
   model     String?
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("ai_configs")
 }

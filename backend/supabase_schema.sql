@@ -224,6 +224,7 @@ ALTER TABLE ai_configs ENABLE ROW LEVEL SECURITY;
 -- Políticas básicas (permitir tudo para usuários autenticados)
 -- Ajuste conforme necessário para seu caso de uso
 CREATE POLICY "Allow all for authenticated" ON leads FOR ALL USING (auth.role() = 'authenticated');
+CREATE POLICY "Allow anonymous insert" ON leads FOR INSERT WITH CHECK (true);
 CREATE POLICY "Allow all for authenticated" ON users FOR ALL USING (auth.role() = 'authenticated');
 CREATE POLICY "Allow all for authenticated" ON clients FOR ALL USING (auth.role() = 'authenticated');
 CREATE POLICY "Allow all for authenticated" ON cases FOR ALL USING (auth.role() = 'authenticated');
