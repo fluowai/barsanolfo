@@ -1,6 +1,6 @@
 {
   "rewrites": [
-    { "source": "/login/:match*", "destination": "/login/index.html" },
+    { "source": "/painel/:match*", "destination": "/painel/index.html" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
