@@ -9,7 +9,7 @@ export default defineConfig({
   },
   base: '/painel/',
   build: {
-    outDir: '../backend/public/painel',
+    outDir: '../dist/painel',
     emptyOutDir: true,
   }
 })

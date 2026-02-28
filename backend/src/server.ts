@@ -30,11 +30,19 @@ app.use('/api', teamRoutes);
 app.use('/api', aiConfigRoutes);
 
 // Servir arquivos estáticos do Painel
-app.use('/painel', express.static(path.join(__dirname, '../public/painel')));
+app.use('/painel', express.static(path.join(__dirname, '../../dist/painel')));
 
 // Fallback para SPA (Painel)
 app.get('/painel/*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/painel/index.html'));
+  res.sendFile(path.join(__dirname, '../../dist/painel/index.html'));
+});
+
+// Servir arquivos estáticos do Site Principal
+app.use(express.static(path.join(__dirname, '../../dist')));
+
+// Fallback para SPA (Site)
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../../dist/index.html'));
 });
 
 // Tratamento de erros
