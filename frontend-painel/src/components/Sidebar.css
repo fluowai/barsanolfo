@@ -28,7 +28,7 @@
 .sidebar-logo img {
   max-width: 40px;
   height: auto;
-  object-contain: contain;
+  object-fit: contain;
 }
 
 .logo-icon {
