@@ -9,7 +9,7 @@ export const NAV_ITEMS: NavItem[] = [
   { label: 'Atuação', href: '#atuacao' },
   { label: 'Equipe', href: '#equipe' },
   { label: 'Contato', href: '#contato' },
-  { label: 'Área Restrita', href: '/login' },
+  { label: 'Área Restrita', href: '/painel/login' },
 ];
 
 export const SERVICES: Service[] = [

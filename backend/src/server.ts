@@ -1,6 +1,7 @@
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import path from 'path';
 import contactRoutes from './routes/contact.routes';
 import clientRoutes from './routes/clients.routes';
 import datajudRoutes from './routes/datajud.routes';
@@ -27,6 +28,14 @@ app.use('/api', datajudRoutes);
 app.use('/api', caseRoutes);
 app.use('/api', teamRoutes);
 app.use('/api', aiConfigRoutes);
+
+// Servir arquivos estáticos do Painel
+app.use('/painel', express.static(path.join(__dirname, '../public/painel')));
+
+// Fallback para SPA (Painel)
+app.get('/painel/*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/painel/index.html'));
+});
 
 // Tratamento de erros
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {

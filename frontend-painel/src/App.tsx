@@ -22,7 +22,7 @@ function App() {
 
   return (
     <MobileMenuProvider>
-      <BrowserRouter>
+      <BrowserRouter basename="/painel">
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route index element={<Dashboard />} />

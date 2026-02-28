@@ -7,9 +7,9 @@ export default defineConfig({
     port: 3001,
     host: '0.0.0.0',
   },
-  base: '/login/',
+  base: '/painel/',
   build: {
-    outDir: '../dist/login',
+    outDir: '../backend/public/painel',
     emptyOutDir: true,
   }
 })
