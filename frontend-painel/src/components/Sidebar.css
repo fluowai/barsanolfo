@@ -22,6 +22,13 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  overflow: hidden;
+}
+
+.sidebar-logo img {
+  max-width: 40px;
+  height: auto;
+  object-contain: contain;
 }
 
 .logo-icon {
