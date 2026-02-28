@@ -25,7 +25,7 @@ export default function Leads() {
 
   const fetchLeads = async () => {
     try {
-      const response = await fetch('http://localhost:3000/api/leads');
+      const response = await fetch('/api/leads');
       const data = await response.json();
       if (data.success) {
         setLeads(data.leads);

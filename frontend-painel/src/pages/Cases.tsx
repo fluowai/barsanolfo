@@ -39,7 +39,7 @@ export default function Cases() {
     setResult(null);
 
     try {
-      const response = await fetch('http://localhost:3000/api/datajud/search', {
+      const response = await fetch('/api/datajud/search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ processNumber: search })
@@ -253,7 +253,7 @@ export default function Cases() {
               onClick={async () => {
                 if (!proc.numeroProcesso) return;
                 try {
-                  const response = await fetch('http://localhost:3000/api/cases/import', {
+                  const response = await fetch('/api/cases/import', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 

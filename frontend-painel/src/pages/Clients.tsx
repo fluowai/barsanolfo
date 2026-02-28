@@ -36,7 +36,7 @@ export default function Clients() {
 
   const fetchClients = async () => {
     try {
-      const response = await fetch('http://localhost:3000/api/clients');
+      const response = await fetch('/api/clients');
       const data = await response.json();
       if (data.success) {
         setClients(data.clients);
@@ -53,8 +53,8 @@ export default function Clients() {
     
     try {
       const url = editingClient
-        ? `http://localhost:3000/api/clients/${editingClient.id}`
-        : 'http://localhost:3000/api/clients';
+        ? `/api/clients/${editingClient.id}`
+        : '/api/clients';
       
       const method = editingClient ? 'PATCH' : 'POST';
 
@@ -82,7 +82,7 @@ export default function Clients() {
     if (!confirm('Tem certeza que deseja deletar este cliente?')) return;
 
     try {
-      const response = await fetch(`http://localhost:3000/api/clients/${id}`, {
+      const response = await fetch(`/api/clients/${id}`, {
         method: 'DELETE',
       });
 

@@ -18,7 +18,7 @@ export default function Dashboard() {
 
   const fetchStats = async () => {
     try {
-      const response = await fetch('http://localhost:3000/api/leads/stats');
+      const response = await fetch('/api/leads/stats');
       const data = await response.json();
       if (data.success) {
         setStats(data.stats);

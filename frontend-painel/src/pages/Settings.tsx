@@ -36,7 +36,7 @@ export default function Settings() {
   const fetchTeam = async () => {
 
     try {
-      const res = await fetch('http://localhost:3000/api/team');
+      const res = await fetch('/api/team');
       const data = await res.json();
       if (data.success) setTeam(data.users);
     } catch (err) { console.error(err); }
@@ -46,7 +46,7 @@ export default function Settings() {
   const fetchAIConfigs = async () => {
 
     try {
-      const res = await fetch('http://localhost:3000/api/ai-config');
+      const res = await fetch('/api/ai-config');
       const data = await res.json();
       if (data.success) setAIConfigs(data.configs);
     } catch (err) { console.error(err); }
@@ -55,7 +55,7 @@ export default function Settings() {
 
   const handleCreateMember = async () => {
     try {
-      const res = await fetch('http://localhost:3000/api/team', {
+      const res = await fetch('/api/team', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newMember)
@@ -73,13 +73,13 @@ export default function Settings() {
 
   const handleDeleteMember = async (id: string) => {
     if (!confirm('Remover este membro?')) return;
-    await fetch(`http://localhost:3000/api/team/${id}`, { method: 'DELETE' });
+    await fetch(`/api/team/${id}`, { method: 'DELETE' });
     fetchTeam();
   };
 
   const handleCreateAIConfig = async () => {
     try {
-      const res = await fetch('http://localhost:3000/api/ai-config', {
+      const res = await fetch('/api/ai-config', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newAIConfig)
@@ -95,7 +95,7 @@ export default function Settings() {
 
   const handleDeleteAIConfig = async (id: string) => {
     if (!confirm('Remover esta configuração?')) return;
-    await fetch(`http://localhost:3000/api/ai-config/${id}`, { method: 'DELETE' });
+    await fetch(`/api/ai-config/${id}`, { method: 'DELETE' });
     fetchAIConfigs();
   };
 
