@@ -12,6 +12,42 @@ const leadSchema = z.object({
   message: z.string().min(1),
 });
 
+// GET /api/leads/stats - Estatísticas dos leads
+router.get('/leads/stats', async (req: Request, res: Response) => {
+  try {
+    const { data: leads, error } = await supabase
+      .from('leads')
+      .select('status, created_at');
+
+    if (error) throw error;
+
+    const total = leads.length;
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+    const recent = leads.filter(l => new Date(l.created_at) > sevenDaysAgo).length;
+    
+    const byStatus = leads.reduce((acc: any, lead) => {
+      const status = lead.status || 'NEW';
+      const existing = acc.find((s: any) => s.status === status);
+      if (existing) {
+        existing._count++;
+      } else {
+        acc.push({ status, _count: 1 });
+      }
+      return acc;
+    }, []);
+
+    res.json({ 
+      success: true, 
+      stats: { total, recent, byStatus } 
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: 'Erro ao gerar estatísticas' });
+  }
+});
+
 // GET /api/leads - Listar leads
 router.get('/leads', async (req: Request, res: Response) => {
   try {
