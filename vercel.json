@@ -1,7 +1,12 @@
-{
+ {
+  "functions": {
+    "api/index.ts": {
+      "runtime": "vercel-node@latest"
+    }
+  },
   "rewrites": [
+    { "source": "/api/:match*", "destination": "/api" },
     { "source": "/painel/:match*", "destination": "/painel/index.html" },
-    { "source": "/api/:match*", "destination": "/api/:match*" },
     { "source": "/((?!api|painel).*)", "destination": "/index.html" }
   ]
 }
