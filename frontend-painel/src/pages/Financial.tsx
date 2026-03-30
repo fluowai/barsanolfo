@@ -1,4 +1,5 @@
 import { DollarSign, Landmark, TrendingUp, TrendingDown, MoreVertical } from 'lucide-react';
+import './Financial.css';
 
 export default function Financial() {
   const summary = [

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Clock, AlertCircle, CheckCircle2 } from 'lucide-react';
+import './Deadlines.css';
 
 interface Deadline {
   id: string;

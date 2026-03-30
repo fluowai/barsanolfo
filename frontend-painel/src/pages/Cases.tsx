@@ -1,6 +1,7 @@
 
 import { useState } from 'react';
 import { Search, Loader, FileText, Calendar, Database, AlertCircle } from 'lucide-react';
+import './Cases.css';
 
 interface ProcessMove {
   dataHora: string;
