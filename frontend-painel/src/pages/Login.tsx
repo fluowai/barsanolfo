@@ -1,78 +1,51 @@
 import Logo from '../components/Logo';
+import './Login.css';
 
 export default function Login() {
   return (
-    <div style={{ 
-      minHeight: '100vh', 
-      display: 'flex', 
-      alignItems: 'center', 
-      justifyContent: 'center',
-      background: 'var(--black)'
-    }}>
-      <div style={{ 
-        width: '100%', 
-        maxWidth: '400px', 
-        padding: '40px',
-        background: 'var(--darker)',
-        borderRadius: '12px',
-        border: '1px solid var(--border)',
-        textAlign: 'center'
-      }}>
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
+    <div className="login-container">
+      <div className="login-card">
+        <div className="login-logo">
           <Logo imgClassName="h-20 w-auto" />
         </div>
-        <h1 style={{ color: 'var(--gold)', marginBottom: '10px' }}>Login</h1>
-        <p style={{ color: 'var(--text-muted)', marginBottom: '30px' }}>Painel Administrativo</p>
         
-        <form>
-          <div style={{ marginBottom: '20px' }}>
-            <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text)', fontSize: '14px' }}>Email</label>
+        <div className="login-header">
+          <h1 className="login-title">Login</h1>
+          <p className="login-subtitle">Painel Administrativo</p>
+        </div>
+        
+        <form className="login-form">
+          <div className="form-group">
+            <label className="form-label" htmlFor="email">Email</label>
             <input 
+              id="email"
               type="email" 
-              style={{ 
-                width: '100%', 
-                padding: '12px', 
-                background: 'var(--black)', 
-                border: '1px solid var(--border)',
-                borderRadius: '6px',
-                color: 'var(--text)',
-                outline: 'none'
-              }}
+              className="form-input"
+              placeholder="seu@email.com"
             />
           </div>
           
-          <div style={{ marginBottom: '30px' }}>
-            <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text)', fontSize: '14px' }}>Senha</label>
+          <div className="form-group">
+            <label className="form-label" htmlFor="password">Senha</label>
             <input 
+              id="password"
               type="password" 
-              style={{ 
-                width: '100%', 
-                padding: '12px', 
-                background: 'var(--black)', 
-                border: '1px solid var(--border)',
-                borderRadius: '6px',
-                color: 'var(--text)',
-                outline: 'none'
-              }}
+              className="form-input"
+              placeholder="••••••••"
             />
           </div>
           
           <button 
             type="submit"
-            style={{ 
-              width: '100%', 
-              padding: '14px', 
-              background: 'var(--gold)', 
-              color: 'var(--black)',
-              border: 'none',
-              borderRadius: '6px',
-              fontWeight: '600',
-              cursor: 'pointer'
-            }}
+            className="login-button"
           >
             Entrar
           </button>
         </form>
+        
+        <div className="login-footer">
+          <p>Primeira vez? Entre em contato com o administrador</p>
+        </div>
       </div>
     </div>
   );
