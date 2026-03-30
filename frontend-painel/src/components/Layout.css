@@ -1,19 +1,20 @@
 .layout {
   display: flex;
   min-height: 100vh;
+  background: var(--black);
 }
 
 .layout-main {
   flex: 1;
   display: flex;
   flex-direction: column;
-  min-width: 0; /* Importante para overflow em flex */
+  min-width: 0;
+  background: linear-gradient(180deg, var(--black) 0%, var(--darker) 100%);
 }
 
 .layout-content {
   flex: 1;
-  padding: 30px;
-  background: var(--black);
+  padding: 40px;
   overflow-y: auto;
   overflow-x: hidden;
 }
@@ -28,14 +29,14 @@
   }
 
   .layout-content {
-    padding: 15px;
+    padding: 24px;
     min-height: calc(100vh - 70px);
   }
 }
 
 @media (max-width: 480px) {
   .layout-content {
-    padding: 10px;
+    padding: 16px;
   }
 }
 

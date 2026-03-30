@@ -1,6 +1,6 @@
 .sidebar {
   width: 260px;
-  background: var(--darker);
+  background: linear-gradient(180deg, var(--darker) 0%, var(--darker-alt) 100%);
   border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
@@ -8,6 +8,7 @@
   position: sticky;
   top: 0;
   transition: transform 0.3s ease;
+  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.5);
 }
 
 .sidebar-header {
@@ -16,6 +17,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background: rgba(212, 175, 55, 0.05);
 }
 
 .sidebar-logo {
@@ -37,8 +39,11 @@
 
 .sidebar-title {
   font-size: 24px;
-  font-weight: bold;
-  color: var(--gold);
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   line-height: 1;
   margin-bottom: 2px;
 }
@@ -83,28 +88,44 @@
   border-left: 3px solid transparent;
   font-size: 14px;
   font-weight: 500;
+  position: relative;
 }
 
 .sidebar-link:hover {
-  background: var(--dark);
-  color: var(--text);
+  background: rgba(212, 175, 55, 0.08);
+  color: var(--gold);
+  border-left-color: var(--gold);
 }
 
 .sidebar-link.active {
-  background: var(--dark);
+  background: rgba(212, 175, 55, 0.1);
   color: var(--gold);
   border-left-color: var(--gold);
+  font-weight: 600;
 }
 
 .sidebar-footer {
   padding: 20px;
   border-top: 1px solid var(--border);
   text-align: center;
+  background: rgba(0, 0, 0, 0.2);
 }
 
 .sidebar-version {
   font-size: 11px;
   color: var(--text-muted);
+}
+
+.view-site-btn {
+  background: transparent !important;
+  border: 1px solid var(--gold) !important;
+  color: var(--gold) !important;
+  font-weight: 600 !important;
+  transition: all 0.2s !important;
+}
+
+.view-site-btn:hover {
+  background: rgba(212, 175, 55, 0.1) !important;
 }
 
 /* Overlay para mobile */
@@ -156,7 +177,7 @@
   }
 
   .sidebar-link span {
-    display: inline; /* Garante que os labels apareçam no mobile */
+    display: inline;
   }
 }
 

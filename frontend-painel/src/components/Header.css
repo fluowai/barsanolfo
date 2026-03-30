@@ -1,5 +1,5 @@
 .header {
-  background: var(--darker);
+  background: linear-gradient(90deg, var(--darker) 0%, var(--dark) 100%);
   border-bottom: 1px solid var(--border);
   padding: 20px 30px;
   display: flex;
@@ -8,6 +8,7 @@
   position: sticky;
   top: 0;
   z-index: 10;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .header-left {
@@ -20,7 +21,10 @@
 .header-title {
   font-size: 20px;
   font-weight: 600;
-  color: var(--text);
+  background: linear-gradient(135deg, var(--text), var(--text-muted));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .menu-toggle {
@@ -41,6 +45,7 @@
   background: var(--dark);
   border-color: var(--gold);
   color: var(--gold);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.2);
 }
 
 .header-right {
@@ -68,13 +73,14 @@
   background: var(--dark);
   border-color: var(--gold);
   color: var(--gold);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.15);
 }
 
 .badge {
   position: absolute;
   top: -5px;
   right: -5px;
-  background: #ef4444;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
   color: white;
   font-size: 10px;
   font-weight: bold;
@@ -82,6 +88,7 @@
   border-radius: 10px;
   min-width: 18px;
   text-align: center;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
 }
 
 .header-user {
@@ -93,10 +100,11 @@
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s;
+  background: rgba(212, 175, 55, 0.05);
 }
 
 .header-user:hover {
-  background: var(--dark);
+  background: rgba(212, 175, 55, 0.1);
   border-color: var(--gold);
 }
 
@@ -104,11 +112,13 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: var(--gold);
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--black);
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(212, 175, 55, 0.2);
 }
 
 .user-info {
