@@ -20,7 +20,7 @@ export default function Sidebar() {
   const { isOpen, closeMenu } = useMobileMenu();
 
   const handleViewSite = () => {
-    window.open('http://localhost:3003', '_blank');
+    window.open('http://localhost:5033', '_blank');
   };
 
   const menuItems = [
