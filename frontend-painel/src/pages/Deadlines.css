@@ -1,0 +1,228 @@
+/* Deadlines Page */
+.deadlines-page {
+  max-width: 1400px;
+  animation: fadeIn 0.3s ease;
+}
+
+.deadlines-header {
+  margin-bottom: 40px;
+  padding-bottom: 30px;
+  border-bottom: 2px solid var(--border);
+}
+
+.deadlines-header h1 {
+  font-size: 32px;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 8px;
+}
+
+.deadlines-header p {
+  font-size: 16px;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* Deadlines Grid */
+.deadlines-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 24px;
+}
+
+.deadline-card {
+  background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.deadline-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(180deg, var(--gold), var(--gold-dark));
+  transition: all 0.3s ease;
+}
+
+.deadline-card.completed::before {
+  background: linear-gradient(180deg, #10b981, #059669);
+}
+
+.deadline-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100px;
+  height: 100px;
+  background: radial-gradient(circle, var(--gold) 0%, transparent 70%);
+  opacity: 0.03;
+  transition: all 0.3s ease;
+}
+
+.deadline-card:hover {
+  border-color: var(--gold);
+  transform: translateY(-8px);
+  box-shadow: 0 12px 30px rgba(212, 175, 55, 0.1);
+}
+
+.deadline-card.completed:hover {
+  border-color: #10b981;
+  box-shadow: 0 12px 30px rgba(16, 185, 129, 0.1);
+}
+
+.deadline-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+  position: relative;
+  z-index: 1;
+}
+
+.deadline-date-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  background: rgba(212, 175, 55, 0.1);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: 12px;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.deadline-card.completed .deadline-date-badge {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.deadline-day {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--gold);
+  line-height: 1;
+}
+
+.deadline-card.completed .deadline-day {
+  color: #10b981;
+}
+
+.deadline-month {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 4px;
+  font-weight: 600;
+}
+
+.deadline-status-icon {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.deadline-card-body {
+  margin-bottom: 16px;
+  position: relative;
+  z-index: 1;
+}
+
+.deadline-title {
+  color: var(--text);
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.deadline-case-number {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.deadline-card-footer {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  position: relative;
+  z-index: 1;
+}
+
+.deadline-action-btn {
+  width: 100%;
+  padding: 12px;
+  background: rgba(212, 175, 55, 0.1);
+  color: var(--gold);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.deadline-action-btn:hover {
+  background: rgba(212, 175, 55, 0.2);
+  border-color: var(--gold);
+}
+
+.deadline-card.completed .deadline-action-btn {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.deadline-card.completed .deadline-action-btn:hover {
+  background: rgba(16, 185, 129, 0.2);
+  border-color: #10b981;
+}
+
+@media (max-width: 768px) {
+  .deadlines-header h1 {
+    font-size: 24px;
+  }
+
+  .deadlines-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+  }
+
+  .deadline-card {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .deadlines-header h1 {
+    font-size: 20px;
+  }
+
+  .deadlines-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .deadline-date-badge {
+    width: 64px;
+    height: 64px;
+  }
+
+  .deadline-day {
+    font-size: 24px;
+  }
+}
