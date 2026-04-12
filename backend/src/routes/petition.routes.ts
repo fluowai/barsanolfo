@@ -133,8 +133,9 @@ router.post('/petition-templates', authMiddleware, async (req: AuthRequest, res:
 
 router.delete('/petition-templates/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
+    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
     await prisma.petitionTemplate.delete({
-      where: { id: req.params.id }
+      where: { id }
     });
     res.json({ success: true, message: 'Template removido' });
   } catch (error) {
@@ -178,8 +179,9 @@ router.post('/petitions', authMiddleware, async (req: AuthRequest, res: Response
 
 router.get('/petitions/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
+    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
     const petition = await prisma.petition.findUnique({
-      where: { id: req.params.id }
+      where: { id }
     });
     if (!petition) {
       res.status(404).json({ success: false, message: 'Petição não encontrada' });
@@ -194,8 +196,9 @@ router.get('/petitions/:id', authMiddleware, async (req: AuthRequest, res: Respo
 
 router.delete('/petitions/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
+    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
     await prisma.petition.delete({
-      where: { id: req.params.id }
+      where: { id }
     });
     res.json({ success: true, message: 'Petição removida' });
   } catch (error) {
