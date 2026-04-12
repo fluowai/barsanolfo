@@ -23,6 +23,9 @@ model Lead {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
+  @@index([status])
+  @@index([createdAt])
+  @@index([email])
   @@map("leads")
 }
 
@@ -85,6 +88,10 @@ model Case {
   deadlines    Deadline[]
   hearings     Hearing[]
 
+  @@index([clientId])
+  @@index([lawyerId])
+  @@index([status])
+  @@index([createdAt])
   @@map("cases")
 }
 
@@ -145,6 +152,10 @@ model Task {
 
   user        User     @relation(fields: [assignedTo], references: [id])
 
+  @@index([assignedTo])
+  @@index([status])
+  @@index([dueDate])
+  @@index([priority])
   @@map("tasks")
 }
 
@@ -166,16 +177,25 @@ model Contract {
 
 // FATURAS
 model Invoice {
-  id         String    @id @default(uuid())
-  contractId String    @map("contract_id")
-  amount     Float
-  dueDate    DateTime  @map("due_date")
-  paidDate   DateTime? @map("paid_date")
-  status     String    @default("PENDING") // PENDING, PAID, OVERDUE, CANCELLED
-  createdAt  DateTime  @default(now()) @map("created_at")
+  id              String    @id @default(uuid())
+  contractId      String    @map("contract_id")
+  clientId        String    @map("client_id")
+  title           String    // Descrição da cobrança
+  amount          Float
+  dueDate         DateTime  @map("due_date")
+  paidDate        DateTime? @map("paid_date")
+  status          String    @default("PENDING") // PENDING, PAID, OVERDUE, CANCELLED
+  paymentMethod   String?   @map("payment_method")
+  notes           String?
+  createdAt       DateTime  @default(now()) @map("created_at")
 
-  contract   Contract  @relation(fields: [contractId], references: [id])
+  contract        Contract  @relation(fields: [contractId], references: [id])
 
+  @@index([contractId])
+  @@index([clientId])
+  @@index([status])
+  @@index([dueDate])
+  @@index([createdAt])
   @@map("invoices")
 }
 
@@ -184,7 +204,7 @@ model Expense {
   id          String   @id @default(uuid())
   description String
   amount      Float
-  category    String?
+  category    String?  // CUSTAS, HONORARIOS, DESPESAS_GERAIS
   date        DateTime
   createdAt   DateTime @default(now())
 
@@ -201,4 +221,140 @@ model AIConfig {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("ai_configs")
+}
+
+// WHATSAPP - Configurações
+model WhatsAppConfig {
+  id             String   @id @default(uuid())
+  autoReply     Boolean  @default(false) @map("auto_reply")
+  welcomeMessage String?  @map("welcome_message")
+  reminderHours  Int      @default(24) @map("reminder_hours")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  @@map("whatsapp_configs")
+}
+
+// WHATSAPP - Templates de Mensagem
+model WhatsAppTemplate {
+  id        String   @id @default(uuid())
+  name      String
+  content   String   // Conteúdo com {{variaveis}}
+  type      String   @default("CUSTOM") // CUSTOM, REMINDER, WELCOME, etc
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("whatsapp_templates")
+}
+
+// WHATSAPP - Contatos
+model WhatsAppContact {
+  id          String    @id @default(uuid())
+  phone       String    @unique
+  name        String?
+  clientId    String?   @map("client_id")
+  lastMessage DateTime? @map("last_message")
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  @@map("whatsapp_contacts")
+}
+
+// WHATSAPP - Mensagens
+model WhatsAppMessage {
+  id         String   @id @default(uuid())
+  phone      String
+  message    String
+  direction  String   // INCOMING, OUTGOING
+  status     String   @default("PENDING") // PENDING, SENT, DELIVERED, READ, FAILED
+  messageId  String?  @map("message_id")
+  templateId String?  @map("template_id")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@map("whatsapp_messages")
+}
+
+// PORTAL DO CLIENTE - Tokens de Acesso
+model ClientAccess {
+  id        String   @id @default(uuid())
+  clientId  String   @map("client_id")
+  token     String   @unique
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("client_access")
+}
+
+// DOCUMENTOS - Assinatura Digital
+model Document {
+  id          String   @id @default(uuid())
+  name        String
+  type        String   // PETITION, CONTRACT, CERTIFICATE, etc
+  content     String   // Base64 do PDF
+  hash        String   // Hash SHA256 para integridade
+  signature   String?  // Assinatura digital (base64)
+  signedAt    DateTime? @map("signed_at")
+  signedBy    String?  @map("signed_by")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("documents")
+}
+
+// CONTABILIDADE - Integração
+model AccountingEntry {
+  id          String   @id @default(uuid())
+  type        String   // INCOME, EXPENSE
+  category    String   // HONORARIOS, CUSTAS, SALARIOS, etc
+  description String
+  amount      Float
+  date        DateTime
+  invoiceId   String?  @map("invoice_id")
+  expenseId   String?  @map("expense_id")
+  synced      Boolean  @default(false) @map("synced")
+  externalId  String?  @map("external_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@map("accounting_entries")
+}
+
+// CONFIGURAÇÕES DE PETIÇÃO (Logo e Rodapé)
+model PetitionConfig {
+  id             String   @id @default(uuid())
+  logoData       String?  @map("logo_data")   // Base64 da logo
+  logoMimeType   String?  @map("logo_mime_type")
+  footerName     String?  @map("footer_name")    // Nome do escritório
+  footerOab      String?  @map("footer_oab")     // Número OAB
+  footerAddress  String?  @map("footer_address") // Endereço
+  footerPhone    String?  @map("footer_phone")   // Telefone
+  footerEmail    String?  @map("footer_email")   // Email
+  footerWebsite  String?  @map("footer_website") // Website
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  @@map("petition_configs")
+}
+
+// MODELOS DE PETIÇÃO (Templates)
+model PetitionTemplate {
+  id          String   @id @default(uuid())
+  name        String
+  content     String   // HTML/Template com placeholders
+  fields      String   // JSON com definições de campos
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("petition_templates")
+}
+
+// PETIÇÕES CRIADAS
+model Petition {
+  id          String   @id @default(uuid())
+  title       String
+  content     String   // HTML final gerado
+  templateId  String?  @map("template_id")
+  caseId      String?  @map("case_id")
+  clientName  String?  @map("client_name")
+  values      String   // JSON com valores dos campos
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("petitions")
 }

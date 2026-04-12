@@ -1,168 +1,203 @@
+/* ============================================
+   HEADER - Professional Style
+   ============================================ */
+
 .header {
-  background: linear-gradient(90deg, var(--darker) 0%, var(--dark) 100%);
-  border-bottom: 1px solid var(--border);
-  padding: 20px 30px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-6);
+  gap: var(--space-4);
 }
 
 .header-left {
-  flex: 1;
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: var(--space-4);
 }
 
 .header-title {
-  font-size: 20px;
+  font-size: var(--font-size-md);
   font-weight: 600;
-  background: linear-gradient(135deg, var(--text), var(--text-muted));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--text-primary);
 }
 
 .menu-toggle {
   display: none;
-  background: transparent;
-  border: 1px solid var(--border);
-  color: var(--text);
-  width: 44px;
-  height: 44px;
-  border-radius: 8px;
+  width: 40px;
+  height: 40px;
   align-items: center;
   justify-content: center;
+  border-radius: var(--radius-md);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all var(--transition-fast);
 }
 
 .menu-toggle:hover {
-  background: var(--dark);
-  border-color: var(--gold);
-  color: var(--gold);
-  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.2);
+  background: var(--bg-secondary);
+  border-color: var(--primary);
+  color: var(--primary);
 }
 
 .header-right {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: var(--space-3);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
 }
 
 .header-btn {
   position: relative;
-  background: transparent;
-  border: 1px solid var(--border);
-  color: var(--text-muted);
   width: 40px;
   height: 40px;
-  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: var(--radius-md);
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all var(--transition-fast);
 }
 
 .header-btn:hover {
-  background: var(--dark);
-  border-color: var(--gold);
-  color: var(--gold);
-  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.15);
+  background: var(--bg-tertiary);
+  border-color: var(--primary);
+  color: var(--primary);
 }
 
-.badge {
+.header-btn .badge-count {
   position: absolute;
-  top: -5px;
-  right: -5px;
-  background: linear-gradient(135deg, #ef4444, #dc2626);
+  top: -4px;
+  right: -4px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--danger);
   color: white;
   font-size: 10px;
-  font-weight: bold;
-  padding: 2px 6px;
-  border-radius: 10px;
-  min-width: 18px;
-  text-align: center;
-  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+  font-weight: 600;
+  border-radius: var(--radius-full);
+  border: 2px solid var(--bg-elevated);
 }
 
 .header-user {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 8px 12px;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--bg-tertiary);
   border: 1px solid var(--border);
-  border-radius: 8px;
   cursor: pointer;
-  transition: all 0.2s;
-  background: rgba(212, 175, 55, 0.05);
+  transition: all var(--transition-fast);
 }
 
 .header-user:hover {
-  background: rgba(212, 175, 55, 0.1);
-  border-color: var(--gold);
+  background: var(--bg-secondary);
+  border-color: var(--border-hover);
 }
 
 .user-avatar {
   width: 36px;
   height: 36px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  border-radius: var(--radius-md);
+  background: var(--primary-gradient);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--black);
+  color: white;
   font-weight: 600;
-  box-shadow: 0 2px 8px rgba(212, 175, 55, 0.2);
+  font-size: var(--font-size-sm);
 }
 
 .user-info {
   display: flex;
   flex-direction: column;
-  gap: 2px;
 }
 
 .user-name {
-  font-size: 14px;
+  font-size: var(--font-size-sm);
   font-weight: 600;
-  color: var(--text);
-  line-height: 1;
+  color: var(--text-primary);
+  line-height: 1.2;
 }
 
 .user-role {
-  font-size: 11px;
-  color: var(--text-muted);
-  line-height: 1;
+  font-size: var(--font-size-xs);
+  color: var(--text-tertiary);
+  line-height: 1.2;
 }
 
-@media (max-width: 768px) {
-  .header {
-    padding: 15px;
-  }
+.header-search {
+  position: relative;
+  width: 280px;
+}
 
-  .header-title {
-    font-size: 16px;
-  }
+.header-search .input {
+  padding-left: 40px;
+  background: var(--bg-tertiary);
+  border-color: transparent;
+}
 
+.header-search .input:focus {
+  background: var(--bg-elevated);
+  border-color: var(--primary);
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-tertiary);
+  pointer-events: none;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 992px) {
   .menu-toggle {
     display: flex;
   }
 
-  .user-info {
+  .header-search {
     display: none;
   }
 
-  .header-user {
-    padding: 6px;
+  .header-title {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .header {
+    padding: var(--space-3) var(--space-4);
   }
 
   .header-right {
-    gap: 10px;
+    gap: var(--space-2);
+  }
+
+  .header-user {
+    padding: var(--space-2);
+  }
+
+  .user-info {
+    display: none;
   }
 
   .header-btn {
@@ -170,14 +205,3 @@
     height: 36px;
   }
 }
-
-@media (max-width: 480px) {
-  .header-title {
-    display: none;
-  }
-
-  .header-user {
-    display: none;
-  }
-}
-

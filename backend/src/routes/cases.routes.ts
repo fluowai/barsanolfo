@@ -1,8 +1,10 @@
-import { Router, Request, Response } from 'express';
+import { Router, Response } from 'express';
 import { z } from 'zod';
-import supabase from '../lib/supabase';
+import { PrismaClient } from '@prisma/client';
+import { authMiddleware, AuthRequest } from '../middleware/auth.middleware';
 
 const router = Router();
+const prisma = new PrismaClient();
 
 const caseSchema = z.object({
   number: z.string(),
@@ -15,19 +17,15 @@ const caseSchema = z.object({
   lawyerId: z.string(),
 });
 
-// GET /api/cases - Listar processos
-router.get('/cases', async (req: Request, res: Response) => {
+router.get('/cases', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const { data: cases, error } = await supabase
-      .from('cases')
-      .select(`
-        *,
-        clients (id, name, email),
-        users (id, name)
-      `)
-      .order('created_at', { ascending: false });
-
-    if (error) throw error;
+    const cases = await prisma.case.findMany({
+      include: {
+        client: { select: { id: true, name: true, email: true } },
+        lawyer: { select: { id: true, name: true } },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
     res.json({ success: true, cases });
   } catch (error) {
     console.error(error);
@@ -35,63 +33,47 @@ router.get('/cases', async (req: Request, res: Response) => {
   }
 });
 
-// POST /api/cases - Criar processo
-router.post('/cases', async (req: Request, res: Response) => {
+router.post('/cases', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
     const data = caseSchema.parse(req.body);
-    const { data: newCase, error } = await supabase
-      .from('cases')
-      .insert({
+    const newCase = await prisma.case.create({
+      data: {
         number: data.number,
         type: data.type,
         court: data.court,
         status: data.status || 'ACTIVE',
         value: data.value,
-        filed_date: data.filedDate,
-        client_id: data.clientId,
-        lawyer_id: data.lawyerId,
-      })
-      .select()
-      .single();
-
-    if (error) {
-      if (error.code === '23505') {
-        return res.status(400).json({ success: false, message: 'Número de processo já cadastrado' });
-      }
-      throw error;
-    }
+        filedDate: data.filedDate ? new Date(data.filedDate) : null,
+        clientId: data.clientId,
+        lawyerId: data.lawyerId,
+      },
+    });
     res.json({ success: true, case: newCase });
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      res.status(400).json({ success: false, message: 'Dados inválidos', errors: error.issues });
+      return;
+    }
     console.error(error);
     res.status(500).json({ success: false, message: 'Erro ao criar processo' });
   }
 });
 
-// POST /api/cases/import - Importar processo do Datajud
-router.post('/cases/import', async (req: Request, res: Response) => {
+router.post('/cases/import', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
     const { numero, tipo, tribunal, valor, clienteId, advogadoId } = req.body;
     
-    const { data: newCase, error } = await supabase
-      .from('cases')
-      .insert({
+    const newCase = await prisma.case.create({
+      data: {
         number: numero,
         type: tipo || 'TRABALHISTA',
         court: tribunal,
         status: 'ACTIVE',
         value: valor,
-        client_id: clienteId,
-        lawyer_id: advogadoId,
-      })
-      .select()
-      .single();
-
-    if (error) {
-      if (error.code === '23505') {
-        return res.status(400).json({ success: false, message: 'Processo já importado' });
-      }
-      throw error;
-    }
+        clientId: clienteId,
+        lawyerId: advogadoId,
+      },
+    });
     res.json({ success: true, case: newCase, message: 'Processo importado com sucesso!' });
   } catch (error) {
     console.error(error);
@@ -99,16 +81,29 @@ router.post('/cases/import', async (req: Request, res: Response) => {
   }
 });
 
-// DELETE /api/cases/:id - Remover processo
-router.delete('/cases/:id', async (req: Request, res: Response) => {
+router.patch('/cases/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const { id } = req.params;
-    const { error } = await supabase
-      .from('cases')
-      .delete()
-      .eq('id', id);
+    const id = String(req.params.id);
+    const data = caseSchema.partial().parse(req.body);
+    const updatedCase = await prisma.case.update({
+      where: { id },
+      data: {
+        ...data,
+        filedDate: data.filedDate ? new Date(data.filedDate) : undefined,
+      },
+    });
+    res.json({ success: true, case: updatedCase });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Erro ao atualizar processo' });
+  }
+});
 
-    if (error) throw error;
+router.delete('/cases/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
+  try {
+    const id = String(req.params.id);
+    await prisma.case.delete({
+      where: { id },
+    });
     res.json({ success: true, message: 'Processo removido' });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Erro ao remover processo' });

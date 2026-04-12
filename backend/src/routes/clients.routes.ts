@@ -1,8 +1,10 @@
-import { Router, Request, Response } from 'express';
+import { Router, Response } from 'express';
 import { z } from 'zod';
-import supabase from '../lib/supabase';
+import { PrismaClient } from '@prisma/client';
+import { authMiddleware, AuthRequest } from '../middleware/auth.middleware';
 
 const router = Router();
+const prisma = new PrismaClient();
 
 const clientSchema = z.object({
   name: z.string().min(1),
@@ -14,15 +16,11 @@ const clientSchema = z.object({
   notes: z.string().optional(),
 });
 
-// GET /api/clients - Listar clientes
-router.get('/clients', async (req: Request, res: Response) => {
+router.get('/clients', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const { data: clients, error } = await supabase
-      .from('clients')
-      .select('*')
-      .order('name', { ascending: true });
-
-    if (error) throw error;
+    const clients = await prisma.client.findMany({
+      orderBy: { name: 'asc' },
+    });
     res.json({ success: true, clients });
   } catch (error) {
     console.error(error);
@@ -30,76 +28,73 @@ router.get('/clients', async (req: Request, res: Response) => {
   }
 });
 
-// GET /api/clients/:id - Buscar cliente por ID
-router.get('/clients/:id', async (req: Request, res: Response) => {
+router.get('/clients/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const { id } = req.params;
-    const { data: client, error } = await supabase
-      .from('clients')
-      .select('*')
-      .eq('id', id)
-      .single();
-
-    if (error) throw error;
-    res.json({ success: true, client });
-  } catch (error) {
-    res.status(404).json({ success: false, message: 'Cliente não encontrado' });
-  }
-});
-
-// POST /api/clients - Criar cliente
-router.post('/clients', async (req: Request, res: Response) => {
-  try {
-    const data = clientSchema.parse(req.body);
-    const { data: client, error } = await supabase
-      .from('clients')
-      .insert(data)
-      .select()
-      .single();
-
-    if (error) {
-      if (error.code === '23505') {
-        return res.status(400).json({ success: false, message: 'CPF já cadastrado' });
-      }
-      throw error;
+    const id = String(req.params.id);
+    const client = await prisma.client.findUnique({
+      where: { id },
+    });
+    if (!client) {
+      res.status(404).json({ success: false, message: 'Cliente não encontrado' });
+      return;
     }
     res.json({ success: true, client });
   } catch (error) {
+    res.status(500).json({ success: false, message: 'Erro ao buscar cliente' });
+  }
+});
+
+router.post('/clients', authMiddleware, async (req: AuthRequest, res: Response) => {
+  try {
+    const data = clientSchema.parse(req.body);
+    const client = await prisma.client.create({
+      data,
+    });
+    res.json({ success: true, client });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      res.status(400).json({ success: false, message: 'Dados inválidos', errors: error.issues });
+      return;
+    }
     console.error(error);
     res.status(500).json({ success: false, message: 'Erro ao criar cliente' });
   }
 });
 
-// PUT /api/clients/:id - Atualizar cliente
-router.put('/clients/:id', async (req: Request, res: Response) => {
+router.put('/clients/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const { id } = req.params;
+    const id = String(req.params.id);
     const data = clientSchema.parse(req.body);
-    
-    const { data: client, error } = await supabase
-      .from('clients')
-      .update(data)
-      .eq('id', id)
-      .select()
-      .single();
-
-    if (error) throw error;
+    const client = await prisma.client.update({
+      where: { id },
+      data,
+    });
     res.json({ success: true, client });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Erro ao atualizar cliente' });
   }
 });
 
-// DELETE /api/clients/:id - Remover cliente
-router.delete('/clients/:id', async (req: Request, res: Response) => {
+router.patch('/clients/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const { id } = req.params;
-    const { error } = await supabase
-      .from('clients')
-      .delete()
-      .eq('id', id);
+    const id = String(req.params.id);
+    const data = clientSchema.partial().parse(req.body);
+    const client = await prisma.client.update({
+      where: { id },
+      data,
+    });
+    res.json({ success: true, client });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Erro ao atualizar cliente' });
+  }
+});
 
-    if (error) throw error;
+router.delete('/clients/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
+  try {
+    const id = String(req.params.id);
+    await prisma.client.delete({
+      where: { id },
+    });
     res.json({ success: true, message: 'Cliente removido' });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Erro ao remover cliente' });

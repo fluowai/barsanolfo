@@ -1,7 +1,42 @@
+import { useState, FormEvent } from 'react';
 import Logo from '../components/Logo';
+import { STORAGE_KEYS } from '../constants';
 import './Login.css';
 
 export default function Login() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, data.accessToken);
+        localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(data.user));
+        window.location.reload();
+      } else {
+        setError(data.message || 'Email ou senha incorretos');
+      }
+    } catch (err) {
+      setError('Erro ao conectar com o servidor');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="login-container">
       <div className="login-card">
@@ -14,7 +49,9 @@ export default function Login() {
           <p className="login-subtitle">Painel Administrativo</p>
         </div>
         
-        <form className="login-form">
+        <form className="login-form" onSubmit={handleSubmit}>
+          {error && <div className="error-message">{error}</div>}
+          
           <div className="form-group">
             <label className="form-label" htmlFor="email">Email</label>
             <input 
@@ -22,6 +59,9 @@ export default function Login() {
               type="email" 
               className="form-input"
               placeholder="seu@email.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
             />
           </div>
           
@@ -32,19 +72,23 @@ export default function Login() {
               type="password" 
               className="form-input"
               placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
             />
           </div>
           
           <button 
             type="submit"
             className="login-button"
+            disabled={loading}
           >
-            Entrar
+            {loading ? 'Entrando...' : 'Entrar'}
           </button>
         </form>
         
         <div className="login-footer">
-          <p>Primeira vez? Entre em contato com o administrador</p>
+          <p>Credenciais padrão: admin@barsaadvocacia.com.br / admin123</p>
         </div>
       </div>
     </div>

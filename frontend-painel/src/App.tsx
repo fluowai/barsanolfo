@@ -1,5 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { MobileMenuProvider } from './contexts/MobileMenuContext';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
 import Leads from './pages/Leads';
@@ -10,36 +12,93 @@ import Settings from './pages/Settings';
 import Login from './pages/Login';
 import Deadlines from './pages/Deadlines';
 import Tasks from './pages/Tasks';
+import Petitions from './pages/Petitions';
+import PetitionSettings from './pages/PetitionSettings';
+import Jurisprudence from './pages/Jurisprudence';
+import WhatsApp from './pages/WhatsApp';
 import './App.css';
+import { STORAGE_KEYS } from './constants';
 
 function App() {
-  // TODO: Implementar autenticação real
-  const isAuthenticated = true;
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
+    if (token) {
+      fetch('/api/auth/me', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            setIsAuthenticated(true);
+          } else {
+            localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
+            localStorage.removeItem(STORAGE_KEYS.USER);
+            setIsAuthenticated(false);
+          }
+        })
+        .catch(() => {
+          localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
+          localStorage.removeItem(STORAGE_KEYS.USER);
+          setIsAuthenticated(false);
+        });
+    } else {
+      setIsAuthenticated(false);
+    }
+  }, []);
+
+  if (isAuthenticated === null) {
+    return (
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '100vh',
+        background: '#1a1a1a',
+        color: '#d4af37',
+        fontFamily: 'system-ui, sans-serif'
+      }}>
+        Carregando...
+      </div>
+    );
+  }
 
   if (!isAuthenticated) {
-    return <Login />;
+    return (
+      <ErrorBoundary>
+        <Login />
+      </ErrorBoundary>
+    );
   }
 
   return (
-    <MobileMenuProvider>
-      <BrowserRouter basename="/painel">
-        <Routes>
-          <Route path="/" element={<Layout />}>
-            <Route index element={<Dashboard />} />
-            <Route path="leads" element={<Leads />} />
-            <Route path="clientes" element={<Clients />} />
-            <Route path="processos" element={<Cases />} />
-            <Route path="prazos" element={<Deadlines />} />
-            <Route path="tarefas" element={<Tasks />} />
-            <Route path="financeiro" element={<Financial />} />
-            <Route path="configuracoes" element={<Settings />} />
-          </Route>
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </BrowserRouter>
-    </MobileMenuProvider>
+    <ErrorBoundary>
+      <MobileMenuProvider>
+        <BrowserRouter basename="/painel">
+          <Routes>
+            <Route path="/" element={<Layout />}>
+              <Route index element={<Dashboard />} />
+              <Route path="leads" element={<Leads />} />
+              <Route path="clientes" element={<Clients />} />
+              <Route path="processos" element={<Cases />} />
+              <Route path="prazos" element={<Deadlines />} />
+              <Route path="tarefas" element={<Tasks />} />
+              <Route path="financeiro" element={<Financial />} />
+              <Route path="peticoes" element={<Petitions />} />
+              <Route path="peticoes/configuracoes" element={<PetitionSettings />} />
+              <Route path="jurisprudencia" element={<Jurisprudence />} />
+              <Route path="whatsapp" element={<WhatsApp />} />
+              <Route path="configuracoes" element={<Settings />} />
+            </Route>
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </BrowserRouter>
+      </MobileMenuProvider>
+    </ErrorBoundary>
   );
 }
 
 export default App;
-

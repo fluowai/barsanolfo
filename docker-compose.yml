@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  # ============================================
+  # Backend API
+  # ============================================
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: barsa-api
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      PORT: 5032
+      DATABASE_URL: file:./prisma/dev.db
+      JWT_SECRET: ${JWT_SECRET:-change-me-in-production}
+      SUPABASE_URL: ${SUPABASE_URL}
+      SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY}
+      SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY}
+      DATAJUD_API_KEY: ${DATAJUD_API_KEY}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      ALLOWED_ORIGINS: http://localhost:5032,http://localhost:5033,http://localhost:3001
+      LOG_LEVEL: info
+    ports:
+      - "5032:5032"
+    volumes:
+      - ./backend/prisma:/app/backend/prisma
+      - ./backend/whatsapp-sessions:/app/backend/whatsapp-sessions
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5032/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - barsa-network
+
+  # ============================================
+  # PostgreSQL (Opcional - Descomente para usar em produção)
+  # ============================================
+  # postgres:
+  #   image: postgres:15-alpine
+  #   container_name: barsa-postgres
+  #   restart: unless-stopped
+  #   environment:
+  #     POSTGRES_USER: barsa
+  #     POSTGRES_PASSWORD: ${DB_PASSWORD:-change-me}
+  #     POSTGRES_DB: barsa_db
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   ports:
+  #     - "5432:5432"
+  #   networks:
+  #     - barsa-network
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U barsa"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+
+networks:
+  barsa-network:
+    driver: bridge
+
+# volumes:
+#   postgres_data:

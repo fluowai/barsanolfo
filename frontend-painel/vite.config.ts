@@ -15,7 +15,7 @@ export default defineConfig({
   },
   base: '/painel/',
   build: {
-    outDir: '../dist/painel',
+    outDir: './dist',
     emptyOutDir: true,
   }
 })

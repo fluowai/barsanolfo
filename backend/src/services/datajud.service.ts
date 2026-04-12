@@ -1,4 +1,3 @@
-
 export class DatajudService {
   private static API_KEY = 'APIKey cDZHYzlZa0JadVREZDJCendQbXY6SkJlTzNjLV9TRENyQk1RdnFKZGRQdw==';
   private static BASE_URL = 'https://api-publica.datajud.cnj.jus.br';
@@ -12,45 +11,29 @@ export class DatajudService {
     '26': 'tjsp', '27': 'tjto'
   };
 
-  /**
-   * Determina o alias do tribunal (api_publica_alias) baseado no número CNJ
-   * Formato CNJ: NNNNNNN-DD.AAAA.J.TR.OOOO
-   */
+  private static TRT_TO_ALIAS: Record<string, string> = {
+    '1': 'trt1', '2': 'trt2', '3': 'trt3', '4': 'trt4', '5': 'trt5',
+    '6': 'trt6', '7': 'trt7', '8': 'trt8', '9': 'trt9', '10': 'trt10',
+    '11': 'trt11', '12': 'trt12', '13': 'trt13', '14': 'trt14', '15': 'trt15',
+    '16': 'trt16', '17': 'trt17', '18': 'trt18', '19': 'trt19', '20': 'trt20',
+    '21': 'trt21', '22': 'trt22', '23': 'trt23', '24': 'trt24'
+  };
+
   private static getTribunalAlias(cnjRaw: string): string | null {
-    // Remove caracteres não numéricos
     const cnj = cnjRaw.replace(/\D/g, '');
     
     if (cnj.length < 20) return null;
 
-    // Extrair componentes
-    // NNNNNNN (7) DD (2) AAAA (4) J (1) TR (2) OOOO (4)
-    // 0123456     78     9012     3     45     6789
-    
-    // Posições baseadas em 0 (tamanho 20)
-    // J está no índice 13
-    // TR está nos índices 14, 15
-    
     const j = cnj.substring(13, 14);
     const tr = cnj.substring(14, 16);
 
-    // Justiça Federal (J=4)
-    if (j === '4') {
-      return `trf${parseInt(tr)}`; // trf1, trf2...
-    }
+    if (j === '4') return `trf${parseInt(tr)}`;
+    if (j === '5') return this.TRT_TO_ALIAS[tr] || null;
+    if (j === '8') return this.TR_TO_STATE_ALIAS[tr] || null;
+    if (j === '1') return 'stf';
+    if (j === '2') return 'stj';
+    if (j === '3') return 'tst';
 
-    // Justiça do Trabalho (J=5)
-    if (j === '5') {
-      return `trt${parseInt(tr)}`; // trt1... trt24
-    }
-
-    // Justiça Estadual (J=8)
-    if (j === '8') {
-      return this.TR_TO_STATE_ALIAS[tr] || null;
-    }
-
-    // Tribunais Superiores (J=1, 2, 3, etc - Implementar conforme demanda)
-    // Por enquanto foca nos principais
-    
     return null;
   }
 
@@ -59,7 +42,7 @@ export class DatajudService {
     const alias = this.getTribunalAlias(cleanNumber);
 
     if (!alias) {
-      throw new Error('Não foi possível identificar o tribunal pelo número do processo ou tribunal não suportado.');
+      throw new Error('Não foi possível identificar o tribunal pelo número do processo.');
     }
 
     const endpoint = `${this.BASE_URL}/api_publica_${alias}/_search`;
@@ -89,7 +72,7 @@ export class DatajudService {
         throw new Error(`Erro API Datajud (${response.status}): ${errorText}`);
       }
 
-      const data = await response.json();
+      const data: any = await response.json();
       return {
         alias,
         tribunal: alias.toUpperCase(),
@@ -99,6 +82,150 @@ export class DatajudService {
 
     } catch (error) {
       console.error('❌ Erro na consulta Datajud:', error);
+      throw error;
+    }
+  }
+
+  public static async getMovements(processNumber: string) {
+    const result = await this.searchProcess(processNumber);
+    
+    if (result.processes && result.processes.length > 0) {
+      const processo = result.processes[0];
+      return processo.movimentacoes || [];
+    }
+    
+    return [];
+  }
+
+  public static async searchJurisprudence(
+    query: string, 
+    court?: string, 
+    theme?: string, 
+    page: number = 0, 
+    size: number = 10
+  ) {
+    const aliases = court ? [court] : ['tjgo', 'tst', 'stj', 'stf'];
+    const allResults: any[] = [];
+    let totalHits = 0;
+
+    for (const alias of aliases) {
+      const endpoint = `${this.BASE_URL}/api_publica_${alias}/_search`;
+      
+      const mustClauses: any[] = [];
+      mustClauses.push({
+        match: {
+          conteudo: query
+        }
+      });
+
+      if (theme) {
+        mustClauses.push({
+          match: {
+            tema: theme
+          }
+        });
+      }
+
+      const payload = {
+        query: {
+          bool: {
+            must: mustClauses
+          }
+        },
+        from: page * size,
+        size: size,
+        sort: [
+          { dataPublicacao: { order: 'desc' } }
+        ]
+      };
+
+      try {
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: {
+            'Authorization': this.API_KEY,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (response.ok) {
+          const data: any = await response.json();
+          const hits = data.hits?.hits?.map((hit: any) => ({
+            ...hit._source,
+            tribunal: alias.toUpperCase(),
+            score: hit._score
+          })) || [];
+          
+          allResults.push(...hits);
+          totalHits += data.hits?.total?.value || 0;
+        }
+      } catch (error) {
+        console.error(`Erro na busca ${alias}:`, error);
+      }
+    }
+
+    return {
+      results: allResults.slice(0, size),
+      total: totalHits,
+      page,
+      size,
+      query
+    };
+  }
+
+  public static async getAvailableCourts() {
+    return [
+      { id: 'tjgo', name: 'TJGO - Tribunal de Justiça de Goiás' },
+      { id: 'trt18', name: 'TRT 18 - Goiás' },
+      { id: 'tst', name: 'TST - Tribunal Superior do Trabalho' },
+      { id: 'stj', name: 'STJ - Superior Tribunal de Justiça' },
+      { id: 'stf', name: 'STF - Supremo Tribunal Federal' },
+      { id: 'tjsp', name: 'TJSP - Tribunal de Justiça de São Paulo' },
+      { id: 'tjrj', name: 'TJRJ - Tribunal de Justiça do Rio de Janeiro' },
+      { id: 'tjmg', name: 'TJMG - Tribunal de Justiça de Minas Gerais' },
+      { id: 'tjrs', name: 'TJRS - Tribunal de Justiça do Rio Grande do Sul' },
+      { id: 'tjpe', name: 'TJPE - Tribunal de Justiça de Pernambuco' },
+    ];
+  }
+
+  public static async getJudges(court: string) {
+    const endpoint = `${this.BASE_URL}/api_publica_${court}/_search`;
+    
+    const payload = {
+      size: 0,
+      aggs: {
+        magistrates: {
+          terms: {
+            field: 'magistrado',
+            size: 100
+          }
+        }
+      }
+    };
+
+    try {
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Authorization': this.API_KEY,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao buscar magistrados');
+      }
+
+      const data: any = await response.json();
+      return data.aggregations?.magistrates?.buckets?.map((bucket: any) => ({
+        name: bucket.key,
+        count: bucket.doc_count
+      })) || [];
+
+    } catch (error) {
+      console.error('Erro ao buscar magistrados:', error);
       throw error;
     }
   }

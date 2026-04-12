@@ -1,7 +1,11 @@
+/* ============================================
+   LAYOUT
+   ============================================ */
+
 .layout {
   display: flex;
   min-height: 100vh;
-  background: var(--black);
+  background: var(--bg-secondary);
 }
 
 .layout-main {
@@ -9,34 +13,30 @@
   display: flex;
   flex-direction: column;
   min-width: 0;
-  background: linear-gradient(180deg, var(--black) 0%, var(--darker) 100%);
+  margin-left: var(--sidebar-width);
+  transition: margin-left var(--transition-base);
+}
+
+.layout-header {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  background: var(--bg-elevated);
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
 }
 
 .layout-content {
   flex: 1;
-  padding: 40px;
   overflow-y: auto;
-  overflow-x: hidden;
+  background: var(--bg-secondary);
 }
 
-@media (max-width: 768px) {
-  .layout {
-    flex-direction: column;
-  }
-
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 992px) {
   .layout-main {
-    width: 100%;
-  }
-
-  .layout-content {
-    padding: 24px;
-    min-height: calc(100vh - 70px);
+    margin-left: 0;
   }
 }
-
-@media (max-width: 480px) {
-  .layout-content {
-    padding: 16px;
-  }
-}
-

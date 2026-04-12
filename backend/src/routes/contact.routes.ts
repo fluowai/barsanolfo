@@ -1,8 +1,10 @@
 import { Router, Request, Response } from 'express';
 import { z } from 'zod';
-import supabase from '../lib/supabase';
+import { PrismaClient } from '@prisma/client';
+import { authMiddleware, AuthRequest } from '../middleware/auth.middleware';
 
 const router = Router();
+const prisma = new PrismaClient();
 
 const leadSchema = z.object({
   name: z.string().min(1),
@@ -12,24 +14,21 @@ const leadSchema = z.object({
   message: z.string().min(1),
 });
 
-// GET /api/leads/stats - Estatísticas dos leads
-router.get('/leads/stats', async (req: Request, res: Response) => {
+router.get('/leads/stats', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const { data: leads, error } = await supabase
-      .from('leads')
-      .select('status, created_at');
-
-    if (error) throw error;
+    const leads = await prisma.lead.findMany({
+      select: { status: true, createdAt: true },
+    });
 
     const total = leads.length;
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-    const recent = leads.filter(l => new Date(l.created_at) > sevenDaysAgo).length;
+    const recent = leads.filter(l => l.createdAt > sevenDaysAgo).length;
     
-    const byStatus = leads.reduce((acc: any, lead) => {
+    const byStatus = leads.reduce((acc: { status: string; _count: number }[], lead) => {
       const status = lead.status || 'NEW';
-      const existing = acc.find((s: any) => s.status === status);
+      const existing = acc.find(s => s.status === status);
       if (existing) {
         existing._count++;
       } else {
@@ -48,15 +47,11 @@ router.get('/leads/stats', async (req: Request, res: Response) => {
   }
 });
 
-// GET /api/leads - Listar leads
-router.get('/leads', async (req: Request, res: Response) => {
+router.get('/leads', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const { data: leads, error } = await supabase
-      .from('leads')
-      .select('*')
-      .order('created_at', { ascending: false });
-
-    if (error) throw error;
+    const leads = await prisma.lead.findMany({
+      orderBy: { createdAt: 'desc' },
+    });
     res.json({ success: true, leads });
   } catch (error) {
     console.error(error);
@@ -64,58 +59,52 @@ router.get('/leads', async (req: Request, res: Response) => {
   }
 });
 
-// POST /api/contact - Criar lead (formulário de contato)
 router.post('/contact', async (req: Request, res: Response) => {
   try {
     const data = leadSchema.parse(req.body);
-    const { data: lead, error } = await supabase
-      .from('leads')
-      .insert({
-        ...data,
+    const lead = await prisma.lead.create({
+      data: {
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        type: data.type,
+        message: data.message,
         source: 'WEBSITE',
-        status: 'NEW'
-      })
-      .select()
-      .single();
-
-    if (error) throw error;
+        status: 'NEW',
+      },
+    });
     res.json({ success: true, lead, message: 'Mensagem enviada com sucesso!' });
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      res.status(400).json({ success: false, message: 'Dados inválidos', errors: error.issues });
+      return;
+    }
     console.error(error);
     res.status(500).json({ success: false, message: 'Erro ao enviar mensagem' });
   }
 });
 
-// PUT /api/leads/:id/status - Atualizar status do lead
-router.put('/leads/:id/status', async (req: Request, res: Response) => {
+router.put('/leads/:id/status', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const { id } = req.params;
+    const id = String(req.params.id);
     const { status } = req.body;
     
-    const { data: lead, error } = await supabase
-      .from('leads')
-      .update({ status })
-      .eq('id', id)
-      .select()
-      .single();
-
-    if (error) throw error;
+    const lead = await prisma.lead.update({
+      where: { id },
+      data: { status },
+    });
     res.json({ success: true, lead });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Erro ao atualizar status' });
   }
 });
 
-// DELETE /api/leads/:id - Remover lead
-router.delete('/leads/:id', async (req: Request, res: Response) => {
+router.delete('/leads/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const { id } = req.params;
-    const { error } = await supabase
-      .from('leads')
-      .delete()
-      .eq('id', id);
-
-    if (error) throw error;
+    const id = String(req.params.id);
+    await prisma.lead.delete({
+      where: { id },
+    });
     res.json({ success: true, message: 'Lead removido' });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Erro ao remover lead' });

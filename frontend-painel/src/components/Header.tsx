@@ -1,40 +1,79 @@
-import { Bell, User, LogOut, Menu } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Bell, Menu, Search, LogOut, User } from 'lucide-react';
 import { useMobileMenu } from '../contexts/MobileMenuContext';
+import { STORAGE_KEYS } from '../constants';
 import './Header.css';
 
 export default function Header() {
   const { openMenu } = useMobileMenu();
+  const [user, setUser] = useState<{ name: string; email: string; role: string } | null>(null);
+
+  useEffect(() => {
+    const userData = localStorage.getItem(STORAGE_KEYS.USER);
+    if (userData) {
+      try {
+        setUser(JSON.parse(userData));
+      } catch (e) {
+        console.error('Error parsing user data');
+      }
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
+    localStorage.removeItem(STORAGE_KEYS.USER);
+    window.location.href = '/painel/login';
+  };
+
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(n => n[0])
+      .slice(0, 2)
+      .join('')
+      .toUpperCase();
+  };
 
   return (
     <header className="header">
       <div className="header-left">
-        <button className="menu-toggle" onClick={openMenu} title="Menu">
-          <Menu size={24} />
+        <button className="menu-toggle" onClick={openMenu} aria-label="Abrir menu">
+          <Menu size={20} />
         </button>
-        <h2 className="header-title">Painel Administrativo</h2>
+        <h1 className="header-title">Painel de Controle</h1>
       </div>
 
       <div className="header-right">
-        <button className="header-btn" title="Notificações">
-          <Bell size={20} />
-          <span className="badge">3</span>
-        </button>
+        <div className="header-search">
+          <Search size={18} className="search-icon" />
+          <input 
+            type="text" 
+            className="input" 
+            placeholder="Buscar..." 
+          />
+        </div>
 
-        <div className="header-user">
+        <div className="header-actions">
+          <button className="header-btn" title="Notificações">
+            <Bell size={18} />
+            <span className="badge-count">3</span>
+          </button>
+        </div>
+
+        <div className="header-user" role="button" tabIndex={0}>
           <div className="user-avatar">
-            <User size={18} />
+            {user ? getInitials(user.name) : <User size={16} />}
           </div>
           <div className="user-info">
-            <p className="user-name">Admin</p>
-            <p className="user-role">Administrador</p>
+            <span className="user-name">{user?.name || 'Usuário'}</span>
+            <span className="user-role">{user?.role === 'ADMIN' ? 'Administrador' : 'Usuário'}</span>
           </div>
         </div>
 
-        <button className="header-btn" title="Sair">
-          <LogOut size={20} />
+        <button className="header-btn" onClick={handleLogout} title="Sair">
+          <LogOut size={18} />
         </button>
       </div>
     </header>
   );
 }
-

@@ -1,8 +1,30 @@
-import { useEffect, useState } from 'react';
-import { Search, Plus, Edit, Trash2, X } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { 
+  Users, 
+  Plus, 
+  Search, 
+  Edit, 
+  Trash2, 
+  Eye, 
+  Phone, 
+  Mail, 
+  FileText,
+  Calendar
+} from 'lucide-react';
+import { STORAGE_KEYS } from '../constants';
 import './Clients.css';
 
 interface Client {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  cpf?: string;
+  address?: string;
+  createdAt: string;
+}
+
+interface ClientDetail {
   id: string;
   name: string;
   email: string;
@@ -12,14 +34,17 @@ interface Client {
   address?: string;
   notes?: string;
   createdAt: string;
+  cases: any[];
 }
 
 export default function Clients() {
   const [clients, setClients] = useState<Client[]>([]);
+  const [filteredClients, setFilteredClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [showModal, setShowModal] = useState(false);
-  const [editingClient, setEditingClient] = useState<Client | null>(null);
+  const [showForm, setShowForm] = useState(false);
+  const [editingClient, setEditingClient] = useState<ClientDetail | null>(null);
+  const [viewingClient, setViewingClient] = useState<ClientDetail | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -27,244 +52,167 @@ export default function Clients() {
     cpf: '',
     rg: '',
     address: '',
-    notes: '',
+    notes: ''
   });
 
   useEffect(() => {
     fetchClients();
   }, []);
 
+  useEffect(() => {
+    filterClients();
+  }, [searchTerm, clients]);
+
+  const getAuthHeaders = () => ({
+    'Authorization': `Bearer ${localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN)}`
+  });
+
   const fetchClients = async () => {
     try {
-      const response = await fetch('/api/clients');
-      const data = await response.json();
+      const res = await fetch('/api/clients', { headers: getAuthHeaders() });
+      const data = await res.json();
       if (data.success) {
         setClients(data.clients);
       }
-    } catch (error) {
-      console.error('Erro ao carregar clientes:', error);
+    } catch (err) {
+      console.error(err);
     } finally {
       setLoading(false);
     }
   };
 
+  const filterClients = () => {
+    if (!searchTerm) {
+      setFilteredClients(clients);
+      return;
+    }
+    const term = searchTerm.toLowerCase();
+    setFilteredClients(clients.filter(c => 
+      c.name.toLowerCase().includes(term) ||
+      c.email.toLowerCase().includes(term) ||
+      c.phone.includes(term) ||
+      (c.cpf && c.cpf.includes(term))
+    ));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    const url = editingClient ? `/api/clients/${editingClient.id}` : '/api/clients';
+    const method = editingClient ? 'PUT' : 'POST';
+
     try {
-      const url = editingClient
-        ? `/api/clients/${editingClient.id}`
-        : '/api/clients';
-      
-      const method = editingClient ? 'PATCH' : 'POST';
-
-      const response = await fetch(url, {
+      const res = await fetch(url, {
         method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
       });
-
-      const data = await response.json();
-
+      const data = await res.json();
+      
       if (data.success) {
         fetchClients();
-        closeModal();
+        resetForm();
       } else {
-        alert(data.message || 'Erro ao salvar cliente');
+        alert(data.message);
       }
-    } catch (error) {
-      console.error('Erro ao salvar cliente:', error);
-      alert('Erro ao salvar cliente');
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleEdit = (client: Client) => {
+    setEditingClient(client as any);
+    setFormData({
+      name: client.name,
+      email: client.email,
+      phone: client.phone,
+      cpf: client.cpf || '',
+      rg: '',
+      address: client.address || '',
+      notes: ''
+    });
+    setShowForm(true);
+  };
+
+  const handleView = async (clientId: string) => {
+    try {
+      const res = await fetch(`/api/clients/${clientId}`, { headers: getAuthHeaders() });
+      const data = await res.json();
+      if (data.success) {
+        setViewingClient(data.client);
+      }
+    } catch (err) {
+      console.error(err);
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Tem certeza que deseja deletar este cliente?')) return;
-
+    if (!confirm('Tem certeza que deseja excluir este cliente?')) return;
+    
     try {
-      const response = await fetch(`/api/clients/${id}`, {
-        method: 'DELETE',
+      await fetch(`/api/clients/${id}`, { 
+        method: 'DELETE', 
+        headers: getAuthHeaders() 
       });
-
-      const data = await response.json();
-
-      if (data.success) {
-        fetchClients();
-      } else {
-        alert(data.message || 'Erro ao deletar cliente');
-      }
-    } catch (error) {
-      console.error('Erro ao deletar cliente:', error);
-      alert('Erro ao deletar cliente');
+      fetchClients();
+    } catch (err) {
+      console.error(err);
     }
   };
 
-  const openModal = (client?: Client) => {
-    if (client) {
-      setEditingClient(client);
-      setFormData({
-        name: client.name,
-        email: client.email,
-        phone: client.phone,
-        cpf: client.cpf || '',
-        rg: client.rg || '',
-        address: client.address || '',
-        notes: client.notes || '',
-      });
-    } else {
-      setEditingClient(null);
-      setFormData({
-        name: '',
-        email: '',
-        phone: '',
-        cpf: '',
-        rg: '',
-        address: '',
-        notes: '',
-      });
-    }
-    setShowModal(true);
-  };
-
-  const closeModal = () => {
-    setShowModal(false);
+  const resetForm = () => {
+    setShowForm(false);
     setEditingClient(null);
-    setFormData({
-      name: '',
-      email: '',
-      phone: '',
-      cpf: '',
-      rg: '',
-      address: '',
-      notes: '',
-    });
+    setFormData({ name: '', email: '', phone: '', cpf: '', rg: '', address: '', notes: '' });
   };
 
-  const filteredClients = clients.filter(client =>
-    client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    client.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (client.cpf && client.cpf.includes(searchTerm))
-  );
+  const formatDate = (dateStr: string) => {
+    return new Date(dateStr).toLocaleDateString('pt-BR');
+  };
 
   if (loading) {
-    return <div className="loading">Carregando clientes...</div>;
+    return <div className="page-loading">Carregando...</div>;
   }
 
   return (
-    <div className="clients-page">
+    <div className="page clients-page">
       <div className="page-header">
         <div>
-          <h1 className="page-title">Gestão de Clientes</h1>
-          <p className="page-subtitle">{filteredClients.length} clientes encontrados</p>
+          <h1>Clientes</h1>
+          <p>{clients.length} clientes cadastrados</p>
         </div>
-        <button className="btn-primary" onClick={() => openModal()}>
-          <Plus size={20} />
-          Novo Cliente
+        <button className="btn btn-primary" onClick={() => setShowForm(true)}>
+          <Plus size={18} /> Novo Cliente
         </button>
       </div>
 
-      <div className="filters-bar">
-        <div className="search-box">
-          <Search size={20} />
-          <input
-            type="text"
-            placeholder="Buscar por nome, email ou CPF..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
+      {/* Search */}
+      <div className="search-bar">
+        <Search size={18} />
+        <input
+          type="text"
+          placeholder="Buscar por nome, email, CPF..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
       </div>
 
-      <div className="clients-grid">
-        {filteredClients.map((client) => (
-          <div key={client.id} className="client-card">
-            <div className="client-card-header">
-              <h3>{client.name}</h3>
-              <div className="client-actions">
-                <button className="btn-icon" onClick={() => openModal(client)} title="Editar">
-                  <Edit size={18} />
-                </button>
-                <button className="btn-icon btn-danger" onClick={() => handleDelete(client.id)} title="Deletar">
-                  <Trash2 size={18} />
-                </button>
-              </div>
-            </div>
-            <div className="client-card-body">
-              <div className="client-info">
-                <span className="label">Email:</span>
-                <span>{client.email}</span>
-              </div>
-              <div className="client-info">
-                <span className="label">Telefone:</span>
-                <span>{client.phone}</span>
-              </div>
-              {client.cpf && (
-                <div className="client-info">
-                  <span className="label">CPF:</span>
-                  <span>{client.cpf}</span>
-                </div>
-              )}
-              {client.address && (
-                <div className="client-info">
-                  <span className="label">Endereço:</span>
-                  <span>{client.address}</span>
-                </div>
-              )}
-            </div>
-            <div className="client-card-footer">
-              <span className="client-date">
-                Cadastrado em {new Date(client.createdAt).toLocaleDateString('pt-BR')}
-              </span>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {filteredClients.length === 0 && (
-        <div className="empty-state">
-          <p>Nenhum cliente encontrado</p>
-          <button className="btn-primary" onClick={() => openModal()}>
-            <Plus size={20} />
-            Adicionar Primeiro Cliente
-          </button>
-        </div>
-      )}
-
-      {showModal && (
-        <div className="modal-overlay" onClick={closeModal}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+      {/* Client Form Modal */}
+      {showForm && (
+        <div className="modal-overlay">
+          <div className="modal">
             <div className="modal-header">
               <h2>{editingClient ? 'Editar Cliente' : 'Novo Cliente'}</h2>
-              <button className="btn-close" onClick={closeModal}>
-                <X size={24} />
-              </button>
+              <button className="btn-close" onClick={resetForm}>×</button>
             </div>
-            <form onSubmit={handleSubmit}>
-              <div className="form-grid">
+            <form onSubmit={handleSubmit} className="modal-body">
+              <div className="form-row">
                 <div className="form-group">
-                  <label>Nome *</label>
+                  <label>Nome Completo *</label>
                   <input
                     type="text"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Email *</label>
-                  <input
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Telefone *</label>
-                  <input
-                    type="tel"
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     required
                   />
                 </div>
@@ -274,45 +222,137 @@ export default function Clients() {
                     type="text"
                     value={formData.cpf}
                     onChange={(e) => setFormData({ ...formData, cpf: e.target.value })}
-                  />
-                </div>
-                <div className="form-group">
-                  <label>RG</label>
-                  <input
-                    type="text"
-                    value={formData.rg}
-                    onChange={(e) => setFormData({ ...formData, rg: e.target.value })}
-                  />
-                </div>
-                <div className="form-group full-width">
-                  <label>Endereço</label>
-                  <input
-                    type="text"
-                    value={formData.address}
-                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                  />
-                </div>
-                <div className="form-group full-width">
-                  <label>Observações</label>
-                  <textarea
-                    value={formData.notes}
-                    onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                    rows={3}
+                    placeholder="000.000.000-00"
                   />
                 </div>
               </div>
-              <div className="modal-footer">
-                <button type="button" className="btn-secondary" onClick={closeModal}>
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Email</label>
+                  <input
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Telefone *</label>
+                  <input
+                    type="text"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    required
+                  />
+                </div>
+              </div>
+              <div className="form-group">
+                <label>Endereço</label>
+                <input
+                  type="text"
+                  value={formData.address}
+                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                  placeholder="Av. T-7, 500, Setor Bueno, Goiânia/GO"
+                />
+              </div>
+              <div className="form-group">
+                <label>Observações</label>
+                <textarea
+                  value={formData.notes}
+                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                  rows={3}
+                />
+              </div>
+              <div className="modal-actions">
+                <button type="button" className="btn btn-outline" onClick={resetForm}>
                   Cancelar
                 </button>
-                <button type="submit" className="btn-primary">
-                  {editingClient ? 'Salvar Alterações' : 'Criar Cliente'}
+                <button type="submit" className="btn btn-primary">
+                  {editingClient ? 'Salvar' : 'Cadastrar'}
                 </button>
               </div>
             </form>
           </div>
         </div>
       )}
+
+      {/* Client Detail Modal */}
+      {viewingClient && (
+        <div className="modal-overlay">
+          <div className="modal modal-large">
+            <div className="modal-header">
+              <h2>{viewingClient.name}</h2>
+              <button className="btn-close" onClick={() => setViewingClient(null)}>×</button>
+            </div>
+            <div className="modal-body">
+              <div className="client-detail-grid">
+                <div className="detail-card">
+                  <h3><Mail size={16} /> Contato</h3>
+                  <p><strong>Email:</strong> {viewingClient.email}</p>
+                  <p><strong>Telefone:</strong> {viewingClient.phone}</p>
+                  {viewingClient.address && (
+                    <p><strong>Endereço:</strong> {viewingClient.address}</p>
+                  )}
+                </div>
+                <div className="detail-card">
+                  <h3><FileText size={16} /> Documentos</h3>
+                  <p><strong>CPF:</strong> {viewingClient.cpf || 'Não informado'}</p>
+                  <p><strong>RG:</strong> {viewingClient.rg || 'Não informado'}</p>
+                </div>
+                <div className="detail-card">
+                  <h3><Calendar size={16} /> Informações</h3>
+                  <p><strong>Cadastro:</strong> {formatDate(viewingClient.createdAt)}</p>
+                </div>
+              </div>
+              {viewingClient.notes && (
+                <div className="detail-card full-width">
+                  <h3><FileText size={16} /> Observações</h3>
+                  <p>{viewingClient.notes}</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Clients List */}
+      <div className="clients-list">
+        {filteredClients.length === 0 ? (
+          <div className="empty-state">
+            <Users size={48} />
+            <p>Nenhum cliente encontrado</p>
+            <button className="btn btn-primary" onClick={() => setShowForm(true)}>
+              <Plus size={16} /> Cadastrar Primeiro Cliente
+            </button>
+          </div>
+        ) : (
+          filteredClients.map(client => (
+            <div key={client.id} className="client-card">
+              <div className="client-avatar">
+                {client.name.charAt(0).toUpperCase()}
+              </div>
+              <div className="client-info">
+                <h3>{client.name}</h3>
+                <div className="client-meta">
+                  <span><Mail size={14} /> {client.email}</span>
+                  <span><Phone size={14} /> {client.phone}</span>
+                  {client.cpf && <span><FileText size={14} /> {client.cpf}</span>}
+                </div>
+              </div>
+              <div className="client-actions">
+                <button className="btn-icon" onClick={() => handleView(client.id)} title="Ver detalhes">
+                  <Eye size={18} />
+                </button>
+                <button className="btn-icon" onClick={() => handleEdit(client)} title="Editar">
+                  <Edit size={18} />
+                </button>
+                <button className="btn-icon danger" onClick={() => handleDelete(client.id)} title="Excluir">
+                  <Trash2 size={18} />
+                </button>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
     </div>
   );
 }
