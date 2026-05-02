@@ -1,9 +1,11 @@
-import express, { Request, Response, NextFunction } from 'express';
+import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
 import path from 'path';
+import { createServer } from 'http';
+import { Server as SocketIOServer } from 'socket.io';
 import { httpLogger, logger } from './lib/logger';
 import contactRoutes from './routes/contact.routes';
 import clientRoutes from './routes/clients.routes';
@@ -12,10 +14,13 @@ import caseRoutes from './routes/cases.routes';
 import teamRoutes from './routes/team.routes';
 import authRoutes from './routes/auth.routes';
 import aiConfigRoutes from './routes/ai_config.routes';
+import aiRoutes from './routes/ai.routes';
+import paymentRoutes from './routes/payment.routes';
 import petitionRoutes from './routes/petition.routes';
 import financialRoutes from './routes/financial.routes';
 import whatsappRoutes from './routes/whatsapp.routes';
 import whatsappInstanceRoutes from './routes/whatsapp.instance.routes';
+import supabase from './lib/supabase';
 
 dotenv.config();
 
@@ -23,14 +28,8 @@ const app = express();
 const PORT = process.env.PORT || 5032;
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
-// ============================================
-// LOGGING - PINO
-// ============================================
 app.use(httpLogger);
 
-// ============================================
-// SECURITY - HELMET.JS
-// ============================================
 app.use(helmet());
 app.use(helmet.contentSecurityPolicy({
   directives: {
@@ -47,30 +46,29 @@ app.use(helmet.hsts({
   preload: NODE_ENV === 'production',
 }));
 
-// ============================================
-// RATE LIMITING - Geral
-// ============================================
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutos
-  max: 100, // limite de 100 requisições por IP
-  message: 'Muitas requisições deste IP, tente novamente mais tarde',
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: 'Muitas requisicoes deste IP, tente novamente mais tarde',
   standardHeaders: true,
   legacyHeaders: false,
 });
 app.use('/api/', limiter);
 
-// ============================================
-// CORS - CONFIGURADO COM SEGURANÇA
-// ============================================
-const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || 
-  ['http://localhost:5032', 'http://localhost:5033', 'http://localhost:5034', 'http://localhost:5173', 'http://localhost:5174'];
+const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [
+  'http://localhost:5032',
+  'http://localhost:5033',
+  'http://localhost:5034',
+  'http://localhost:5173',
+  'http://localhost:5174'
+];
 
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error('CORS não permitido para este origin'));
+      callback(new Error('CORS nao permitido para este origin'));
     }
   },
   credentials: true,
@@ -78,26 +76,13 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
-// ============================================
-// MIDDLEWARE - BODY PARSER
-// ============================================
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// ============================================
-// HEALTH CHECK
-// ============================================
-app.get('/api/health', (req, res) => {
-  res.json({ 
-    status: 'ok', 
-    timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'development'
-  });
+app.get('/api/health', (req: express.Request, res: express.Response) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString(), environment: NODE_ENV });
 });
 
-// ============================================
-// API ROUTES
-// ============================================
 app.use('/api', authRoutes);
 app.use('/api', contactRoutes);
 app.use('/api', clientRoutes);
@@ -105,80 +90,113 @@ app.use('/api', datajudRoutes);
 app.use('/api', caseRoutes);
 app.use('/api', teamRoutes);
 app.use('/api', aiConfigRoutes);
+app.use('/api', aiRoutes);
+app.use('/api', paymentRoutes);
 app.use('/api', petitionRoutes);
 app.use('/api', financialRoutes);
 app.use('/api', whatsappRoutes);
 app.use('/api', whatsappInstanceRoutes);
 
-// ============================================
-// STATIC FILES - PAINEL
-// ============================================
 app.use('/painel', express.static(path.join(__dirname, '../../frontend-painel/dist')));
 
-// Fallback para SPA (Painel) - usar middleware em vez de route
-app.use('/painel', (req, res, next) => {
-  if (req.url === '/painel' || req.url === '/') {
-    const filePath = path.join(__dirname, '../../frontend-painel/dist/index.html');
-    res.sendFile(filePath, (err) => {
-      if (err && !res.headersSent) {
-        res.status(404).json({ success: false, message: 'Painel não encontrado' });
-      }
-    });
-  } else {
-    // Para rotas nested, também enviar index.html para SPA routing
-    const filePath = path.join(__dirname, '../../frontend-painel/dist/index.html');
-    res.sendFile(filePath, (err) => {
-      if (err && !res.headersSent) {
-        res.status(404).json({ success: false, message: 'Painel não encontrado' });
-      }
-    });
-  }
-});
-
-// ============================================
-// STATIC FILES - SITE PRINCIPAL
-// ============================================
-app.use(express.static(path.join(__dirname, '../../dist')));
-
-// Fallback para SPA (Site)
-app.use((req, res, next) => {
-  const filePath = path.join(__dirname, '../../dist/index.html');
+app.get('/painel*', (req: express.Request, res: express.Response) => {
+  const filePath = path.join(__dirname, '../../frontend-painel/dist/index.html');
   res.sendFile(filePath, (err) => {
     if (err && !res.headersSent) {
-      res.status(404).json({ success: false, message: 'Página não encontrada' });
+      res.status(404).json({ success: false, message: 'Painel nao encontrado' });
     }
   });
 });
 
-// ============================================
-// ERROR HANDLING
-// ============================================
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+app.use(express.static(path.join(__dirname, '../../dist')));
+
+app.get('*', (req: express.Request, res: express.Response) => {
+  const filePath = path.join(__dirname, '../../dist/index.html');
+  res.sendFile(filePath, (err) => {
+    if (err && !res.headersSent) {
+      res.status(404).json({ success: false, message: 'Pagina nao encontrada' });
+    }
+  });
+});
+
+app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
   logger.error({
     err,
     method: req.method,
     path: req.path,
     ip: req.ip,
-  }, 'Erro na requisição');
-  
-  res.status(500).json({ 
-    success: false, 
+  }, 'Erro na requisicao');
+
+  res.status(500).json({
+    success: false,
     message: 'Erro interno do servidor',
     error: NODE_ENV === 'development' ? err.message : undefined,
-    requestId: req.id,
   });
 });
 
-// ============================================
-// START SERVER
-// ============================================
-app.listen(PORT, () => {
-  logger.info(`Servidor Barsa Advocacia iniciando...`);
-  logger.info(`🚀 Site: http://localhost:${PORT}`);
-  logger.info(`📊 Painel: http://localhost:${PORT}/painel`);
-  logger.info(`🔍 Health: http://localhost:${PORT}/api/health`);
-  logger.info(`📝 Ambiente: ${NODE_ENV}`);
-  logger.info(`✅ Servidor rodando com sucesso!`);
+const httpServer = createServer(app);
+const io = new SocketIOServer(httpServer, {
+  cors: {
+    origin: allowedOrigins,
+    methods: ['GET', 'POST'],
+    credentials: true
+  }
+});
+
+io.on('connection', (socket) => {
+  logger.info(`Cliente conectado: ${socket.id}`);
+
+  socket.on('join-lawyer', (lawyerId: string) => {
+    socket.join(`lawyer-${lawyerId}`);
+    logger.info(`Lawyer ${lawyerId} joined notification room`);
+  });
+
+  socket.on('disconnect', () => {
+    logger.info(`Cliente desconectado: ${socket.id}`);
+  });
+});
+
+export const notifyDeadline = (lawyerId: string, deadline: any) => {
+  io.to(`lawyer-${lawyerId}`).emit('deadline-alert', {
+    type: 'deadline',
+    title: 'Prazo Proximo!',
+    message: `O prazo "${deadline.description}" vence em ${new Date(deadline.dueDate).toLocaleDateString('pt-BR')}`,
+    deadline
+  });
+};
+
+setInterval(async () => {
+  try {
+    const { data: deadlines } = await supabase
+      .from('deadlines')
+      .select('id, description, due_date, case:cases(lawyer_id)')
+      .eq('completed', false);
+
+    if (!deadlines) return;
+
+    const now = new Date();
+    for (const d of deadlines as any[]) {
+      const due = new Date(d.due_date);
+      const diffHours = (due.getTime() - now.getTime()) / (1000 * 60 * 60);
+      if (diffHours > 0 && diffHours <= 24) {
+        const lawyerId = d.case?.lawyer_id;
+        if (lawyerId) {
+          notifyDeadline(lawyerId, { id: d.id, description: d.description, dueDate: d.due_date });
+        }
+      }
+    }
+  } catch (err: any) {
+    logger.error({ msg: 'Erro ao verificar prazos para notificacao', error: String(err) });
+  }
+}, 3600000);
+
+httpServer.listen(PORT, () => {
+  logger.info('Servidor Barsa Advocacia iniciando...');
+  logger.info(`Site: http://localhost:${PORT}`);
+  logger.info(`Painel: http://localhost:${PORT}/painel`);
+  logger.info(`Health: http://localhost:${PORT}/api/health`);
+  logger.info(`Ambiente: ${NODE_ENV}`);
+  logger.info('Servidor rodando com sucesso (com WebSockets)!');
 });
 
 export default app;

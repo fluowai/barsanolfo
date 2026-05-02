@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Bell, Menu, Search, LogOut, User } from 'lucide-react';
+import { Menu, LogOut, User } from 'lucide-react';
 import { useMobileMenu } from '../contexts/MobileMenuContext';
 import { STORAGE_KEYS } from '../constants';
+import NotificationBell from './NotificationBell';
 import './Header.css';
+import './NotificationBell.css';
 
 export default function Header() {
   const { openMenu } = useMobileMenu();
@@ -43,22 +45,10 @@ export default function Header() {
         <h1 className="header-title">Painel de Controle</h1>
       </div>
 
-      <div className="header-right">
-        <div className="header-search">
-          <Search size={18} className="search-icon" />
-          <input 
-            type="text" 
-            className="input" 
-            placeholder="Buscar..." 
-          />
-        </div>
-
-        <div className="header-actions">
-          <button className="header-btn" title="Notificações">
-            <Bell size={18} />
-            <span className="badge-count">3</span>
-          </button>
-        </div>
+        <div className="header-right">
+          <div className="header-actions">
+            <NotificationBell />
+          </div>
 
         <div className="header-user" role="button" tabIndex={0}>
           <div className="user-avatar">

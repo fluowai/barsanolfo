@@ -7,7 +7,7 @@ Write-Host "🚀 INICIANDO BARSA ADVOCACIA" -ForegroundColor Green
 Write-Host "=========================================" -ForegroundColor Cyan
 Write-Host ""
 
-$projectPath = "C:\Users\paulo\OneDrive\Área de Trabalho\NÃO APAGAR\site barsa"
+$projectPath = $PSScriptRoot
 Set-Location $projectPath
 
 # Verificar se backend foi compilado
