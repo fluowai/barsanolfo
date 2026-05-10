@@ -1,15 +1,16 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { STORAGE_KEYS } from '../constants';
+import { notificationsApi } from '../services/api';
 
 interface Notification {
   id: string;
-  type: 'deadline' | 'task' | 'message' | 'system';
+  type: 'deadline' | 'task' | 'message' | 'system' | string;
   title: string;
   message: string;
   data?: any;
   read: boolean;
-  createdAt: Date;
+  createdAt: Date | string;
 }
 
 export function useNotifications() {
@@ -18,9 +19,28 @@ export function useNotifications() {
   const [unreadCount, setUnreadCount] = useState(0);
   const socketRef = useRef<Socket | null>(null);
 
+  const loadFromApi = useCallback(async () => {
+    try {
+      const data: any = await notificationsApi.list();
+      if (data.notifications) {
+        setNotifications(data.notifications);
+        const unread = data.notifications.filter((n: any) => !n.read).length;
+        setUnreadCount(unread);
+      }
+      const countData: any = await notificationsApi.unreadCount();
+      if (countData.count !== undefined) {
+        setUnreadCount(countData.count);
+      }
+    } catch {
+      // API not available, socket will handle
+    }
+  }, []);
+
   useEffect(() => {
     const token = localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
     if (!token) return;
+
+    loadFromApi();
 
     let mounted = true;
     let s: Socket | null = null;
@@ -56,6 +76,21 @@ export function useNotifications() {
           playNotificationSound();
         });
 
+        s.on('notification', (data: any) => {
+          const notification: Notification = {
+            id: data.id || `notif-${Date.now()}`,
+            type: data.type || 'system',
+            title: data.title || 'Nova notificação',
+            message: data.message || '',
+            data: data,
+            read: false,
+            createdAt: new Date()
+          };
+          setNotifications(prev => [notification, ...prev]);
+          setUnreadCount(prev => prev + 1);
+          playNotificationSound();
+        });
+
         s.on('connect_error', (err: Error) => {
           console.error('Socket connection error:', err.message);
         });
@@ -72,18 +107,24 @@ export function useNotifications() {
         socketRef.current = null;
       }
     };
-  }, []);
+  }, [loadFromApi]);
 
-  const markAsRead = useCallback((id: string) => {
+  const markAsRead = useCallback(async (id: string) => {
     setNotifications(prev =>
       prev.map(n => n.id === id ? { ...n, read: true } : n)
     );
     setUnreadCount(prev => Math.max(0, prev - 1));
+    try {
+      await notificationsApi.markRead(id);
+    } catch { /* silent */ }
   }, []);
 
-  const markAllAsRead = useCallback(() => {
+  const markAllAsRead = useCallback(async () => {
     setNotifications(prev => prev.map(n => ({ ...n, read: true })));
     setUnreadCount(0);
+    try {
+      await notificationsApi.markAllRead();
+    } catch { /* silent */ }
   }, []);
 
   const clearNotification = useCallback((id: string) => {

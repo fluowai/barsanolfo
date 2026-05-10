@@ -48,7 +48,11 @@ router.post('/clients', authMiddleware, async (req: AuthRequest, res: Response) 
   try {
     const data = clientSchema.parse(req.body);
     const client = await prisma.client.create({
-      data,
+      data: {
+        ...data,
+        cpfCnpj: data.cpf,
+        organizationId: req.user!.organizationId,
+      },
     });
     res.json({ success: true, client });
   } catch (error) {

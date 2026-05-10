@@ -1,220 +1,753 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  // provider = "postgresql" // Use postgresql em produção
   provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
-// LEADS - Contatos do formulário
-model Lead {
+// ========== ORGANIZAÇÃO / MULTI-TENANT ==========
+model Organization {
   id        String   @id @default(uuid())
   name      String
-  email     String
-  phone     String
-  type      String   // rescisao, horas, assedio, outro
-  message   String
-  source    String   @default("WEBSITE")
-  status    String   @default("NEW") // NEW, CONTACTED, QUALIFIED, CONVERTED, LOST
+  cnpj      String?  @unique
+  logo      String?
+  address   String?
+  phone     String?
+  email     String?
+  website   String?
+  theme     String? // JSON with brand colors
+  timezone  String   @default("America/Sao_Paulo")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  @@index([status])
-  @@index([createdAt])
-  @@index([email])
-  @@map("leads")
+  users                 User[]
+  leads                 Lead[]
+  clients               Client[]
+  cases                 Case[]
+  holidays              Holiday[]
+  settings              Setting[]
+  deadlines             Deadline[]
+  hearings              Hearing[]
+  tasks                 Task[]
+  documents             Document[]
+  contracts             Contract[]
+  contractTemplates     ContractTemplate[]
+  financialTransactions FinancialTransaction[]
+  invoices              Invoice[]
+  conversations         Conversation[]
+  notifications         Notification[]
+  auditLogs             AuditLog[]
+  marketingCampaigns    MarketingCampaign[]
+  contentCalendar       ContentCalendar[]
+  automations           Automation[]
+
+  @@map("organizations")
 }
 
-// USUÁRIOS - Sistema de autenticação
+// ========== USUÁRIOS & PERFIS ==========
 model User {
-  id           String   @id @default(uuid())
-  email        String   @unique
-  passwordHash String @map("password_hash")
-  name         String
-  role         String   @default("LAWYER") // ADMIN, LAWYER, SECRETARY
-  avatar       String?
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
+  id             String    @id @default(uuid())
+  organizationId String    @map("organization_id")
+  email          String    @unique
+  passwordHash   String    @map("password_hash")
+  name           String
+  role           String    @default("LAWYER") // SUPER_ADMIN, OWNER, ADMIN, LAWYER, INTERN, SECRETARY, FINANCIAL, SDR, PARALEGAL, CORRESPONDENT
+  title          String? // Cargo (ex: "Advogado Sênior")
+  oab            String? // Número OAB
+  avatar         String?
+  phone          String?
+  status         String    @default("ACTIVE") // ACTIVE, INACTIVE, INVITED
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+  deletedAt      DateTime? @map("deleted_at")
 
-  // Relações
-  cases        Case[]
-  tasks        Task[]
+  organization  Organization @relation(fields: [organizationId], references: [id])
+  assignedCases Case[]       @relation("CaseLawyer")
+  createdTasks  Task[]       @relation("TaskCreator")
+  assignedTasks Task[]       @relation("TaskAssignee")
+  deadlines     Deadline[]
+  hearings      Hearing[]
 
+  @@index([organizationId])
+  @@index([email])
+  @@index([role])
   @@map("users")
 }
 
-// CLIENTES - Gestão de clientes
-model Client {
+// ========== LEADS ==========
+model Lead {
+  id             String    @id @default(uuid())
+  organizationId String    @map("organization_id")
+  name           String
+  phone          String
+  whatsapp       String?
+  email          String?
+  cpfCnpj        String?   @map("cpf_cnpj")
+  city           String?
+  state          String?
+  source         String    @default("WEBSITE") // WHATSAPP, INSTAGRAM, FACEBOOK, GOOGLE, SITE, INDICATION, PAID_TRAFFIC, ORGANIC, EVENT, COUNTER, EMAIL, MANUAL
+  channel        String? // Canal de entrada específico
+  legalArea      String? // CRIMINAL, FAMILY, LABOR, SOCIAL_SECURITY, CIVIL, BUSINESS, CONSUMER, TAX, REAL_ESTATE, ADMINISTRATIVE
+  description    String? // Descrição inicial do caso
+  urgency        String    @default("NORMAL") // LOW, NORMAL, HIGH, URGENT
+  potentialValue Float?    @map("potential_value")
+  score          Int? // Lead score 0-100
+  status         String    @default("NEW") // NEW, AWAITING_CONTACT, TRIAGE, AWAITING_DOCS, SCHEDULED, MEETING_DONE, PROPOSAL_SENT, CONTRACT_SENT, PAYMENT_PENDING, CLOSED, LOST, DISQUALIFIED
+  lossReason     String?   @map("loss_reason")
+  responsibleId  String?   @map("responsible_id")
+  lawyerId       String?   @map("lawyer_id")
+  clientId       String?   @map("client_id") // When converted
+  lastContactAt  DateTime? @map("last_contact_at")
+  nextAction     String?   @map("next_action")
+  nextActionDate DateTime? @map("next_action_date")
+  tags           String? // JSON array
+  notes          String?
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+  deletedAt      DateTime? @map("deleted_at")
+
+  organization Organization      @relation(fields: [organizationId], references: [id])
+  interactions LeadInteraction[]
+  triages      LeadTriage[]
+
+  @@index([organizationId])
+  @@index([status])
+  @@index([source])
+  @@index([legalArea])
+  @@index([urgency])
+  @@index([responsibleId])
+  @@map("leads")
+}
+
+model LeadInteraction {
   id        String   @id @default(uuid())
-  name      String
-  cpf       String?  @unique
-  rg        String?
-  email     String
-  phone     String
-  address   String?
-  notes     String?
+  leadId    String   @map("lead_id")
+  type      String // CALL, WHATSAPP, EMAIL, MEETING, NOTE, SYSTEM
+  content   String?
+  userId    String?  @map("user_id")
   createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
 
-  // Relações
-  cases     Case[]
-  contracts Contract[]
+  lead Lead @relation(fields: [leadId], references: [id])
 
+  @@map("lead_interactions")
+}
+
+model LeadTriage {
+  id           String    @id @default(uuid())
+  leadId       String    @map("lead_id")
+  legalArea    String // CRIMINAL, FAMILY, LABOR, etc
+  formData     String // JSON - structured triage answers
+  urgency      String    @default("NORMAL")
+  riskLevel    String?   @map("risk_level") // LOW, MEDIUM, HIGH
+  summary      String? // Resumo automático
+  nextSteps    String?   @map("next_steps")
+  internalNote String?   @map("internal_note")
+  approvedBy   String?   @map("approved_by")
+  approvedAt   DateTime? @map("approved_at")
+  status       String    @default("PENDING") // PENDING, APPROVED, REJECTED
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  lead Lead @relation(fields: [leadId], references: [id])
+
+  @@map("lead_triages")
+}
+
+// ========== CLIENTES ==========
+model Client {
+  id             String    @id @default(uuid())
+  organizationId String    @map("organization_id")
+  name           String
+  type           String    @default("PERSON") // PERSON, COMPANY
+  cpfCnpj        String?   @map("cpf_cnpj")
+  rg             String?
+  birthDate      DateTime? @map("birth_date")
+  maritalStatus  String?   @map("marital_status")
+  profession     String?
+  address        String?
+  city           String?
+  state          String?
+  phone          String
+  whatsapp       String?
+  email          String
+  source         String?
+  status         String    @default("ACTIVE") // ACTIVE, INACTIVE, ONBOARDING, AWAITING_DOCS, OVERDUE, CLOSED, ARCHIVED
+  responsibleId  String?   @map("responsible_id")
+  lawyerId       String?   @map("lawyer_id")
+  notes          String?
+  tags           String? // JSON array
+  onboardingAt   DateTime? @map("onboarding_at")
+  lastContactAt  DateTime? @map("last_contact_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+  deletedAt      DateTime? @map("deleted_at")
+
+  organization  Organization   @relation(fields: [organizationId], references: [id])
+  cases         Case[]
+  contracts     Contract[]
+  documents     Document[]
+  conversations Conversation[]
+  logs          AuditLog[]     @relation("ClientLogs")
+
+  @@index([organizationId])
+  @@index([status])
+  @@index([lawyerId])
+  @@index([cpfCnpj])
   @@map("clients")
 }
 
-// PROCESSOS
+// ========== PROCESSOS ==========
 model Case {
-  id           String     @id @default(uuid())
-  number       String     @unique
-  type         String     // TRABALHISTA, CIVEL, etc
-  court        String?
-  status       String     @default("ACTIVE") // ACTIVE, SUSPENDED, ARCHIVED, CLOSED
-  value        Float?
-  filedDate    DateTime? @map("filed_date")
-  clientId     String    @map("client_id")
-  lawyerId     String    @map("lawyer_id")
-  createdAt    DateTime   @default(now()) @map("created_at")
-  updatedAt    DateTime   @updatedAt @map("updated_at")
+  id                   String    @id @default(uuid())
+  organizationId       String    @map("organization_id")
+  clientId             String    @map("client_id")
+  number               String? // CNJ number
+  internalTitle        String    @map("internal_title")
+  court                String? // Tribunal
+  courtRoom            String?   @map("court_room") // Vara
+  district             String? // Comarca
+  state                String?
+  caseClass            String?   @map("case_class") // Classe processual
+  legalArea            String? // CRIMINAL, FAMILY, LABOR, etc
+  subject              String? // Assunto
+  activePole           String?   @map("active_pole") // Polo ativo
+  passivePole          String?   @map("passive_pole") // Polo passivo
+  opposingParty        String?   @map("opposing_party") // Parte contrária
+  lawyerId             String    @map("lawyer_id")
+  internId             String?   @map("intern_id")
+  phase                String    @default("PRE_PROCEDURAL") // PRE_PROCEDURAL, INITIAL, DEFENSE, INSTRUCTION, HEARING, SENTENCE, APPEAL, ENFORCEMENT, EXECUTION, ARCHIVED
+  status               String    @default("ACTIVE") // ANALYSIS, ACTIVE, AWAITING_DISTRIBUTION, IN_PROGRESS, AWAITING_HEARING, AWAITING_DECISION, IN_APPEAL, IN_EXECUTION, SUSPENDED, CLOSED, ARCHIVED
+  caseValue            Float?    @map("case_value")
+  successProbability   Int?      @map("success_probability") // 0-100
+  riskLevel            String?   @map("risk_level") // LOW, MEDIUM, HIGH
+  strategy             String?
+  nextAction           String?   @map("next_action")
+  lastMovementAt       DateTime? @map("last_movement_at")
+  visibleToClient      Boolean   @default(false) @map("visible_to_client")
+  clientFriendlyUpdate String?   @map("client_friendly_update")
+  filedDate            DateTime? @map("filed_date")
+  createdAt            DateTime  @default(now()) @map("created_at")
+  updatedAt            DateTime  @updatedAt @map("updated_at")
+  deletedAt            DateTime? @map("deleted_at")
 
-  // Relações
-  client       Client     @relation(fields: [clientId], references: [id])
-  lawyer       User       @relation(fields: [lawyerId], references: [id])
+  organization Organization           @relation(fields: [organizationId], references: [id])
+  client       Client                 @relation(fields: [clientId], references: [id])
+  lawyer       User                   @relation("CaseLawyer", fields: [lawyerId], references: [id])
   movements    CaseMovement[]
   deadlines    Deadline[]
   hearings     Hearing[]
+  documents    Document[]
+  contracts    Contract[]
+  tasks        Task[]
+  financialTx  FinancialTransaction[]
 
+  @@index([organizationId])
   @@index([clientId])
   @@index([lawyerId])
   @@index([status])
-  @@index([createdAt])
+  @@index([phase])
+  @@index([legalArea])
+  @@index([number])
   @@map("cases")
 }
 
-// MOVIMENTAÇÕES PROCESSUAIS
 model CaseMovement {
-  id          String   @id @default(uuid())
-  caseId      String   @map("case_id")
-  date        DateTime
-  description String
-  type        String?
-  createdAt   DateTime @default(now()) @map("created_at")
+  id              String   @id @default(uuid())
+  caseId          String   @map("case_id")
+  date            DateTime
+  description     String
+  type            String? // DECISION, FILING, HEARING, etc
+  visibleToClient Boolean  @default(false) @map("visible_to_client")
+  clientSummary   String?  @map("client_summary") // Friendly version
+  createdAt       DateTime @default(now()) @map("created_at")
 
-  case        Case     @relation(fields: [caseId], references: [id])
+  case Case @relation(fields: [caseId], references: [id])
 
+  @@index([caseId])
   @@map("case_movements")
 }
 
-// PRAZOS
+// ========== PRAZOS ==========
 model Deadline {
-  id          String   @id @default(uuid())
-  caseId      String   @map("case_id")
-  description String
-  dueDate     DateTime @map("due_date")
-  completed   Boolean  @default(false)
-  createdAt   DateTime @default(now()) @map("created_at")
+  id               String    @id @default(uuid())
+  organizationId   String    @map("organization_id")
+  caseId           String?   @map("case_id")
+  clientId         String?   @map("client_id")
+  title            String
+  type             String    @default("OTHER") // CONTESTATION, APPEAL, MANIFESTATION, EMBARGS, INTERLOCUTORY_APPEAL, APPELLATE, COUNTER_ARGUMENTS, COMPLIANCE, DOCUMENT_JOINDER, HEARING, ADMINISTRATIVE, OTHER
+  notificationDate DateTime? @map("notification_date")
+  startDate        DateTime  @map("start_date")
+  endDate          DateTime  @map("end_date")
+  daysCount        Int?      @map("days_count")
+  businessDays     Boolean   @default(false) @map("business_days")
+  responsibleId    String    @map("responsible_id")
+  reviewerId       String?   @map("reviewer_id")
+  status           String    @default("NOT_STARTED") // NOT_STARTED, IN_PRODUCTION, IN_REVIEW, AWAITING_PROTOCOL, FILED, COMPLETED, MISSED, CANCELLED
+  priority         String    @default("NORMAL") // LOW, NORMAL, HIGH, CRITICAL
+  description      String?
+  documentId       String?   @map("document_id")
+  proofFile        String?   @map("proof_file")
+  completedAt      DateTime? @map("completed_at")
+  notes            String?
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+  deletedAt        DateTime? @map("deleted_at")
 
-  case        Case     @relation(fields: [caseId], references: [id])
+  organization Organization @relation(fields: [organizationId], references: [id])
+  case         Case?        @relation(fields: [caseId], references: [id])
+  responsible  User         @relation(fields: [responsibleId], references: [id])
 
+  @@index([organizationId])
+  @@index([caseId])
+  @@index([responsibleId])
+  @@index([status])
+  @@index([endDate])
+  @@index([priority])
   @@map("deadlines")
 }
 
-// AUDIÊNCIAS
+// ========== AUDIÊNCIAS ==========
 model Hearing {
-  id        String   @id @default(uuid())
-  caseId    String   @map("case_id")
-  date      DateTime
-  location  String?
-  type      String
-  notes     String?
-  createdAt DateTime @default(now()) @map("created_at")
+  id             String   @id @default(uuid())
+  organizationId String   @map("organization_id")
+  caseId         String?  @map("case_id")
+  clientId       String?  @map("client_id")
+  title          String
+  type           String   @default("HEARING") // HEARING, CLIENT_MEETING, INTERNAL_MEETING, JUDGMENT_SESSION, ORAL_ARGUMENT, DILIGENCE, DISPATCH, PROTOCOL, DEADLINE, COMMERCIAL, VIDEO_CALL
+  date           DateTime
+  startTime      String?  @map("start_time")
+  endTime        String?  @map("end_time")
+  location       String?
+  meetingLink    String?  @map("meeting_link")
+  responsibleId  String   @map("responsible_id")
+  participants   String? // JSON array
+  description    String?
+  notes          String? // Ata/resumo
+  status         String   @default("SCHEDULED") // SCHEDULED, CONFIRMED, RESCHEDULED, COMPLETED, CANCELLED, NO_SHOW
+  reminderBefore Int?     @default(60) @map("reminder_before") // minutes
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
 
-  case      Case     @relation(fields: [caseId], references: [id])
+  organization Organization @relation(fields: [organizationId], references: [id])
+  case         Case?        @relation(fields: [caseId], references: [id])
+  responsible  User         @relation(fields: [responsibleId], references: [id])
 
+  @@index([organizationId])
+  @@index([caseId])
+  @@index([responsibleId])
+  @@index([date])
   @@map("hearings")
 }
 
-// TAREFAS
+// ========== TAREFAS ==========
 model Task {
-  id          String   @id @default(uuid())
-  title       String
-  description String?
-  dueDate     DateTime? @map("due_date")
-  status      String   @default("TODO") // TODO, IN_PROGRESS, DONE, CANCELLED
-  priority    String   @default("MEDIUM") // LOW, MEDIUM, HIGH, URGENT
-  assignedTo  String   @map("assigned_to")
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  id             String    @id @default(uuid())
+  organizationId String    @map("organization_id")
+  title          String
+  description    String?
+  clientId       String?   @map("client_id")
+  caseId         String?   @map("case_id")
+  deadlineId     String?   @map("deadline_id")
+  createdById    String    @map("created_by_id")
+  assignedToId   String    @map("assigned_to_id")
+  reviewerId     String?   @map("reviewer_id")
+  priority       String    @default("MEDIUM") // LOW, MEDIUM, HIGH, URGENT, CRITICAL
+  status         String    @default("TODO") // TODO, IN_PROGRESS, AWAITING_CLIENT, AWAITING_DOCUMENT, AWAITING_LAWYER, IN_REVIEW, READY_FOR_PROTOCOL, FILED, COMPLETED, CANCELLED
+  dueDate        DateTime? @map("due_date")
+  completedAt    DateTime? @map("completed_at")
+  estimatedTime  Int?      @map("estimated_time") // minutes
+  spentTime      Int?      @map("spent_time") // minutes
+  tags           String? // JSON array
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+  deletedAt      DateTime? @map("deleted_at")
 
-  user        User     @relation(fields: [assignedTo], references: [id])
+  organization Organization        @relation(fields: [organizationId], references: [id])
+  case         Case?               @relation(fields: [caseId], references: [id])
+  createdBy    User                @relation("TaskCreator", fields: [createdById], references: [id])
+  assignedTo   User                @relation("TaskAssignee", fields: [assignedToId], references: [id])
+  checklist    TaskChecklistItem[]
+  comments     TaskComment[]
 
-  @@index([assignedTo])
+  @@index([organizationId])
+  @@index([assignedToId])
   @@index([status])
-  @@index([dueDate])
   @@index([priority])
+  @@index([dueDate])
   @@map("tasks")
 }
 
-// FINANCEIRO - CONTRATOS
+model TaskChecklistItem {
+  id        String   @id @default(uuid())
+  taskId    String   @map("task_id")
+  content   String
+  completed Boolean  @default(false)
+  order     Int      @default(0)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  task Task @relation(fields: [taskId], references: [id])
+
+  @@map("task_checklist_items")
+}
+
+model TaskComment {
+  id        String   @id @default(uuid())
+  taskId    String   @map("task_id")
+  userId    String   @map("user_id")
+  content   String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  task Task @relation(fields: [taskId], references: [id])
+
+  @@map("task_comments")
+}
+
+// ========== DOCUMENTOS / GED ==========
+model Document {
+  id              String    @id @default(uuid())
+  organizationId  String    @map("organization_id")
+  clientId        String?   @map("client_id")
+  caseId          String?   @map("case_id")
+  name            String
+  category        String    @default("OTHER") // PERSONAL_DOC, PROCURATION, CONTRACT, DECLARATION, INITIAL_PETITION, DEFENSE, APPEAL, DECISION, SENTENCE, RULING, RECEIPT, EVIDENCE, AUDIO, IMAGE, VIDEO, BO, SUMMONS, PUBLICATION, COSTS_GUIDE, RECEIPT, INVOICE, OTHER
+  filePath        String?   @map("file_path") // Path to physical file
+  fileSize        Int?      @map("file_size") // bytes
+  mimeType        String?   @map("mime_type")
+  contentHash     String?   @map("content_hash")
+  version         Int       @default(1)
+  status          String    @default("PENDING") // PENDING, SENT, IN_ANALYSIS, APPROVED, REJECTED, EXPIRED, ARCHIVED
+  visibleToClient Boolean   @default(false) @map("visible_to_client")
+  validUntil      DateTime? @map("valid_until")
+  notes           String?
+  uploadedById    String?   @map("uploaded_by_id")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  deletedAt       DateTime? @map("deleted_at")
+
+  organization Organization      @relation(fields: [organizationId], references: [id])
+  client       Client?           @relation(fields: [clientId], references: [id])
+  case         Case?             @relation(fields: [caseId], references: [id])
+  versions     DocumentVersion[]
+
+  @@index([organizationId])
+  @@index([clientId])
+  @@index([caseId])
+  @@index([category])
+  @@index([status])
+  @@map("documents")
+}
+
+model DocumentVersion {
+  id           String   @id @default(uuid())
+  documentId   String   @map("document_id")
+  version      Int
+  filePath     String?  @map("file_path")
+  fileSize     Int?     @map("file_size")
+  mimeType     String?  @map("mime_type")
+  contentHash  String?  @map("content_hash")
+  uploadedById String?  @map("uploaded_by_id")
+  notes        String?
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  document Document @relation(fields: [documentId], references: [id])
+
+  @@map("document_versions")
+}
+
+// ========== CONTRATOS ==========
 model Contract {
-  id            String   @id @default(uuid())
-  clientId      String   @map("client_id")
-  type          String   // FIXED_FEE, PERCENTAGE, etc
-  value         Float
-  paymentMethod String?  @map("payment_method")
-  signedDate    DateTime? @map("signed_date")
-  createdAt     DateTime @default(now()) @map("created_at")
+  id                 String    @id @default(uuid())
+  organizationId     String    @map("organization_id")
+  clientId           String    @map("client_id")
+  caseId             String?   @map("case_id")
+  legalArea          String?
+  type               String    @default("FIXED_FEE") // FIXED_FEE, CONTINGENCY_FEE, MIXED, CONSULTATION, RECURRING
+  templateId         String?   @map("template_id")
+  title              String
+  description        String?
+  totalValue         Float?    @map("total_value")
+  upfrontPayment     Float?    @map("upfront_payment")
+  installmentCount   Int?      @map("installment_count")
+  contingencyPercent Float?    @map("contingency_percent")
+  paymentMethod      String?   @map("payment_method") // PIX, BOLETO, CREDIT_CARD, TRANSFER, CASH
+  dueDay             Int?      @map("due_day")
+  penalty            Float?    @default(0)
+  interest           Float?    @default(0)
+  clauses            String? // JSON - specific clauses
+  content            String? // PDF or HTML content
+  status             String    @default("DRAFT") // DRAFT, GENERATED, SENT, VIEWED, SIGNED, REJECTED, EXPIRED, CANCELLED
+  sentAt             DateTime? @map("sent_at")
+  signedAt           DateTime? @map("signed_at")
+  validUntil         DateTime? @map("valid_until")
+  signedByClient     Boolean   @default(false) @map("signed_by_client")
+  signedByOffice     Boolean   @default(false) @map("signed_by_office")
+  responsibleId      String?   @map("responsible_id")
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+  deletedAt          DateTime? @map("deleted_at")
 
-  client        Client   @relation(fields: [clientId], references: [id])
-  invoices      Invoice[]
+  organization Organization @relation(fields: [organizationId], references: [id])
+  client       Client       @relation(fields: [clientId], references: [id])
+  case         Case?        @relation(fields: [caseId], references: [id])
+  invoices     Invoice[]
 
+  @@index([organizationId])
+  @@index([clientId])
+  @@index([status])
   @@map("contracts")
 }
 
-// FATURAS
-model Invoice {
+model ContractTemplate {
+  id             String   @id @default(uuid())
+  organizationId String   @map("organization_id")
+  name           String
+  legalArea      String?
+  type           String   @default("FIXED_FEE")
+  content        String // Template content with placeholders {{name}}, {{value}}, etc
+  fields         String? // JSON - dynamic fields definition
+  isDefault      Boolean  @default(false) @map("is_default")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+
+  @@map("contract_templates")
+}
+
+// ========== FINANCEIRO ==========
+model FinancialTransaction {
   id              String    @id @default(uuid())
-  contractId      String    @map("contract_id")
-  clientId        String    @map("client_id")
-  title           String    // Descrição da cobrança
-  amount          Float
+  organizationId  String    @map("organization_id")
+  type            String // INCOME, EXPENSE
+  category        String // INITIAL_FEES, MONTHLY_FEES, CONTINGENCY_FEES, CONSULTATION, AGREEMENT, RECURRENCE, OTHER_INCOME, COSTS, DILIGENCE, CORRESPONDENT, SOFTWARE, MARKETING, TAXES, PAYROLL, RENT, TRAVEL, CARTORIO, OTHER_EXPENSE
+  clientId        String?   @map("client_id")
+  caseId          String?   @map("case_id")
+  contractId      String?   @map("contract_id")
+  invoiceId       String?   @map("invoice_id")
+  description     String
+  value           Float
   dueDate         DateTime  @map("due_date")
-  paidDate        DateTime? @map("paid_date")
-  status          String    @default("PENDING") // PENDING, PAID, OVERDUE, CANCELLED
-  paymentMethod   String?   @map("payment_method")
+  paymentDate     DateTime? @map("payment_date")
+  paymentMethod   String?   @map("payment_method") // PIX, BOLETO, CREDIT_CARD, TRANSFER, CASH, DEPOSIT
+  status          String    @default("PENDING") // PENDING, PAID, PARTIALLY_PAID, OVERDUE, CANCELLED, IN_COLLECTION
+  proofFile       String?   @map("proof_file")
   notes           String?
+  costCenter      String?   @map("cost_center")
+  commissionPct   Float?    @map("commission_pct")
+  commissionValue Float?    @map("commission_value")
+  createdById     String?   @map("created_by_id")
   createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
 
-  contract        Contract  @relation(fields: [contractId], references: [id])
+  organization Organization @relation(fields: [organizationId], references: [id])
+  case         Case?        @relation(fields: [caseId], references: [id])
 
+  @@index([organizationId])
+  @@index([clientId])
+  @@index([caseId])
+  @@index([status])
+  @@index([type])
+  @@index([category])
+  @@index([dueDate])
+  @@map("financial_transactions")
+}
+
+model Invoice {
+  id             String    @id @default(uuid())
+  organizationId String    @map("organization_id")
+  contractId     String?   @map("contract_id")
+  clientId       String    @map("client_id")
+  title          String
+  description    String?
+  amount         Float
+  dueDate        DateTime  @map("due_date")
+  paidDate       DateTime? @map("paid_date")
+  status         String    @default("PENDING") // PENDING, PAID, PARTIALLY_PAID, OVERDUE, CANCELLED, IN_COLLECTION
+  paymentMethod  String?   @map("payment_method")
+  barcode        String? // Boleto barcode
+  pixCode        String?   @map("pix_code")
+  notes          String?
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+  contract     Contract?    @relation(fields: [contractId], references: [id])
+
+  @@index([organizationId])
   @@index([contractId])
   @@index([clientId])
   @@index([status])
-  @@index([dueDate])
-  @@index([createdAt])
   @@map("invoices")
 }
 
-// DESPESAS
-model Expense {
-  id          String   @id @default(uuid())
-  description String
-  amount      Float
-  category    String?  // CUSTAS, HONORARIOS, DESPESAS_GERAIS
-  date        DateTime
-  createdAt   DateTime @default(now())
+// ========== ATENDIMENTO / CONVERSAS ==========
+model Conversation {
+  id             String    @id @default(uuid())
+  organizationId String    @map("organization_id")
+  clientId       String?   @map("client_id")
+  leadId         String?   @map("lead_id")
+  channel        String // WHATSAPP, INSTAGRAM, FACEBOOK, SITE, FORM, EMAIL, CHAT
+  externalId     String?   @map("external_id") // ID from external platform
+  contactName    String    @map("contact_name")
+  contactPhone   String?   @map("contact_phone")
+  contactEmail   String?   @map("contact_email")
+  responsibleId  String?   @map("responsible_id")
+  status         String    @default("NEW") // NEW, IN_PROGRESS, AWAITING_CLIENT, AWAITING_TEAM, RESOLVED, ARCHIVED
+  tags           String? // JSON array
+  lastMessageAt  DateTime? @map("last_message_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
 
-  @@map("expenses")
+  organization Organization @relation(fields: [organizationId], references: [id])
+  client       Client?      @relation(fields: [clientId], references: [id])
+  messages     Message[]
+
+  @@index([organizationId])
+  @@index([clientId])
+  @@index([status])
+  @@index([channel])
+  @@map("conversations")
 }
-// CONFIGURAÇÕES DE IA
+
+model Message {
+  id             String   @id @default(uuid())
+  conversationId String   @map("conversation_id")
+  content        String
+  direction      String // INCOMING, OUTGOING
+  type           String   @default("TEXT") // TEXT, IMAGE, AUDIO, VIDEO, FILE, TEMPLATE
+  mediaUrl       String?  @map("media_url")
+  status         String   @default("SENT") // SENT, DELIVERED, READ, FAILED
+  userId         String?  @map("user_id")
+  isInternal     Boolean  @default(false) @map("is_internal") // Internal note, not sent
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  conversation Conversation @relation(fields: [conversationId], references: [id])
+
+  @@map("messages")
+}
+
+// ========== AUTOMAÇÕES ==========
+model Automation {
+  id             String    @id @default(uuid())
+  organizationId String    @map("organization_id")
+  name           String
+  description    String?
+  trigger        String // LEAD_CREATED, LEAD_URGENT, PROPOSAL_SENT, CONTRACT_SIGNED, CLIENT_CREATED, DEADLINE_APPROACHING, DEADLINE_OVERDUE, INVOICE_OVERDUE, CLIENT_OVERDUE, DOCUMENT_REJECTED, HEARING_SCHEDULED, CASE_INACTIVE, CLIENT_INACTIVE
+  condition      String? // JSON - condition expression
+  action         String // CREATE_TASK, NOTIFY_USER, UPDATE_STATUS, SEND_MESSAGE, CREATE_REMINDER, UPDATE_FIELD
+  actionConfig   String? // JSON - action parameters
+  isActive       Boolean   @default(true) @map("is_active")
+  lastRunAt      DateTime? @map("last_run_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  organization Organization    @relation(fields: [organizationId], references: [id])
+  logs         AutomationLog[]
+
+  @@map("automations")
+}
+
+model AutomationLog {
+  id           String   @id @default(uuid())
+  automationId String   @map("automation_id")
+  trigger      String
+  result       String // SUCCESS, FAILED, SKIPPED
+  details      String? // JSON
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  automation Automation @relation(fields: [automationId], references: [id])
+
+  @@map("automation_logs")
+}
+
+// ========== NOTIFICAÇÕES ==========
+model Notification {
+  id             String    @id @default(uuid())
+  organizationId String    @map("organization_id")
+  userId         String?   @map("user_id")
+  type           String // DEADLINE, LEAD_NEW, LEAD_URGENT, CLIENT_RESPONDED, CONTRACT_SIGNED, PAYMENT_RECEIVED, INVOICE_OVERDUE, HEARING_UPCOMING, TASK_ASSIGNED, TASK_OVERDUE, DOCUMENT_SENT, DOCUMENT_REJECTED, CASE_UPDATED
+  title          String
+  message        String?
+  data           String? // JSON with contextual data
+  read           Boolean   @default(false)
+  readAt         DateTime? @map("read_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+
+  @@index([organizationId])
+  @@index([userId])
+  @@index([read])
+  @@index([createdAt])
+  @@map("notifications")
+}
+
+// ========== AUDITORIA ==========
+model AuditLog {
+  id             String   @id @default(uuid())
+  organizationId String   @map("organization_id")
+  userId         String?  @map("user_id")
+  action         String // CREATE, UPDATE, DELETE, VIEW
+  entity         String // lead, client, case, deadline, task, document, contract, financial, etc
+  entityId       String?  @map("entity_id")
+  clientId       String?  @map("client_id")
+  description    String?
+  oldValues      String? // JSON
+  newValues      String? // JSON
+  ipAddress      String?  @map("ip_address")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+  client       Client?      @relation("ClientLogs", fields: [clientId], references: [id])
+
+  @@index([organizationId])
+  @@index([userId])
+  @@index([action])
+  @@index([entity])
+  @@index([entityId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+// ========== CONFIGURAÇÕES ==========
+model Setting {
+  id             String   @id @default(uuid())
+  organizationId String   @map("organization_id")
+  key            String
+  value          String // JSON value
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+
+  @@unique([organizationId, key])
+  @@map("settings")
+}
+
+// ========== FERIADOS ==========
+model Holiday {
+  id             String   @id @default(uuid())
+  organizationId String   @map("organization_id")
+  name           String
+  date           DateTime
+  type           String   @default("NATIONAL") // NATIONAL, STATE, MUNICIPAL
+  recurring      Boolean  @default(true)
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+
+  @@index([organizationId])
+  @@index([date])
+  @@map("holidays")
+}
+
+// ========== CONFIGURAÇÕES EXISTENTES (mantidas para compatibilidade) ==========
+
 model AIConfig {
   id        String   @id @default(uuid())
-  provider  String   // GEMINI, OPENAI, etc
+  provider  String // GEMINI, OPENAI, etc
   apiKey    String
   model     String?
   isActive  Boolean  @default(true) @map("is_active")
@@ -224,10 +757,9 @@ model AIConfig {
   @@map("ai_configs")
 }
 
-// WHATSAPP - Configurações
 model WhatsAppConfig {
   id             String   @id @default(uuid())
-  autoReply     Boolean  @default(false) @map("auto_reply")
+  autoReply      Boolean  @default(false) @map("auto_reply")
   welcomeMessage String?  @map("welcome_message")
   reminderHours  Int      @default(24) @map("reminder_hours")
   updatedAt      DateTime @updatedAt @map("updated_at")
@@ -235,19 +767,17 @@ model WhatsAppConfig {
   @@map("whatsapp_configs")
 }
 
-// WHATSAPP - Templates de Mensagem
 model WhatsAppTemplate {
   id        String   @id @default(uuid())
   name      String
-  content   String   // Conteúdo com {{variaveis}}
-  type      String   @default("CUSTOM") // CUSTOM, REMINDER, WELCOME, etc
+  content   String
+  type      String   @default("CUSTOM")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("whatsapp_templates")
 }
 
-// WHATSAPP - Contatos
 model WhatsAppContact {
   id          String    @id @default(uuid())
   phone       String    @unique
@@ -259,12 +789,11 @@ model WhatsAppContact {
   @@map("whatsapp_contacts")
 }
 
-// WHATSAPP - Mensagens
 model WhatsAppMessage {
   id         String   @id @default(uuid())
   phone      String
   message    String
-  direction  String   // INCOMING, OUTGOING
+  direction  String // INCOMING, OUTGOING
   status     String   @default("PENDING") // PENDING, SENT, DELIVERED, READ, FAILED
   messageId  String?  @map("message_id")
   templateId String?  @map("template_id")
@@ -273,7 +802,6 @@ model WhatsAppMessage {
   @@map("whatsapp_messages")
 }
 
-// PORTAL DO CLIENTE - Tokens de Acesso
 model ClientAccess {
   id        String   @id @default(uuid())
   clientId  String   @map("client_id")
@@ -284,27 +812,101 @@ model ClientAccess {
   @@map("client_access")
 }
 
-// DOCUMENTOS - Assinatura Digital
-model Document {
-  id          String   @id @default(uuid())
-  name        String
-  type        String   // PETITION, CONTRACT, CERTIFICATE, etc
-  content     String   // Base64 do PDF
-  hash        String   // Hash SHA256 para integridade
-  signature   String?  // Assinatura digital (base64)
-  signedAt    DateTime? @map("signed_at")
-  signedBy    String?  @map("signed_by")
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+model PetitionConfig {
+  id            String   @id @default(uuid())
+  logoData      String?  @map("logo_data")
+  logoMimeType  String?  @map("logo_mime_type")
+  footerName    String?  @map("footer_name")
+  footerOab     String?  @map("footer_oab")
+  footerAddress String?  @map("footer_address")
+  footerPhone   String?  @map("footer_phone")
+  footerEmail   String?  @map("footer_email")
+  footerWebsite String?  @map("footer_website")
+  updatedAt     DateTime @updatedAt @map("updated_at")
 
-  @@map("documents")
+  @@map("petition_configs")
 }
 
-// CONTABILIDADE - Integração
+model PetitionTemplate {
+  id        String   @id @default(uuid())
+  name      String
+  content   String
+  fields    String // JSON
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("petition_templates")
+}
+
+model Petition {
+  id         String   @id @default(uuid())
+  title      String
+  content    String
+  templateId String?  @map("template_id")
+  caseId     String?  @map("case_id")
+  clientName String?  @map("client_name")
+  values     String // JSON
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@map("petitions")
+}
+
+// ========== MARKETING ==========
+model MarketingCampaign {
+  id             String    @id @default(uuid())
+  organizationId String    @map("organization_id")
+  name           String
+  type           String?
+  description    String?
+  startDate      DateTime? @map("start_date")
+  endDate        DateTime? @map("end_date")
+  budget         Float?
+  channel        String?
+  status         String    @default("DRAFT")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+
+  @@index([organizationId])
+  @@map("marketing_campaigns")
+}
+
+model ContentCalendar {
+  id             String   @id @default(uuid())
+  organizationId String   @map("organization_id")
+  title          String
+  type           String?
+  date           DateTime
+  status         String?
+  content        String?
+  platform       String?
+  author         String?
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+
+  @@index([organizationId])
+  @@map("content_calendar")
+}
+
+model Expense {
+  id          String   @id @default(uuid())
+  description String
+  amount      Float
+  category    String?
+  date        DateTime
+  createdAt   DateTime @default(now())
+
+  @@map("expenses")
+}
+
 model AccountingEntry {
   id          String   @id @default(uuid())
-  type        String   // INCOME, EXPENSE
-  category    String   // HONORARIOS, CUSTAS, SALARIOS, etc
+  type        String // INCOME, EXPENSE
+  category    String
   description String
   amount      Float
   date        DateTime
@@ -315,47 +917,4 @@ model AccountingEntry {
   createdAt   DateTime @default(now()) @map("created_at")
 
   @@map("accounting_entries")
-}
-
-// CONFIGURAÇÕES DE PETIÇÃO (Logo e Rodapé)
-model PetitionConfig {
-  id             String   @id @default(uuid())
-  logoData       String?  @map("logo_data")   // Base64 da logo
-  logoMimeType   String?  @map("logo_mime_type")
-  footerName     String?  @map("footer_name")    // Nome do escritório
-  footerOab      String?  @map("footer_oab")     // Número OAB
-  footerAddress  String?  @map("footer_address") // Endereço
-  footerPhone    String?  @map("footer_phone")   // Telefone
-  footerEmail    String?  @map("footer_email")   // Email
-  footerWebsite  String?  @map("footer_website") // Website
-  updatedAt      DateTime @updatedAt @map("updated_at")
-
-  @@map("petition_configs")
-}
-
-// MODELOS DE PETIÇÃO (Templates)
-model PetitionTemplate {
-  id          String   @id @default(uuid())
-  name        String
-  content     String   // HTML/Template com placeholders
-  fields      String   // JSON com definições de campos
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
-
-  @@map("petition_templates")
-}
-
-// PETIÇÕES CRIADAS
-model Petition {
-  id          String   @id @default(uuid())
-  title       String
-  content     String   // HTML final gerado
-  templateId  String?  @map("template_id")
-  caseId      String?  @map("case_id")
-  clientName  String?  @map("client_name")
-  values      String   // JSON com valores dos campos
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
-
-  @@map("petitions")
 }

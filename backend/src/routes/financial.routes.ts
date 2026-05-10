@@ -11,7 +11,7 @@ const contractSchema = z.object({
   type: z.string(),
   value: z.number().positive(),
   paymentMethod: z.string().optional(),
-  signedDate: z.string().optional(),
+  signedAt: z.string().optional(),
 });
 
 const invoiceSchema = z.object({
@@ -110,8 +110,13 @@ router.post('/contracts', authMiddleware, async (req: AuthRequest, res: Response
     const data = contractSchema.parse(req.body);
     const contract = await prisma.contract.create({
       data: {
-        ...data,
-        signedDate: data.signedDate ? new Date(data.signedDate) : null,
+        type: data.type,
+        title: `Contrato ${Date.now()}`,
+        totalValue: data.value,
+        paymentMethod: data.paymentMethod,
+        signedAt: data.signedAt ? new Date(data.signedAt) : null,
+        client: { connect: { id: data.clientId } },
+        organization: { connect: { id: req.user!.organizationId } },
       },
       include: {
         client: { select: { id: true, name: true } },
@@ -162,9 +167,14 @@ router.post('/invoices', authMiddleware, async (req: AuthRequest, res: Response)
     
     const invoice = await prisma.invoice.create({
       data: {
-        ...data,
+        title: data.title,
+        amount: data.amount,
+        notes: data.notes,
+        clientId: data.clientId,
         dueDate: new Date(data.dueDate),
         status: 'PENDING',
+        organization: { connect: { id: req.user!.organizationId } },
+        contract: data.contractId ? { connect: { id: data.contractId } } : undefined,
       },
     });
     res.status(201).json({ success: true, invoice });

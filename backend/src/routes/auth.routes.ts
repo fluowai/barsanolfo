@@ -46,7 +46,7 @@ router.post('/auth/login', loginLimiter, async (req: Request, res: Response) => 
       });
     }
 
-    const token = generateToken(user.id, user.email, user.role);
+    const token = generateToken(user.id, user.email, user.role, user.organizationId);
 
     res.json({
       success: true,
@@ -92,16 +92,21 @@ router.post('/auth/register', async (req: Request, res: Response) => {
 
     const passwordHash = await bcrypt.hash(password, 10);
 
+    const org = await prisma.organization.create({
+      data: { name: `${name}'s Organization` },
+    });
+
     const user = await prisma.user.create({
       data: {
         name,
         email,
         passwordHash,
         role: 'LAWYER',
+        organizationId: org.id,
       },
     });
 
-    const token = generateToken(user.id, user.email, user.role);
+    const token = generateToken(user.id, user.email, user.role, user.organizationId);
 
     res.status(201).json({
       success: true,

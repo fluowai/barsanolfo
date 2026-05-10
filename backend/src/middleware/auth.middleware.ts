@@ -6,6 +6,7 @@ export interface AuthRequest extends Request {
     id: string;
     email: string;
     role: string;
+    organizationId: string;
   };
 }
 
@@ -13,6 +14,7 @@ export interface JWTPayload {
   sub: string;
   email: string;
   role: string;
+  organizationId: string;
   iat: number;
   exp: number;
 }
@@ -55,6 +57,7 @@ export function authMiddleware(req: AuthRequest, res: Response, next: NextFuncti
       id: decoded.sub,
       email: decoded.email,
       role: decoded.role,
+      organizationId: decoded.organizationId,
     };
 
     next();
@@ -73,11 +76,11 @@ export function authMiddleware(req: AuthRequest, res: Response, next: NextFuncti
   }
 }
 
-export function generateToken(userId: string, email: string, role: string): string {
+export function generateToken(userId: string, email: string, role: string, organizationId: string): string {
   const secret = getJWTSecret();
   
   return jwt.sign(
-    { sub: userId, email, role },
+    { sub: userId, email, role, organizationId },
     secret,
     { expiresIn: '24h' }
   );

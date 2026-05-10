@@ -20,6 +20,14 @@ import petitionRoutes from './routes/petition.routes';
 import financialRoutes from './routes/financial.routes';
 import whatsappRoutes from './routes/whatsapp.routes';
 import whatsappInstanceRoutes from './routes/whatsapp.instance.routes';
+import deadlineRoutes from './routes/deadlines.routes';
+import taskRoutes from './routes/tasks.routes';
+import hearingRoutes from './routes/hearings.routes';
+import documentRoutes from './routes/documents.routes';
+import contractRoutes from './routes/contracts.routes';
+import notificationRoutes from './routes/notifications.routes';
+import marketingRoutes from './routes/marketing.routes';
+import automationRoutes from './routes/automations.routes';
 import supabase from './lib/supabase';
 
 dotenv.config();
@@ -96,6 +104,14 @@ app.use('/api', petitionRoutes);
 app.use('/api', financialRoutes);
 app.use('/api', whatsappRoutes);
 app.use('/api', whatsappInstanceRoutes);
+app.use('/api', deadlineRoutes);
+app.use('/api', taskRoutes);
+app.use('/api', hearingRoutes);
+app.use('/api', documentRoutes);
+app.use('/api', contractRoutes);
+app.use('/api', notificationRoutes);
+app.use('/api', marketingRoutes);
+app.use('/api', automationRoutes);
 
 app.use('/painel', express.static(path.join(__dirname, '../../frontend-painel/dist')));
 

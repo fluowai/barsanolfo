@@ -1,26 +1,34 @@
-import { Router, Request, Response } from 'express';
+import { Router, Response } from 'express';
 import { z } from 'zod';
-import supabase from '../lib/supabase';
+import bcrypt from 'bcryptjs';
+import { PrismaClient } from '@prisma/client';
+import { authMiddleware, AuthRequest } from '../middleware/auth.middleware';
 
 const router = Router();
+const prisma = new PrismaClient();
 
 const userSchema = z.object({
   name: z.string().min(1),
   email: z.string().email(),
-  password: z.string().min(6),
-  role: z.enum(['ADMIN', 'LAWYER', 'SECRETARY']).default('LAWYER'),
-  avatar: z.string().optional(),
+  password: z.string().min(6).optional(),
+  role: z.string().default('LAWYER'),
+  title: z.string().optional(),
+  oab: z.string().optional(),
+  phone: z.string().optional(),
+  status: z.string().default('ACTIVE'),
 });
 
-// GET /api/team - Listar membros da equipe
-router.get('/team', async (req: Request, res: Response) => {
+router.get('/team', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const { data: users, error } = await supabase
-      .from('users')
-      .select('id, name, email, role, avatar, created_at')
-      .order('name', { ascending: true });
-
-    if (error) throw error;
+    const users = await prisma.user.findMany({
+      where: { organizationId: req.user!.organizationId },
+      select: {
+        id: true, name: true, email: true, role: true,
+        title: true, oab: true, phone: true, avatar: true,
+        status: true, createdAt: true,
+      },
+      orderBy: { name: 'asc' },
+    });
     res.json({ success: true, users });
   } catch (error) {
     console.error(error);
@@ -28,69 +36,64 @@ router.get('/team', async (req: Request, res: Response) => {
   }
 });
 
-// POST /api/team - Criar novo membro
-router.post('/team', async (req: Request, res: Response) => {
+router.post('/team', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
     const data = userSchema.parse(req.body);
-    // Senha hash simples para demonstração (usar bcrypt em produção)
-    const passwordHash = Buffer.from(data.password).toString('base64');
-    
-    const { data: user, error } = await supabase
-      .from('users')
-      .insert({
+    const existing = await prisma.user.findUnique({ where: { email: data.email } });
+    if (existing) {
+      res.status(400).json({ success: false, message: 'Email já cadastrado' });
+      return;
+    }
+
+    const passwordHash = data.password
+      ? await bcrypt.hash(data.password, 10)
+      : await bcrypt.hash('123456', 10);
+
+    const user = await prisma.user.create({
+      data: {
+        organizationId: req.user!.organizationId,
         name: data.name,
         email: data.email,
-        password_hash: passwordHash,
+        passwordHash,
         role: data.role,
-        avatar: data.avatar,
-      })
-      .select()
-      .single();
+        title: data.title,
+        oab: data.oab,
+        phone: data.phone,
+        status: data.status,
+      },
+      select: { id: true, name: true, email: true, role: true, title: true, oab: true, phone: true, status: true, createdAt: true },
+    });
 
-    if (error) {
-      if (error.code === '23505') {
-        return res.status(400).json({ success: false, message: 'Email já cadastrado' });
-      }
-      throw error;
+    res.json({ success: true, user });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      res.status(400).json({ success: false, message: 'Dados inválidos', errors: error.issues });
+      return;
     }
-    
-    res.json({ success: true, user: { id: user.id, name: user.name, email: user.email, role: user.role } });
-  } catch (error: any) {
     console.error(error);
     res.status(500).json({ success: false, message: 'Erro ao criar membro' });
   }
 });
 
-// PUT /api/team/:id - Atualizar membro
-router.put('/team/:id', async (req: Request, res: Response) => {
+router.put('/team/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const { id } = req.params;
-    const { name, email, role, avatar } = req.body;
-    
-    const { data: user, error } = await supabase
-      .from('users')
-      .update({ name, email, role, avatar })
-      .eq('id', id)
-      .select()
-      .single();
-
-    if (error) throw error;
+    const id = String(req.params.id);
+    const { name, email, role, title, oab, phone, status } = req.body;
+    const user = await prisma.user.update({
+      where: { id },
+      data: { name, email, role, title, oab, phone, status },
+      select: { id: true, name: true, email: true, role: true, title: true, oab: true, phone: true, status: true },
+    });
     res.json({ success: true, user });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Erro ao atualizar membro' });
   }
 });
 
-// DELETE /api/team/:id - Remover membro
-router.delete('/team/:id', async (req: Request, res: Response) => {
+router.delete('/team/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const { id } = req.params;
-    const { error } = await supabase
-      .from('users')
-      .delete()
-      .eq('id', id);
-
-    if (error) throw error;
+    const id = String(req.params.id);
+    await prisma.user.delete({ where: { id } });
     res.json({ success: true, message: 'Membro removido' });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Erro ao remover membro' });

@@ -6,6 +6,10 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('🌱 Seed starting...');
 
+  const org = await prisma.organization.findFirst() || await prisma.organization.create({
+    data: { name: 'Barsa Advocacia' },
+  });
+
   const adminEmail = 'admin@barsaadvocacia.com.br';
   const existingAdmin = await prisma.user.findUnique({
     where: { email: adminEmail },
@@ -20,6 +24,7 @@ async function main() {
         email: adminEmail,
         passwordHash,
         role: 'ADMIN',
+        organizationId: org.id,
       },
     });
     console.log('✅ Admin user created: admin@barsaadvocacia.com.br / admin123');

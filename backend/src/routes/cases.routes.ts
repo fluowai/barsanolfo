@@ -8,7 +8,7 @@ const prisma = new PrismaClient();
 
 const caseSchema = z.object({
   number: z.string(),
-  type: z.string(),
+  legalArea: z.string(),
   court: z.string().optional(),
   status: z.string().optional(),
   value: z.number().optional(),
@@ -39,13 +39,15 @@ router.post('/cases', authMiddleware, async (req: AuthRequest, res: Response) =>
     const newCase = await prisma.case.create({
       data: {
         number: data.number,
-        type: data.type,
+        legalArea: data.legalArea,
         court: data.court,
         status: data.status || 'ACTIVE',
-        value: data.value,
+        internalTitle: data.number || `Processo ${Date.now()}`,
+        caseValue: data.value,
         filedDate: data.filedDate ? new Date(data.filedDate) : null,
-        clientId: data.clientId,
-        lawyerId: data.lawyerId,
+        client: { connect: { id: data.clientId } },
+        lawyer: { connect: { id: data.lawyerId } },
+        organization: { connect: { id: req.user!.organizationId } },
       },
     });
     res.json({ success: true, case: newCase });
@@ -66,12 +68,14 @@ router.post('/cases/import', authMiddleware, async (req: AuthRequest, res: Respo
     const newCase = await prisma.case.create({
       data: {
         number: numero,
-        type: tipo || 'TRABALHISTA',
+        legalArea: tipo || 'TRABALHISTA',
         court: tribunal,
         status: 'ACTIVE',
-        value: valor,
-        clientId: clienteId,
-        lawyerId: advogadoId,
+        internalTitle: `Importado ${Date.now()}`,
+        caseValue: valor,
+        client: clienteId ? { connect: { id: clienteId } } : undefined,
+        lawyer: { connect: { id: advogadoId } },
+        organization: { connect: { id: req.user!.organizationId } },
       },
     });
     res.json({ success: true, case: newCase, message: 'Processo importado com sucesso!' });

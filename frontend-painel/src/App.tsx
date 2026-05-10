@@ -16,6 +16,15 @@ import Petitions from './pages/Petitions';
 import PetitionSettings from './pages/PetitionSettings';
 import Jurisprudence from './pages/Jurisprudence';
 import WhatsApp from './pages/WhatsApp';
+import Triage from './pages/Triage';
+import Hearings from './pages/Hearings';
+import Documents from './pages/Documents';
+import Contracts from './pages/Contracts';
+import Reports from './pages/Reports';
+import Marketing from './pages/Marketing';
+import Service from './pages/Service';
+import Team from './pages/Team';
+import Automations from './pages/Automations';
 import './App.css';
 import { STORAGE_KEYS } from './constants';
 
@@ -87,6 +96,15 @@ function App() {
               <Route path="prazos" element={<Deadlines />} />
               <Route path="tarefas" element={<Tasks />} />
               <Route path="financeiro" element={<Financial />} />
+              <Route path="triagem" element={<Triage />} />
+              <Route path="audiencias" element={<Hearings />} />
+              <Route path="documentos" element={<Documents />} />
+              <Route path="contratos" element={<Contracts />} />
+              <Route path="relatorios" element={<Reports />} />
+              <Route path="marketing" element={<Marketing />} />
+              <Route path="atendimento" element={<Service />} />
+              <Route path="equipe" element={<Team />} />
+              <Route path="automacoes" element={<Automations />} />
               <Route path="peticoes" element={<Petitions />} />
               <Route path="peticoes/configuracoes" element={<PetitionSettings />} />
               <Route path="jurisprudencia" element={<Jurisprudence />} />
