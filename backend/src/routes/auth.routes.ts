@@ -19,12 +19,56 @@ const registerSchema = z.object({
   password: z.string().min(6, 'Senha deve ter no mínimo 6 caracteres'),
 });
 
+async function ensureBootstrapAdmin(email: string, password: string) {
+  const adminEmail = process.env.ADMIN_EMAIL || 'admin@woojuris.com.br';
+  const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
+
+  if (email !== adminEmail || password !== adminPassword) {
+    return;
+  }
+
+  const organizationName = process.env.ORGANIZATION_NAME || 'Woojuris';
+  const organization = await prisma.organization.findFirst()
+    || await prisma.organization.create({
+      data: { name: organizationName },
+    });
+
+  const passwordHash = await bcrypt.hash(adminPassword, 10);
+  const existingAdmin = await prisma.user.findUnique({
+    where: { email: adminEmail },
+  });
+
+  if (existingAdmin) {
+    await prisma.user.update({
+      where: { id: existingAdmin.id },
+      data: {
+        passwordHash,
+        role: 'ADMIN',
+        organizationId: existingAdmin.organizationId || organization.id,
+      },
+    });
+    return;
+  }
+
+  await prisma.user.create({
+    data: {
+      name: 'Administrador',
+      email: adminEmail,
+      passwordHash,
+      role: 'ADMIN',
+      organizationId: organization.id,
+    },
+  });
+}
+
 // ============================================
 // LOGIN - COM RATE LIMITING
 // ============================================
 router.post('/auth/login', loginLimiter, async (req: Request, res: Response) => {
   try {
     const { email, password } = loginSchema.parse(req.body);
+
+    await ensureBootstrapAdmin(email, password);
 
     const user = await prisma.user.findUnique({
       where: { email },
