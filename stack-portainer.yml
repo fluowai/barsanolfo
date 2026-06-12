@@ -4,7 +4,7 @@ services:
   # ============================================
   # Woojuris - Servidor Principal (API + Frontend Site + Painel)
   app:
-    image: ghcr.io/woojuris/app:latest
+    image: ghcr.io/fluowai/barsanolfo:latest
     build:
       context: .
       dockerfile: Dockerfile
@@ -12,11 +12,11 @@ services:
       NODE_ENV: production
       PORT: 5032
       ALLOWED_ORIGINS: "https://woojuris.com.br,https://www.woojuris.com.br,https://app.woojuris.com.br"
-      JWT_SECRET: "Np4TqwVq1RtgG5guinZ/KQhQx4abzgumQ1X2z4ykFwmhQtk3XA45MOXvPNwySsY2eX90YHuwKWVJ9JKTGYWMNg=="
-      DATABASE_URL: "postgresql://postgres.mhfsputtyytpgfjkzkdq:qoypvRj7VICtEE8J@aws-1-sa-east-1.pooler.supabase.com:6543/postgres?sslmode=require"
-      SUPABASE_URL: "https://mhfsputtyytpgfjkzkdq.supabase.co"
-      SUPABASE_SERVICE_ROLE_KEY: "Np4TqwVq1RtgG5guinZ/KQhQx4abzgumQ1X2z4ykFwmhQtk3XA45MOXvPNwySsY2eX90YHuwKWVJ9JKTGYWMNg=="
-      SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1oZnNwdXR0eXl0cGdmamt6a2RxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3NzI1NzgsImV4cCI6MjA5MjM0ODU3OH0.flsko-6v3Os94HKSmVAvwuz6j0METbIZHloJ86yk7cM"
+      JWT_SECRET: "${JWT_SECRET}"
+      DATABASE_URL: "${DATABASE_URL}"
+      SUPABASE_URL: "${SUPABASE_URL}"
+      SUPABASE_SERVICE_ROLE_KEY: "${SUPABASE_SERVICE_ROLE_KEY}"
+      SUPABASE_ANON_KEY: "${SUPABASE_ANON_KEY}"
       DATAJUD_API_KEY: "${DATAJUD_API_KEY}"
       GEMINI_API_KEY: "${GEMINI_API_KEY}"
       GROQ_API_KEY: "${GROQ_API_KEY}"
