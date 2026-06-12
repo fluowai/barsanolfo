@@ -24,11 +24,24 @@ import {
   ChevronRight,
   ChevronDown,
   Sparkles,
+  type LucideIcon,
 } from 'lucide-react';
 import { useMobileMenu } from '../contexts/MobileMenuContext';
 import Logo from './Logo';
 import { STORAGE_KEYS } from '../constants';
 import './Sidebar.css';
+
+interface MenuItem {
+  path: string;
+  icon: LucideIcon;
+  label: string;
+  badge: string | number | null;
+}
+
+interface MenuSection {
+  label: string;
+  items: MenuItem[];
+}
 
 const menuSections = (isAdmin: boolean) => {
   const sections: MenuSection[] = [
