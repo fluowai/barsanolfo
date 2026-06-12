@@ -267,13 +267,13 @@ git push origin main
 ### Via Docker
 ```bash
 # Build
-docker build -t barsa:latest .
+docker build -t woojuris:latest .
 
 # Run
 docker run -p 5032:5032 \
   -e JWT_SECRET=seu-secret \
   -e DATABASE_URL=sua-url \
-  barsa:latest
+  woojuris:latest
 ```
 
 ### Via Docker Compose (Local)

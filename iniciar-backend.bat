@@ -3,7 +3,7 @@ setlocal enabledelayedexpansion
 
 echo.
 echo =========================================
-echo 🚀 INICIANDO BARSA ADVOCACIA
+echo 🚀 INICIANDO WOOJURIS
 echo =========================================
 echo.
 

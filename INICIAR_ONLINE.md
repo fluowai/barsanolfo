@@ -16,7 +16,7 @@
 
 ```powershell
 # Execute no PowerShell como Administrator
-cd "C:\Users\paulo\OneDrive\Área de Trabalho\NÃO APAGAR\site barsa"
+cd "C:\Users\paulo\OneDrive\Área de Trabalho\NÃO APAGAR\woojuris"
 
 # Primeira vez: compilar backend
 cd backend
@@ -45,7 +45,7 @@ iniciar-backend.bat
 
 ```bash
 # Build
-docker build -t barsa-advocacia:latest .
+docker build -t woojuris:latest .
 
 # Run
 docker run -p 5032:5032 \
@@ -53,7 +53,7 @@ docker run -p 5032:5032 \
   -e DATABASE_URL=file:./dev.db \
   -e SUPABASE_URL=https://placeholder.supabase.co \
   -e SUPABASE_SERVICE_ROLE_KEY=placeholder \
-  barsa-advocacia:latest
+  woojuris:latest
 ```
 
 ---

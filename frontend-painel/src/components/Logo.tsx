@@ -12,8 +12,8 @@ const Logo: React.FC<LogoProps> = ({
   return (
     <div className={className}>
       <img 
-        src="/assets/logo.png" 
-        alt="Barsanulfo & Martins Logo" 
+        src="/painel/assets/logo.png"
+        alt="Woojuris Logo" 
         className={`${imgClassName} object-contain`}
       />
     </div>

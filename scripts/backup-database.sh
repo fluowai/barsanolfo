@@ -26,7 +26,7 @@ fi
 
 # Criar timestamp
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-BACKUP_FILE="$BACKUP_DIR/barsa_backup_$TIMESTAMP.db"
+BACKUP_FILE="$BACKUP_DIR/woojuris_backup_$TIMESTAMP.db"
 
 # Fazer backup
 log "Iniciando backup..."
@@ -42,6 +42,6 @@ log "✅ Backup criado com sucesso: $BACKUP_FILE (Tamanho: $SIZE)"
 
 # Remover backups antigos
 log "Removendo backups com mais de $DAYS_TO_KEEP dias..."
-find "$BACKUP_DIR" -name "barsa_backup_*.db.gz" -mtime +$DAYS_TO_KEEP -delete
+find "$BACKUP_DIR" -name "woojuris_backup_*.db.gz" -mtime +$DAYS_TO_KEEP -delete
 
 log "✅ Processo de backup concluído com sucesso!"

@@ -1,4 +1,4 @@
-# Script para reiniciar o servidor Barsa Advocacia
+# Script para reiniciar o servidor Woojuris
 Write-Host "🔄 Reiniciando o servidor..." -ForegroundColor Yellow
 
 # Matar processos node antigos

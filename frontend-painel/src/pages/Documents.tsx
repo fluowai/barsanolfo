@@ -1,4 +1,5 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { documentsApi } from '../services/api';
 import {
   Plus, Search, Filter, X, Eye, Download, Trash2, FileText,
   Folder, FolderOpen, Upload, Clock, CheckCircle2, AlertTriangle,
@@ -53,31 +54,6 @@ const STATUS_CONFIG: Record<DocStatus, { label: string; color: string; bg: strin
 
 const TEAM_MEMBERS = ['Dra. Fernanda Lima', 'Dr. Ricardo Santos', 'Dra. Juliana Costa', 'Dr. Paulo Oliveira', 'Secretaria'];
 const CLIENT_LIST = ['João Silva', 'Maria Oliveira', 'Carlos Santos', 'Ana Beatriz', 'Empresa ABC Ltda', 'Roberto Almeida', 'Fernanda Costa'];
-
-const now = new Date();
-const daysAgo = (n: number) => new Date(now.getTime() - n * 86400000).toISOString();
-const daysFromNow = (n: number) => new Date(now.getTime() + n * 86400000).toISOString().split('T')[0];
-
-const MOCK_DOCUMENTS: Document[] = [
-  { id: '1', title: 'RG - João Silva', category: 'Documento Pessoal', status: 'APROVADO', client: 'João Silva', caseNumber: '0000832-35.2018.4.01.3202', fileName: 'rg_joao_silva.pdf', fileSize: '245 KB', fileType: 'pdf', notes: 'Documento original digitalizado', tags: 'RG,documento pessoal', visibleToClient: true, uploadedBy: 'Secretaria', uploadedAt: daysAgo(30), versions: [{ id: 'v1', version: 1, fileName: 'rg_joao_silva.pdf', fileSize: '245 KB', uploadedBy: 'Secretaria', uploadedAt: daysAgo(30), notes: 'Versão original' }], expiryDate: '' },
-  { id: '2', title: 'Procuração - Maria Oliveira', category: 'Procuração', status: 'APROVADO', client: 'Maria Oliveira', caseNumber: '1234567-89.2023.8.26.0000', fileName: 'procuracao_maria.pdf', fileSize: '180 KB', fileType: 'pdf', notes: 'Procuração com poderes gerais', tags: 'procuração', visibleToClient: true, uploadedBy: 'Dra. Fernanda Lima', uploadedAt: daysAgo(25), versions: [{ id: 'v2', version: 1, fileName: 'procuracao_maria.pdf', fileSize: '180 KB', uploadedBy: 'Dra. Fernanda Lima', uploadedAt: daysAgo(25), notes: 'Original' }], expiryDate: '' },
-  { id: '3', title: 'Contrato Social - ABC Ltda', category: 'Contrato', status: 'APROVADO', client: 'Empresa ABC Ltda', caseNumber: '7890123-45.2023.8.26.0200', fileName: 'contrato_social_abc.pdf', fileSize: '1.2 MB', fileType: 'pdf', notes: 'Contrato social consolidado', tags: 'contrato social,empresarial', visibleToClient: true, uploadedBy: 'Dr. Paulo Oliveira', uploadedAt: daysAgo(20), versions: [{ id: 'v3', version: 1, fileName: 'contrato_social_abc.pdf', fileSize: '1.2 MB', uploadedBy: 'Dr. Paulo Oliveira', uploadedAt: daysAgo(20), notes: 'Original' }], expiryDate: '' },
-  { id: '4', title: 'Petição Inicial - Ação Indenizatória', category: 'Petição Inicial', status: 'ENVIADO', client: 'Maria Oliveira', caseNumber: '1234567-89.2023.8.26.0000', fileName: 'peticao_inicial_indenizatoria.pdf', fileSize: '560 KB', fileType: 'pdf', notes: 'Petição inicial protocolada no TJSP', tags: 'petição inicial,indenização', visibleToClient: true, uploadedBy: 'Dr. Ricardo Santos', uploadedAt: daysAgo(15), versions: [{ id: 'v4', version: 1, fileName: 'peticao_inicial_v1.docx', fileSize: '420 KB', uploadedBy: 'Dr. Ricardo Santos', uploadedAt: daysAgo(18), notes: 'Minuta' }, { id: 'v5', version: 2, fileName: 'peticao_inicial_indenizatoria.pdf', fileSize: '560 KB', uploadedBy: 'Dr. Ricardo Santos', uploadedAt: daysAgo(15), notes: 'Versão final protocolada' }], expiryDate: '' },
-  { id: '5', title: 'Sentença - Processo Silva', category: 'Sentença', status: 'APROVADO', client: 'João Silva', caseNumber: '0000832-35.2018.4.01.3202', fileName: 'sentenca_silva.pdf', fileSize: '320 KB', fileType: 'pdf', notes: 'Sentença de primeiro grau', tags: 'sentença,trabalhista', visibleToClient: true, uploadedBy: 'Sistema', uploadedAt: daysAgo(10), versions: [{ id: 'v6', version: 1, fileName: 'sentenca_silva.pdf', fileSize: '320 KB', uploadedBy: 'Sistema', uploadedAt: daysAgo(10), notes: 'Extraída do PJe' }], expiryDate: '' },
-  { id: '6', title: 'Comprovante de Residência', category: 'Comprovante', status: 'PENDENTE', client: 'Carlos Santos', caseNumber: '9876543-21.2024.4.03.6100', fileName: 'comprovante_residencia.jpg', fileSize: '890 KB', fileType: 'image', notes: 'Conta de luz', tags: 'comprovante,residência', visibleToClient: false, uploadedBy: 'Carlos Santos', uploadedAt: daysAgo(5), versions: [{ id: 'v7', version: 1, fileName: 'comprovante_residencia.jpg', fileSize: '890 KB', uploadedBy: 'Carlos Santos', uploadedAt: daysAgo(5), notes: 'Enviado pelo cliente' }], expiryDate: '' },
-  { id: '7', title: 'Áudio - Reunião Estratégica', category: 'Áudio', status: 'ARQUIVADO', client: 'Interno', caseNumber: '', fileName: 'reuniao_estrategica.mp3', fileSize: '15 MB', fileType: 'audio', notes: 'Gravação da reunião de estratégia do mês', tags: 'áudio,reunião', visibleToClient: false, uploadedBy: 'Dra. Juliana Costa', uploadedAt: daysAgo(8), versions: [{ id: 'v8', version: 1, fileName: 'reuniao_estrategica.mp3', fileSize: '15 MB', uploadedBy: 'Dra. Juliana Costa', uploadedAt: daysAgo(8), notes: 'Gravação original' }], expiryDate: '' },
-  { id: '8', title: 'Guia de Custas - Recurso', category: 'Guia de Custas', status: 'VENCIDO', client: 'Empresa ABC Ltda', caseNumber: '7890123-45.2023.8.26.0200', fileName: 'guia_custas_recurso.pdf', fileSize: '95 KB', fileType: 'pdf', notes: 'Guia de recolhimento de custas processuais', tags: 'custas,guia', visibleToClient: true, uploadedBy: 'Secretaria', uploadedAt: daysAgo(12), versions: [{ id: 'v9', version: 1, fileName: 'guia_custas_recurso.pdf', fileSize: '95 KB', uploadedBy: 'Secretaria', uploadedAt: daysAgo(12), notes: 'Original' }], expiryDate: daysAgo(2) },
-  { id: '9', title: 'Imagem - Documento Acidente', category: 'Imagem', status: 'EM_ANALISE', client: 'Ana Beatriz', caseNumber: '4567890-12.2024.8.26.0100', fileName: 'foto_acidente_1.jpg', fileSize: '2.4 MB', fileType: 'image', notes: 'Foto do local do acidente', tags: 'imagem,acidente,prova', visibleToClient: true, uploadedBy: 'Ana Beatriz', uploadedAt: daysAgo(4), versions: [{ id: 'v10', version: 1, fileName: 'foto_acidente_1.jpg', fileSize: '2.4 MB', uploadedBy: 'Ana Beatriz', uploadedAt: daysAgo(4), notes: 'Enviado pela cliente' }], expiryDate: '' },
-  { id: '10', title: 'Recurso de Apelação', category: 'Recurso', status: 'ENVIADO', client: 'João Silva', caseNumber: '0000832-35.2018.4.01.3202', fileName: 'recurso_apelacao_silva.pdf', fileSize: '780 KB', fileType: 'pdf', notes: 'Recurso de apelação protocolado no TRF1', tags: 'recurso,apelação', visibleToClient: true, uploadedBy: 'Dra. Fernanda Lima', uploadedAt: daysAgo(6), versions: [{ id: 'v11', version: 1, fileName: 'recurso_apelacao_v1.docx', fileSize: '600 KB', uploadedBy: 'Dra. Fernanda Lima', uploadedAt: daysAgo(10), notes: 'Minuta inicial' }, { id: 'v12', version: 2, fileName: 'recurso_apelacao_silva.pdf', fileSize: '780 KB', uploadedBy: 'Dra. Fernanda Lima', uploadedAt: daysAgo(6), notes: 'Protocolado' }], expiryDate: '' },
-  { id: '11', title: 'Acórdão - TRF1', category: 'Acórdão', status: 'APROVADO', client: 'Carlos Santos', caseNumber: '9876543-21.2024.4.03.6100', fileName: 'acordao_trf1.pdf', fileSize: '450 KB', fileType: 'pdf', notes: 'Acórdão da 3ª Turma do TRF1', tags: 'acórdão,TRF1', visibleToClient: true, uploadedBy: 'Sistema', uploadedAt: daysAgo(3), versions: [{ id: 'v13', version: 1, fileName: 'acordao_trf1.pdf', fileSize: '450 KB', uploadedBy: 'Sistema', uploadedAt: daysAgo(3), notes: 'Extraído do PJe' }], expiryDate: '' },
-  { id: '12', title: 'NF - Honorários Advocatícios', category: 'NF', status: 'APROVADO', client: 'Roberto Almeida', caseNumber: '', fileName: 'nf_honorarios_maio.pdf', fileSize: '120 KB', fileType: 'pdf', notes: 'Nota fiscal de honorários mensais', tags: 'NF,honorários,faturamento', visibleToClient: true, uploadedBy: 'Secretaria', uploadedAt: daysAgo(2), versions: [{ id: 'v14', version: 1, fileName: 'nf_honorarios_maio.pdf', fileSize: '120 KB', uploadedBy: 'Secretaria', uploadedAt: daysAgo(2), notes: 'Original' }], expiryDate: '' },
-  { id: '13', title: 'Contrato de Honorários - ABC', category: 'Contrato', status: 'APROVADO', client: 'Empresa ABC Ltda', caseNumber: '7890123-45.2023.8.26.0200', fileName: 'contrato_honorarios_abc.pdf', fileSize: '340 KB', fileType: 'pdf', notes: 'Contrato de honorários de êxito', tags: 'contrato,honorários', visibleToClient: true, uploadedBy: 'Dr. Paulo Oliveira', uploadedAt: daysAgo(20), versions: [{ id: 'v15', version: 1, fileName: 'contrato_honorarios_abc.pdf', fileSize: '340 KB', uploadedBy: 'Dr. Paulo Oliveira', uploadedAt: daysAgo(20), notes: 'Assinado' }], expiryDate: '' },
-  { id: '14', title: 'Vídeo - Gravação Audiência', category: 'Vídeo', status: 'PENDENTE', client: 'Maria Oliveira', caseNumber: '1234567-89.2023.8.26.0000', fileName: 'audiencia_virtual.mp4', fileSize: '120 MB', fileType: 'video', notes: 'Gravação da audiência virtual de conciliação', tags: 'vídeo,audiência', visibleToClient: false, uploadedBy: 'Dra. Fernanda Lima', uploadedAt: daysAgo(1), versions: [{ id: 'v16', version: 1, fileName: 'audiencia_virtual.mp4', fileSize: '120 MB', uploadedBy: 'Dra. Fernanda Lima', uploadedAt: daysAgo(1), notes: 'Original' }], expiryDate: '' },
-  { id: '15', title: 'Declaração de Hipossuficiência', category: 'Declaração', status: 'APROVADO', client: 'Ana Beatriz', caseNumber: '4567890-12.2024.8.26.0100', fileName: 'declaracao_hipossuficiencia.pdf', fileSize: '80 KB', fileType: 'pdf', notes: 'Declaração de hipossuficiência para gratuidade de justiça', tags: 'declaração,justiça gratuita', visibleToClient: true, uploadedBy: 'Ana Beatriz', uploadedAt: daysAgo(7), versions: [{ id: 'v17', version: 1, fileName: 'declaracao_hipossuficiencia.pdf', fileSize: '80 KB', uploadedBy: 'Ana Beatriz', uploadedAt: daysAgo(7), notes: 'Assinado' }], expiryDate: '' },
-  { id: '16', title: 'Boletim de Ocorrência', category: 'BO', status: 'EM_ANALISE', client: 'Fernanda Costa', caseNumber: '', fileName: 'bo_123456_2026.pdf', fileSize: '210 KB', fileType: 'pdf', notes: 'BO de furto de veículo', tags: 'BO,ocorrência', visibleToClient: true, uploadedBy: 'Fernanda Costa', uploadedAt: daysAgo(3), versions: [{ id: 'v18', version: 1, fileName: 'bo_123456_2026.pdf', fileSize: '210 KB', uploadedBy: 'Fernanda Costa', uploadedAt: daysAgo(3), notes: 'Digitalizado' }], expiryDate: '' },
-  { id: '17', title: 'Intimação - Audiência Designada', category: 'Intimação', status: 'APROVADO', client: 'João Silva', caseNumber: '0000832-35.2018.4.01.3202', fileName: 'intimacao_audiencia.pdf', fileSize: '150 KB', fileType: 'pdf', notes: 'Intimação para audiência de instrução', tags: 'intimação,audiência', visibleToClient: true, uploadedBy: 'Sistema', uploadedAt: daysAgo(14), versions: [{ id: 'v19', version: 1, fileName: 'intimacao_audiencia.pdf', fileSize: '150 KB', uploadedBy: 'Sistema', uploadedAt: daysAgo(14), notes: 'Extraída do PJe' }], expiryDate: '' },
-  { id: '18', title: 'Publicação - DJE', category: 'Publicação', status: 'APROVADO', client: 'Maria Oliveira', caseNumber: '1234567-89.2023.8.26.0000', fileName: 'publicacao_dje_10maio.pdf', fileSize: '60 KB', fileType: 'pdf', notes: 'Publicação no Diário de Justiça Eletrônico', tags: 'publicação,DJE', visibleToClient: true, uploadedBy: 'Sistema', uploadedAt: daysAgo(1), versions: [{ id: 'v20', version: 1, fileName: 'publicacao_dje_10maio.pdf', fileSize: '60 KB', uploadedBy: 'Sistema', uploadedAt: daysAgo(1), notes: 'Extraída' }], expiryDate: '' },
-];
 
 function formatDate(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString('pt-BR');
@@ -137,8 +113,24 @@ const folderTree: FolderNode[] = [
 ];
 
 export default function Documents() {
-  const [documents, setDocuments] = useState<Document[]>(MOCK_DOCUMENTS);
+  const [documents, setDocuments] = useState<Document[]>([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+
+  useEffect(() => {
+    (async () => {
+      try {
+        setLoading(true);
+        const res = await documentsApi.list();
+        const list = (res as any).documents || (res as any).data || [];
+        setDocuments(Array.isArray(list) ? list : []);
+      } catch (err) {
+        console.error('Erro ao carregar documentos:', err);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
   const [filterCategory, setFilterCategory] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
   const [filterClient, setFilterClient] = useState('');
@@ -246,7 +238,10 @@ export default function Documents() {
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 24 }}>
+      {loading ? (
+        <div style={{ textAlign: 'center', padding: 48, color: 'var(--text-tertiary)' }}>Carregando documentos...</div>
+      ) : (
+      <><div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 24 }}>
         <div className="stat-card"><div className="stat-label">Total</div><div className="stat-value" style={{ color: 'var(--gold-primary)' }}>{stats.total}</div></div>
         <div className="stat-card"><div className="stat-label">Pendentes</div><div className="stat-value" style={{ color: '#F59E0B' }}>{stats.pendentes}</div></div>
         <div className="stat-card"><div className="stat-label">Aprovados</div><div className="stat-value" style={{ color: '#10B981' }}>{stats.aprovados}</div></div>
@@ -362,6 +357,7 @@ export default function Documents() {
           </div>
         </div>
       </div>
+      </>)}
 
       {selectedDoc && !showVersionHistory && (
         <>

@@ -1,4 +1,5 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { deadlinesApi } from '../services/api';
 import {
   Plus, Search, Calendar, List, Filter, X, Eye, Edit3, Trash2,
   CheckCircle2, AlertTriangle, AlertCircle, Clock, ArrowUpDown,
@@ -55,127 +56,7 @@ const today = now.toISOString().split('T')[0];
 const daysAgo = (n: number) => new Date(now.getTime() - n * 86400000).toISOString().split('T')[0];
 const daysFromNow = (n: number) => new Date(now.getTime() + n * 86400000).toISOString().split('T')[0];
 
-const MOCK_DEADLINES: Deadline[] = [
-  {
-    id: '1', title: 'Protocolar recurso especial', type: 'Recurso', caseNumber: '0000832-35.2018.4.01.3202', client: 'João Silva',
-    notificationDate: daysAgo(3), startDate: daysAgo(3), endDate: daysFromNow(2), daysTerm: 5, businessDays: true,
-    responsible: 'Dr. Paulo', reviewer: 'Dra. Maria', priority: 'CRÍTICA', status: 'PENDENTE',
-    description: 'Protocolar recurso especial no STJ contra acórdão do TRF1', observations: 'Prazo exíguo, priorizar',
-    history: [{ id: 'h1', date: daysAgo(3), user: 'Sistema', action: 'Criação', description: 'Prazo criado a partir de intimação' }]
-  },
-  {
-    id: '2', title: 'Contestação - Ação Indenizatória', type: 'Contestação', caseNumber: '1234567-89.2023.8.26.0000', client: 'Maria Oliveira',
-    notificationDate: daysAgo(10), startDate: daysAgo(10), endDate: daysFromNow(5), daysTerm: 15, businessDays: true,
-    responsible: 'Dra. Maria', reviewer: 'Dr. Carlos', priority: 'ALTA', status: 'EM_ANDAMENTO',
-    description: 'Elaborar contestação em ação indenizatória por danos morais', observations: 'Aguardando documentos do cliente',
-    history: [
-      { id: 'h2a', date: daysAgo(10), user: 'Sistema', action: 'Criação', description: 'Prazo criado' },
-      { id: 'h2b', date: daysAgo(5), user: 'Dra. Maria', action: 'Atualização', description: 'Iniciou minuta' }
-    ]
-  },
-  {
-    id: '3', title: 'Manifestação sobre documentos', type: 'Manifestação', caseNumber: '9876543-21.2024.4.03.6100', client: 'Carlos Santos',
-    notificationDate: daysAgo(12), startDate: daysAgo(12), endDate: today, daysTerm: 12, businessDays: false,
-    responsible: 'Dr. Paulo', reviewer: 'Dra. Ana', priority: 'CRÍTICA', status: 'PENDENTE',
-    description: 'Manifestar-se sobre documentos juntados pela parte adversa', observations: '',
-    history: [{ id: 'h3', date: daysAgo(12), user: 'Sistema', action: 'Criação', description: 'Prazo criado' }]
-  },
-  {
-    id: '4', title: 'Juntar documentos comprobatórios', type: 'Juntada', caseNumber: '4567890-12.2024.8.26.0100', client: 'Ana Beatriz',
-    notificationDate: daysAgo(20), startDate: daysAgo(20), endDate: daysFromNow(10), daysTerm: 30, businessDays: true,
-    responsible: 'Secretaria', reviewer: 'Dr. Paulo', priority: 'NORMAL', status: 'PENDENTE',
-    description: 'Juntar procuração e documentos pessoais do cliente', observations: 'Documentos já estão digitalizados',
-    history: [{ id: 'h4', date: daysAgo(20), user: 'Sistema', action: 'Criação', description: 'Prazo criado' }]
-  },
-  {
-    id: '5', title: 'Embargos à execução', type: 'Embargos', caseNumber: '7890123-45.2023.8.26.0200', client: 'Empresa ABC Ltda',
-    notificationDate: daysAgo(17), startDate: daysAgo(17), endDate: daysAgo(2), daysTerm: 15, businessDays: true,
-    responsible: 'Dr. Carlos', reviewer: 'Dra. Maria', priority: 'CRÍTICA', status: 'ATRASADO',
-    description: 'Interpor embargos à execução fiscal', observations: 'URGENTE - Prazo já ultrapassado',
-    history: [
-      { id: 'h5a', date: daysAgo(17), user: 'Sistema', action: 'Criação', description: 'Prazo criado' },
-      { id: 'h5b', date: daysAgo(2), user: 'Sistema', action: 'Alerta', description: 'Prazo expirou' }
-    ]
-  },
-  {
-    id: '6', title: 'Contrarrazões de apelação', type: 'Contrarrazões', caseNumber: '2345678-90.2022.8.26.0300', client: 'João Silva',
-    notificationDate: daysAgo(7), startDate: daysAgo(7), endDate: daysFromNow(3), daysTerm: 10, businessDays: true,
-    responsible: 'Dra. Ana', reviewer: 'Dr. Paulo', priority: 'ALTA', status: 'EM_ANDAMENTO',
-    description: 'Apresentar contrarrazões ao recurso de apelação interposto pelo autor', observations: '',
-    history: [{ id: 'h6', date: daysAgo(7), user: 'Sistema', action: 'Criação', description: 'Prazo criado' }]
-  },
-  {
-    id: '7', title: 'Recurso de apelação', type: 'Apelação', caseNumber: '3456789-01.2021.8.26.0400', client: 'Maria Oliveira',
-    notificationDate: daysAgo(30), startDate: daysAgo(30), endDate: daysAgo(15), daysTerm: 15, businessDays: true,
-    responsible: 'Dr. Paulo', reviewer: 'Dra. Maria', priority: 'ALTA', status: 'CONCLUIDO',
-    description: 'Interpor recurso de apelação contra sentença desfavorável', observations: 'Recurso protocolado em 15 dias úteis',
-    completedDate: daysAgo(15), completionProof: 'protocolo_apelacao.pdf', completionNotes: 'Protocolado via PJe',
-    history: [
-      { id: 'h7a', date: daysAgo(30), user: 'Sistema', action: 'Criação', description: 'Prazo criado' },
-      { id: 'h7b', date: daysAgo(15), user: 'Dr. Paulo', action: 'Conclusão', description: 'Prazo concluído - Recurso protocolado' }
-    ]
-  },
-  {
-    id: '8', title: 'Agravo de instrumento', type: 'Agravo', caseNumber: '5678901-23.2024.4.01.0000', client: 'Carlos Santos',
-    notificationDate: daysAgo(5), startDate: daysAgo(5), endDate: daysFromNow(15), daysTerm: 20, businessDays: true,
-    responsible: 'Dra. Maria', reviewer: 'Dr. Carlos', priority: 'NORMAL', status: 'PENDENTE',
-    description: 'Interpor agravo de instrumento contra decisão interlocutória', observations: 'Necessário juntar cópia integral do processo',
-    history: [{ id: 'h8', date: daysAgo(5), user: 'Sistema', action: 'Criação', description: 'Prazo criado' }]
-  },
-  {
-    id: '9', title: 'Cumprimento de sentença', type: 'Cumprimento', caseNumber: '6789012-34.2020.8.26.0500', client: 'Empresa ABC Ltda',
-    notificationDate: daysAgo(4), startDate: daysAgo(4), endDate: daysFromNow(25), daysTerm: 30, businessDays: false,
-    responsible: 'Dr. Carlos', reviewer: 'Dra. Ana', priority: 'NORMAL', status: 'PENDENTE',
-    description: 'Iniciar cumprimento de sentença com cálculo de atualização', observations: 'Aguardando cálculo contábil',
-    history: [{ id: 'h9', date: daysAgo(4), user: 'Sistema', action: 'Criação', description: 'Prazo criado' }]
-  },
-  {
-    id: '10', title: 'Comparecer à audiência de conciliação', type: 'Audiência', caseNumber: '8901234-56.2024.8.26.0600', client: 'João Silva',
-    notificationDate: daysAgo(15), startDate: daysAgo(15), endDate: daysFromNow(7), daysTerm: 0, businessDays: false,
-    responsible: 'Dr. Paulo', reviewer: 'Dra. Maria', priority: 'ALTA', status: 'EM_ANDAMENTO',
-    description: 'Audiência de conciliação designada pelo juízo da 3ª Vara Cível', observations: 'Preparar proposta de acordo',
-    history: [{ id: 'h10', date: daysAgo(15), user: 'Sistema', action: 'Criação', description: 'Prazo criado' }]
-  },
-  {
-    id: '11', title: 'Regularização de procuração', type: 'Administrativo', caseNumber: '9012345-67.2024.8.26.0700', client: 'Ana Beatriz',
-    notificationDate: daysAgo(8), startDate: daysAgo(8), endDate: daysFromNow(1), daysTerm: 9, businessDays: true,
-    responsible: 'Secretaria', reviewer: 'Dr. Paulo', priority: 'CRÍTICA', status: 'PENDENTE',
-    description: 'Regularizar procuração nos autos conforme intimação', observations: 'Prazo está vencendo',
-    history: [{ id: 'h11', date: daysAgo(8), user: 'Sistema', action: 'Criação', description: 'Prazo criado' }]
-  },
-  {
-    id: '12', title: 'Petição de juntada de procuração', type: 'Juntada', caseNumber: '0123456-78.2024.8.26.0800', client: 'Empresa XYZ',
-    notificationDate: daysAgo(2), startDate: daysAgo(2), endDate: daysFromNow(20), daysTerm: 22, businessDays: true,
-    responsible: 'Dra. Ana', reviewer: 'Dr. Carlos', priority: 'NORMAL', status: 'PENDENTE',
-    description: 'Juntar procuração e documentos societários da empresa', observations: '',
-    history: [{ id: 'h12', date: daysAgo(2), user: 'Sistema', action: 'Criação', description: 'Prazo criado' }]
-  },
-  {
-    id: '13', title: 'Recurso ordinário constitucional', type: 'Recurso', caseNumber: '1111111-11.2023.4.01.3202', client: 'Maria Oliveira',
-    notificationDate: daysAgo(14), startDate: daysAgo(14), endDate: daysFromNow(8), daysTerm: 22, businessDays: true,
-    responsible: 'Dra. Maria', reviewer: 'Dr. Paulo', priority: 'NORMAL', status: 'PENDENTE',
-    description: 'Interpor recurso ordinário para o TRF1', observations: '',
-    history: [{ id: 'h13', date: daysAgo(14), user: 'Sistema', action: 'Criação', description: 'Prazo criado' }]
-  },
-  {
-    id: '14', title: 'Embargos de declaração', type: 'Embargos', caseNumber: '2222222-22.2022.8.26.0900', client: 'João Silva',
-    notificationDate: daysAgo(40), startDate: daysAgo(40), endDate: daysAgo(10), daysTerm: 30, businessDays: true,
-    responsible: 'Dr. Paulo', reviewer: 'Dra. Ana', priority: 'ALTA', status: 'CONCLUIDO',
-    description: 'Embargos de declaração contra acórdão', observations: '',
-    completedDate: daysAgo(10), completionProof: 'embargos_protocolados.pdf', completionNotes: 'Protocolado',
-    history: [
-      { id: 'h14a', date: daysAgo(40), user: 'Sistema', action: 'Criação', description: 'Prazo criado' },
-      { id: 'h14b', date: daysAgo(10), user: 'Dr. Paulo', action: 'Conclusão', description: 'Prazo concluído' }
-    ]
-  },
-  {
-    id: '15', title: 'Manifestação sobre cálculos', type: 'Manifestação', caseNumber: '3333333-33.2024.8.26.1000', client: 'Empresa ABC Ltda',
-    notificationDate: daysAgo(1), startDate: daysAgo(1), endDate: daysFromNow(4), daysTerm: 5, businessDays: true,
-    responsible: 'Dra. Maria', reviewer: 'Dr. Carlos', priority: 'ALTA', status: 'PENDENTE',
-    description: 'Manifestar-se sobre os cálculos apresentados pelo perito', observations: '',
-    history: [{ id: 'h15', date: daysAgo(1), user: 'Sistema', action: 'Criação', description: 'Prazo criado' }]
-  }
-];
+
 
 function calcDaysRemaining(endDate: string): number {
   const end = new Date(endDate);
@@ -218,7 +99,23 @@ const INITIAL_FORM: Omit<Deadline, 'id' | 'history' | 'status' | 'completedDate'
 };
 
 export default function Deadlines() {
-  const [deadlines, setDeadlines] = useState<Deadline[]>(MOCK_DEADLINES);
+  const [deadlines, setDeadlines] = useState<Deadline[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        setLoading(true);
+        const res = await deadlinesApi.list();
+        const list = (res as any).deadlines || (res as any).data || [];
+        setDeadlines(Array.isArray(list) ? list : []);
+      } catch (err) {
+        console.error('Erro ao carregar prazos:', err);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
   const [viewMode, setViewMode] = useState<ViewMode>('list');
   const [search, setSearch] = useState('');
   const [filterType, setFilterType] = useState<string>('');

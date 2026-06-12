@@ -180,7 +180,7 @@ Semana 2:
 
 ✅ PROJETO ESTÁ ONLINE E PRONTO!
 
-O sistema Barsa Advocacia atingiu 75% de readiness para produção
+O sistema Woojuris atingiu 75% de readiness para produção
 com todas as implementações críticas de segurança, logging,
 CI/CD e containerização completas.
 

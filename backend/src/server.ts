@@ -28,6 +28,7 @@ import contractRoutes from './routes/contracts.routes';
 import notificationRoutes from './routes/notifications.routes';
 import marketingRoutes from './routes/marketing.routes';
 import automationRoutes from './routes/automations.routes';
+import intelligenceRoutes from './routes/intelligence.routes';
 import supabase from './lib/supabase';
 
 dotenv.config();
@@ -112,10 +113,11 @@ app.use('/api', contractRoutes);
 app.use('/api', notificationRoutes);
 app.use('/api', marketingRoutes);
 app.use('/api', automationRoutes);
+app.use('/api', intelligenceRoutes);
 
 app.use('/painel', express.static(path.join(__dirname, '../../frontend-painel/dist')));
 
-app.get('/painel*', (req: express.Request, res: express.Response) => {
+app.get('/painel/{*splat}', (req: express.Request, res: express.Response) => {
   const filePath = path.join(__dirname, '../../frontend-painel/dist/index.html');
   res.sendFile(filePath, (err) => {
     if (err && !res.headersSent) {
@@ -126,7 +128,7 @@ app.get('/painel*', (req: express.Request, res: express.Response) => {
 
 app.use(express.static(path.join(__dirname, '../../dist')));
 
-app.get('*', (req: express.Request, res: express.Response) => {
+app.get('/{*splat}', (req: express.Request, res: express.Response) => {
   const filePath = path.join(__dirname, '../../dist/index.html');
   res.sendFile(filePath, (err) => {
     if (err && !res.headersSent) {
@@ -207,7 +209,7 @@ setInterval(async () => {
 }, 3600000);
 
 httpServer.listen(PORT, () => {
-  logger.info('Servidor Barsa Advocacia iniciando...');
+  logger.info('Servidor Woojuris iniciando...');
   logger.info(`Site: http://localhost:${PORT}`);
   logger.info(`Painel: http://localhost:${PORT}/painel`);
   logger.info(`Health: http://localhost:${PORT}/api/health`);

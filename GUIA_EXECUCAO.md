@@ -1,4 +1,4 @@
-# 🚀 GUIA DE EXECUÇÃO - BARSA ADVOCACIA
+# 🚀 GUIA DE EXECUÇÃO - WOOJURIS
 
 ## Versão: 2.0 - Melhorado e Otimizado
 **Data:** 30 de Março de 2026

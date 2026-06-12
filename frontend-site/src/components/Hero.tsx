@@ -7,7 +7,7 @@ const Hero: React.FC = () => {
     <section id="home" className="relative min-h-screen flex items-center pt-20 overflow-hidden">
       {/* Background Overlay */}
       <div className="absolute inset-0 z-0">
-        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-gray-100 via-white/90 to-transparent"></div>
         <img 
           src="https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&q=80&w=2000" 
           alt="Escritório Advocacia" 
@@ -17,26 +17,26 @@ const Hero: React.FC = () => {
 
       <div className="container mx-auto px-6 relative z-10 grid md:grid-cols-2 gap-12 items-center">
         <div className="max-w-2xl space-y-6">
-          <div className="inline-block px-4 py-1 border border-[#d4af37] text-[#d4af37] text-xs uppercase tracking-[0.3em] font-bold rounded-full mb-4">
+          <div className="inline-block px-4 py-1 border border-[#b8860b] text-[#b8860b] text-xs uppercase tracking-[0.3em] font-bold rounded-full mb-4">
             Especialistas em Direito do Trabalho
           </div>
-          <h1 className="text-5xl md:text-7xl font-bold leading-tight">
+          <h1 className="text-5xl md:text-7xl font-bold leading-tight text-gray-900">
             Defendemos Seus <br />
             <span className="gold-gradient">Direitos com Força e Estratégia.</span>
           </h1>
-          <p className="text-xl text-white/70 font-light leading-relaxed max-w-lg">
-            A Barsanulfo & Martins Advogados Associados é sua aliada contra injustiças laborais. Combatividade e seriedade para garantir o que é seu por direito.
+          <p className="text-xl text-gray-600 font-light leading-relaxed max-w-lg">
+            A Woojuris é sua aliada contra injustiças laborais. Combatividade e seriedade para garantir o que é seu por direito.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 pt-6">
             <a 
               href="#contato" 
-              className="px-8 py-4 gold-bg text-black font-bold uppercase tracking-widest text-center transition-transform transform hover:scale-105"
+              className="px-8 py-4 gold-bg text-white font-bold uppercase tracking-widest text-center transition-transform transform hover:scale-105"
             >
               Consultoria Gratuita
             </a>
             <a 
               href="#atuacao" 
-              className="px-8 py-4 border border-white/20 text-white font-bold uppercase tracking-widest text-center hover:bg-white/10 transition-all"
+              className="px-8 py-4 border border-gray-300 text-gray-700 font-bold uppercase tracking-widest text-center hover:bg-gray-100 transition-all"
             >
               Nossas Áreas
             </a>
@@ -51,14 +51,14 @@ const Hero: React.FC = () => {
                alt="Advocacia Premium" 
                className="w-80 h-[480px] object-cover"
              />
-             <div className="absolute -bottom-6 -left-6 bg-[#1a1a1a] p-6 border border-[#d4af37] shadow-xl">
-                <p className="text-[#d4af37] font-serif text-2xl italic">"Justiça é o nosso dever"</p>
+             <div className="absolute -bottom-6 -left-6 bg-white p-6 border border-[#d4af37] shadow-xl">
+                <p className="text-[#b8860b] font-serif text-2xl italic">"Justiça é o nosso dever"</p>
              </div>
           </div>
         </div>
       </div>
 
-      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce text-white/30 hidden md:block">
+      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce text-gray-400 hidden md:block">
         <ChevronDown size={32} />
       </div>
     </section>

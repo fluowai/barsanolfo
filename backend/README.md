@@ -1,4 +1,4 @@
-# 🚀 Backend - Barsa Advocacia
+# 🚀 Backend - Woojuris
 
 ## ✅ O QUE FOI IMPLEMENTADO
 

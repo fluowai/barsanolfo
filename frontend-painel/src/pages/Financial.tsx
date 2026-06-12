@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import {
   DollarSign, TrendingUp, TrendingDown, Landmark, Clock, AlertTriangle,
   Plus, Search, Download, Send, FileText, Printer, X, Check,
@@ -9,6 +9,9 @@ import {
   Building2, User, Briefcase, ClipboardList, ArrowLeft, GripVertical
 } from 'lucide-react';
 import './Financial.css';
+import { financialApi } from '../services/api';
+import { useApiDataList, useApiData } from '../hooks/useApiData';
+import { dataService } from '../services/dataService';
 
 type TransactionType = 'RECEITA' | 'DESPESA';
 type TransactionStatus = 'PAGO' | 'PENDENTE' | 'VENCIDO' | 'PREVISTO' | 'CANCELADO';
@@ -71,28 +74,7 @@ const PAYMENT_METHODS: { key: PaymentMethod; label: string }[] = [
   { key: 'DEPOSITO', label: 'Depósito' },
 ];
 
-const MOCK_TRANSACTIONS: FinancialEntry[] = [
-  { id: 't1', type: 'RECEITA', category: 'Honorários Advocatícios', client: 'João Silva', description: 'Honorários advocatícios - Ação Cível', value: 8000, dueDate: '2026-04-15', paymentMethod: 'PIX', status: 'PAGO', notes: 'Pagamento referente ao mês de abril', process: '0012345-67.2024.8.26.0100', contract: 'CT-2024/001', paymentDate: '2026-04-10', createdAt: '2026-04-01' },
-  { id: 't2', type: 'RECEITA', category: 'Honorários Advocatícios', client: 'Maria Oliveira', description: 'Entrada - Ação Trabalhista', value: 2500, dueDate: '2026-04-05', paymentMethod: 'BOLETO', status: 'PAGO', notes: '', process: '0012346-67.2024.8.26.0100', paymentDate: '2026-04-03', createdAt: '2026-03-20' },
-  { id: 't3', type: 'RECEITA', category: 'Honorários Advocatícios', client: 'Carlos Mendes', description: 'Parcela mensal - contrato de honorários', value: 1200, dueDate: '2026-03-28', paymentMethod: 'TRANSFERENCIA', status: 'VENCIDO', notes: 'Cliente foi notificado. Aguardando pagamento.', process: '0012347-67.2024.8.26.0100', contract: 'CT-2024/003', createdAt: '2026-03-01' },
-  { id: 't4', type: 'RECEITA', category: 'Consultoria Jurídica', client: 'Empresa Alfa Ltda', description: 'Consultoria tributária mensal', value: 5000, dueDate: '2026-05-10', paymentMethod: 'BOLETO', status: 'PENDENTE', notes: 'Contrato de consultoria recorrente', contract: 'CT-2024/002', createdAt: '2026-04-01' },
-  { id: 't5', type: 'RECEITA', category: 'Consultoria Jurídica', client: 'Fernanda Costa', description: 'Consultoria jurídica - Direito de Família', value: 3000, dueDate: '2026-04-30', paymentMethod: 'PIX', status: 'PENDENTE', notes: '', process: '0012349-67.2024.8.26.0100', createdAt: '2026-04-15' },
-  { id: 't6', type: 'RECEITA', category: 'Êxito Processual', client: 'João Silva', description: 'Êxito processual - Ação Cível (30% do valor)', value: 15000, dueDate: '2026-06-15', paymentMethod: 'TRANSFERENCIA', status: 'PREVISTO', notes: 'Previsão de recebimento após trânsito em julgado', process: '0012345-67.2024.8.26.0100', createdAt: '2026-04-20' },
-  { id: 't7', type: 'RECEITA', category: 'Parecer Jurídico', client: 'Construtora Nova Era', description: 'Parecer jurídico - Licitação Pública', value: 4500, dueDate: '2026-05-20', paymentMethod: 'DEPOSITO', status: 'PREVISTO', notes: 'Aguardando aprovação do parecer', createdAt: '2026-04-22' },
-  { id: 't8', type: 'DESPESA', category: 'Custas Processuais', client: '-', description: 'Custas processuais - Ação Cível', value: 450, dueDate: '2026-04-08', paymentMethod: 'BOLETO', status: 'PAGO', notes: '', process: '0012345-67.2024.8.26.0100', paymentDate: '2026-04-05', createdAt: '2026-04-01' },
-  { id: 't9', type: 'DESPESA', category: 'Software', client: '-', description: 'Assinatura mensal - Pacote Jurídico', value: 200, dueDate: '2026-04-10', paymentMethod: 'CARTAO', status: 'PAGO', notes: 'Renovação automática', paymentDate: '2026-04-10', createdAt: '2026-04-01' },
-  { id: 't10', type: 'DESPESA', category: 'Marketing', client: '-', description: 'Campanha Google Ads - Especialização Trabalhista', value: 1500, dueDate: '2026-05-01', paymentMethod: 'CARTAO', status: 'PENDENTE', notes: 'Contrato mensal com agência', createdAt: '2026-04-15' },
-  { id: 't11', type: 'DESPESA', category: 'Diligência', client: '-', description: 'Diligência - Oficial de Justiça', value: 150, dueDate: '2026-04-12', paymentMethod: 'DINHEIRO', status: 'PAGO', notes: '', process: '0012346-67.2024.8.26.0100', paymentDate: '2026-04-11', createdAt: '2026-04-05' },
-  { id: 't12', type: 'DESPESA', category: 'Aluguel', client: '-', description: 'Aluguel sala comercial - maio', value: 3000, dueDate: '2026-05-05', paymentMethod: 'TRANSFERENCIA', status: 'PENDENTE', notes: '', createdAt: '2026-04-20' },
-  { id: 't13', type: 'DESPESA', category: 'Folha de Pagamento', client: '-', description: 'Folha de pagamento - maio/2026', value: 12000, dueDate: '2026-05-05', paymentMethod: 'TRANSFERENCIA', status: 'PENDENTE', notes: 'Inclui salários + encargos', createdAt: '2026-04-25' },
-  { id: 't14', type: 'DESPESA', category: 'Impostos', client: '-', description: 'ISS - Escritório', value: 850, dueDate: '2026-05-15', paymentMethod: 'BOLETO', status: 'PENDENTE', notes: '', createdAt: '2026-04-28' },
-  { id: 't15', type: 'DESPESA', category: 'Correspondente', client: '-', description: 'Correspondente jurídico - interior', value: 320, dueDate: '2026-04-20', paymentMethod: 'PIX', status: 'PAGO', notes: '', process: '0012348-67.2024.8.26.0100', paymentDate: '2026-04-18', createdAt: '2026-04-10' },
-  { id: 't16', type: 'DESPESA', category: 'Cartório', client: '-', description: 'Registro de protesto - cartório', value: 95, dueDate: '2026-04-25', paymentMethod: 'DINHEIRO', status: 'PAGO', notes: '', paymentDate: '2026-04-24', createdAt: '2026-04-15' },
-  { id: 't17', type: 'DESPESA', category: 'Deslocamento', client: '-', description: 'Deslocamento - Audiência em São Paulo', value: 280, dueDate: '2026-04-22', paymentMethod: 'PIX', status: 'PAGO', notes: 'Pedágio + combustível', process: '0012350-67.2024.8.26.0100', paymentDate: '2026-04-21', createdAt: '2026-04-18' },
-  { id: 't18', type: 'RECEITA', category: 'Assinatura Mensal', client: 'Ana Beatriz', description: 'Assinatura mensal - Pacote Preventivo', value: 800, dueDate: '2026-05-01', paymentMethod: 'CARTAO', status: 'PENDENTE', notes: 'Cliente nova - pacote básico', createdAt: '2026-04-26' },
-  { id: 't19', type: 'RECEITA', category: 'Honorários Advocatícios', client: 'Roberto Alves', description: 'Ação de Cobrança - Honorários', value: 3500, dueDate: '2026-04-25', paymentMethod: 'PIX', status: 'PENDENTE', notes: '', process: '0012350-67.2024.8.26.0100', createdAt: '2026-04-10' },
-  { id: 't20', type: 'DESPESA', category: 'Marketing', client: '-', description: 'Manutenção site escritório', value: 600, dueDate: '2026-05-10', paymentMethod: 'CARTAO', status: 'PREVISTO', notes: 'Renovação domínio + hospedagem', createdAt: '2026-04-28' },
-];
+
 
 const monthNames = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
 
@@ -231,6 +213,55 @@ function PieChartSVG({ segments, size = 140 }: {
   );
 }
 
+// ─── HELPERS ────────────────────────────────────────────────────
+function mapInvoiceToEntry(invoice: any): FinancialEntry {
+  const clientName = invoice.contract?.client?.name || invoice.clientId || '-';
+  const statusMap: Record<string, TransactionStatus> = {
+    PAID: 'PAGO', PENDING: 'PENDENTE', OVERDUE: 'VENCIDO',
+    CANCELLED: 'CANCELADO', PARTIALLY_PAID: 'PENDENTE', IN_COLLECTION: 'VENCIDO',
+  };
+  return {
+    id: invoice.id,
+    type: 'RECEITA',
+    category: invoice.title || 'Honorários Advocatícios',
+    client: clientName,
+    description: invoice.description || invoice.title || '',
+    value: invoice.amount,
+    dueDate: invoice.dueDate?.split('T')[0] || '',
+    paymentMethod: (invoice.paymentMethod || 'PIX') as PaymentMethod,
+    status: statusMap[invoice.status] || 'PENDENTE',
+    notes: invoice.notes || '',
+    process: '',
+    contract: invoice.contractId || '',
+    paymentDate: invoice.paidDate?.split('T')[0] || undefined,
+    createdAt: invoice.createdAt?.split('T')[0] || '',
+  };
+}
+
+function mapExpenseToEntry(expense: any): FinancialEntry {
+  return {
+    id: expense.id,
+    type: 'DESPESA',
+    category: expense.category || 'Outros',
+    client: '-',
+    description: expense.description,
+    value: expense.amount,
+    dueDate: expense.date?.split('T')[0] || '',
+    paymentMethod: 'PIX' as PaymentMethod,
+    status: 'PAGO',
+    notes: '',
+    process: '',
+    contract: '',
+    paymentDate: expense.date?.split('T')[0] || undefined,
+    createdAt: expense.createdAt?.split('T')[0] || '',
+  };
+}
+
+const statusMapReverse: Record<string, string> = {
+  PAGO: 'PAID', PENDENTE: 'PENDING', VENCIDO: 'OVERDUE',
+  PREVISTO: 'PENDING', CANCELADO: 'CANCELLED',
+};
+
 // ─── MAIN COMPONENT ─────────────────────────────────────────────
 export default function Financial() {
   // Tabs
@@ -244,6 +275,34 @@ export default function Financial() {
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [filterCategory, setFilterCategory] = useState<string>('all');
   const [filterClient, setFilterClient] = useState<string>('all');
+  const [submitting, setSubmitting] = useState(false);
+
+  // ── API data ─────────────────────────────────────────────────
+  const { data: invoicesData, loading: loadingInvoices, refetch: refetchInvoices } = useApiDataList<any>(
+    () => dataService.fetchAll('/api/invoices', 'invoices'), []
+  );
+  const { data: expensesData, loading: loadingExpenses, refetch: refetchExpenses } = useApiDataList<any>(
+    () => dataService.fetchAll('/api/expenses', 'expenses'), []
+  );
+  const { data: dashboardData, loading: loadingDashboard } = useApiData<any>(
+    () => financialApi.dashboard().then((r: any) => r.dashboard), []
+  );
+
+  const loading = loadingInvoices || loadingExpenses || loadingDashboard;
+
+  // Merge invoices + expenses into unified FinancialEntry[]
+  const allTransactions = useMemo(() => {
+    const invoices: FinancialEntry[] = (invoicesData || []).map(mapInvoiceToEntry);
+    const expenses: FinancialEntry[] = (expensesData || []).map(mapExpenseToEntry);
+    return [...invoices, ...expenses].sort((a, b) =>
+      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+  }, [invoicesData, expensesData]);
+
+  const refetch = useCallback(() => {
+    refetchInvoices();
+    refetchExpenses();
+  }, [refetchInvoices, refetchExpenses]);
 
   // New transaction form
   const emptyForm = () => ({
@@ -280,7 +339,7 @@ export default function Financial() {
   const currentYear = now.getFullYear();
 
   const filteredTransactions = useMemo(() => {
-    let list = MOCK_TRANSACTIONS.filter(t =>
+    let list = allTransactions.filter(t =>
       activeTab === 'RECEBER' ? t.type === 'RECEITA' : t.type === 'DESPESA'
     );
     if (searchTerm) {
@@ -296,11 +355,11 @@ export default function Financial() {
     if (filterCategory !== 'all') list = list.filter(t => t.category === filterCategory);
     if (filterClient !== 'all') list = list.filter(t => t.client === filterClient);
     return list;
-  }, [activeTab, searchTerm, filterStatus, filterCategory, filterClient]);
+  }, [allTransactions, activeTab, searchTerm, filterStatus, filterCategory, filterClient]);
 
   const stats = useMemo(() => {
     const monthStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`;
-    const monthTransactions = MOCK_TRANSACTIONS.filter(t => t.dueDate.startsWith(monthStr));
+    const monthTransactions = allTransactions.filter(t => t.dueDate.startsWith(monthStr));
     const receitas = monthTransactions.filter(t => t.type === 'RECEITA');
     const despesas = monthTransactions.filter(t => t.type === 'DESPESA');
     const receitaTotal = receitas.reduce((a, t) => a + (t.status === 'PAGO' ? t.value : 0), 0);
@@ -309,11 +368,11 @@ export default function Financial() {
     const inadimplencia = receitas.filter(t => t.status === 'VENCIDO').reduce((a, t) => a + t.value, 0);
     const previsto = receitas.filter(t => t.status === 'PREVISTO').reduce((a, t) => a + t.value, 0);
     return { receitaTotal, despesaTotal, saldo: receitaTotal - despesaTotal, aReceber, inadimplencia, previsto };
-  }, []);
+  }, [allTransactions]);
 
   const revenueByMonth = useMemo(() => {
     const map: Record<string, number> = {};
-    MOCK_TRANSACTIONS.filter(t => t.type === 'RECEITA' && t.status === 'PAGO').forEach(t => {
+    allTransactions.filter(t => t.type === 'RECEITA' && t.status === 'PAGO').forEach(t => {
       const m = t.dueDate.substring(0, 7);
       map[m] = (map[m] || 0) + t.value;
     });
@@ -324,11 +383,11 @@ export default function Financial() {
       result.push({ label: monthNames[d.getMonth()].substring(0, 3), value: map[key] || 0 });
     }
     return result;
-  }, []);
+  }, [allTransactions]);
 
   const incomeVsExpenses = useMemo(() => {
     const map: Record<string, { income: number; expense: number }> = {};
-    MOCK_TRANSACTIONS.filter(t => t.status === 'PAGO' || t.status === 'PENDENTE').forEach(t => {
+    allTransactions.filter(t => t.status === 'PAGO' || t.status === 'PENDENTE').forEach(t => {
       const m = t.dueDate.substring(0, 7);
       if (!map[m]) map[m] = { income: 0, expense: 0 };
       if (t.type === 'RECEITA') map[m].income += t.value;
@@ -342,34 +401,34 @@ export default function Financial() {
       result.push({ label: monthNames[d.getMonth()].substring(0, 3), income: v.income, expense: v.expense });
     }
     return result;
-  }, []);
+  }, [allTransactions]);
 
   const categoryRevenue = useMemo(() => {
     const map: Record<string, number> = {};
-    MOCK_TRANSACTIONS.filter(t => t.type === 'RECEITA' && (t.status === 'PAGO' || t.status === 'PENDENTE')).forEach(t => {
+    allTransactions.filter(t => t.type === 'RECEITA' && (t.status === 'PAGO' || t.status === 'PENDENTE')).forEach(t => {
       map[t.category] = (map[t.category] || 0) + t.value;
     });
     const colors = ['#10b981', '#3b82f6', '#e4c23a', '#f97316', '#8b5cf6', '#ec4899', '#14b8a6'];
     return Object.entries(map).sort((a, b) => b[1] - a[1]).map(([k, v], i) => ({
       label: k, value: v, color: colors[i % colors.length],
     }));
-  }, []);
+  }, [allTransactions]);
 
   const customerRevenue = useMemo(() => {
     const map: Record<string, number> = {};
-    MOCK_TRANSACTIONS.filter(t => t.type === 'RECEITA' && (t.status === 'PAGO' || t.status === 'PENDENTE')).forEach(t => {
+    allTransactions.filter(t => t.type === 'RECEITA' && (t.status === 'PAGO' || t.status === 'PENDENTE')).forEach(t => {
       if (t.client !== '-') map[t.client] = (map[t.client] || 0) + t.value;
     });
     return Object.entries(map).sort((a, b) => b[1] - a[1]).map(([k, v]) => ({ client: k, value: v }));
-  }, []);
+  }, [allTransactions]);
 
   const inadimplenciaByClient = useMemo(() => {
     const map: Record<string, number> = {};
-    MOCK_TRANSACTIONS.filter(t => t.type === 'RECEITA' && t.status === 'VENCIDO').forEach(t => {
+    allTransactions.filter(t => t.type === 'RECEITA' && t.status === 'VENCIDO').forEach(t => {
       if (t.client !== '-') map[t.client] = (map[t.client] || 0) + t.value;
     });
     return Object.entries(map).sort((a, b) => b[1] - a[1]).map(([k, v]) => ({ client: k, value: v }));
-  }, []);
+  }, [allTransactions]);
 
   const categories = activeTab === 'RECEBER' ? RECEITA_CATEGORIES : DESPESA_CATEGORIES;
 
@@ -390,18 +449,76 @@ export default function Financial() {
     return Object.keys(errs).length === 0;
   };
 
-  const handleNewTransaction = () => {
+  const handleNewTransaction = async () => {
     if (!validateForm()) return;
-    setShowNewModal(false);
-    setForm(emptyForm());
-    setFormErrors({});
+    setSubmitting(true);
+    try {
+      if (form.type === 'RECEITA') {
+        await financialApi.invoices.create({
+          title: form.description,
+          description: form.description,
+          amount: form.value,
+          dueDate: form.dueDate,
+          clientId: form.client,
+          notes: form.notes,
+        });
+      } else {
+        await financialApi.expenses.create({
+          description: form.description,
+          amount: form.value,
+          category: form.category,
+          date: form.dueDate,
+        });
+      }
+      setShowNewModal(false);
+      setForm(emptyForm());
+      setFormErrors({});
+      refetch();
+    } catch (err: any) {
+      setFormErrors({ submit: err.message || 'Erro ao criar transação' });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  const handlePayTransaction = () => {
+  const handlePayTransaction = async () => {
     if (!showPayModal) return;
     if (!payForm.paymentDate) return;
-    setShowPayModal(null);
-    setPayForm({ paymentDate: '', paymentMethod: 'PIX', notes: '', proofFileName: '' });
+    setSubmitting(true);
+    try {
+      await financialApi.invoices.pay(showPayModal.id);
+      setShowPayModal(null);
+      setPayForm({ paymentDate: '', paymentMethod: 'PIX', notes: '', proofFileName: '' });
+      refetch();
+    } catch (err: any) {
+      alert(err.message || 'Erro ao marcar como pago');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleDeleteTransaction = async (entry: FinancialEntry) => {
+    if (!window.confirm('Tem certeza que deseja excluir?')) return;
+    try {
+      if (entry.type === 'RECEITA') {
+        await financialApi.invoices.remove(entry.id);
+      } else {
+        await financialApi.expenses.remove(entry.id);
+      }
+      refetch();
+    } catch (err: any) {
+      alert(err.message || 'Erro ao excluir');
+    }
+  };
+
+  const handleCancelInvoice = async (entry: FinancialEntry) => {
+    if (!window.confirm('Tem certeza que deseja cancelar esta fatura?')) return;
+    try {
+      await financialApi.invoices.cancel(entry.id);
+      refetch();
+    } catch (err: any) {
+      alert(err.message || 'Erro ao cancelar fatura');
+    }
   };
 
   // ── styles ───────────────────────────────────────────────────
@@ -613,8 +730,8 @@ export default function Financial() {
                 for (let i = 0; i < 6; i++) {
                   const d = new Date(currentYear, currentMonth + i, 1);
                   const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-                  const inc = MOCK_TRANSACTIONS.filter(t => t.type === 'RECEITA' && t.dueDate.startsWith(key) && t.status !== 'CANCELADO').reduce((a, t) => a + t.value, 0);
-                  const exp = MOCK_TRANSACTIONS.filter(t => t.type === 'DESPESA' && t.dueDate.startsWith(key) && t.status !== 'CANCELADO').reduce((a, t) => a + t.value, 0);
+                  const inc = allTransactions.filter(t => t.type === 'RECEITA' && t.dueDate.startsWith(key) && t.status !== 'CANCELADO').reduce((a, t) => a + t.value, 0);
+                  const exp = allTransactions.filter(t => t.type === 'DESPESA' && t.dueDate.startsWith(key) && t.status !== 'CANCELADO').reduce((a, t) => a + t.value, 0);
                   rows.push({ label: monthNames[d.getMonth()], income: inc, expense: exp });
                 }
                 let runningBalance = stats.saldo;
@@ -765,8 +882,21 @@ export default function Financial() {
                           <FileText size={14} />
                         </button>
                       )}
-                      <button style={{ ...s.ghostBtn, padding: '0.375rem', fontSize: 11 }}>
-                        <MoreVertical size={14} />
+                      {tx.type === 'RECEITA' && tx.status !== 'CANCELADO' && (
+                        <button
+                          onClick={() => handleCancelInvoice(tx)}
+                          style={{ ...s.ghostBtn, padding: '0.375rem', fontSize: 11, color: '#f97316' }}
+                          title="Cancelar fatura"
+                        >
+                          <Ban size={14} />
+                        </button>
+                      )}
+                      <button
+                        onClick={() => handleDeleteTransaction(tx)}
+                        style={{ ...s.ghostBtn, padding: '0.375rem', fontSize: 11, color: '#ef4444' }}
+                        title="Excluir"
+                      >
+                        <X size={14} />
                       </button>
                     </div>
                   </td>
@@ -1337,6 +1467,16 @@ export default function Financial() {
   // ─── MAIN RENDER ─────────────────────────────────────────────
   return (
     <div className="financial-page" style={s.page}>
+      {/* Loading overlay */}
+      {loading && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: 12, padding: '2rem', textAlign: 'center' }}>
+            <Loader2 size={32} style={{ animation: 'spin 1s linear infinite', color: 'var(--gold-primary)' }} />
+            <p style={{ marginTop: 12, color: 'var(--text-secondary)', fontSize: 14 }}>Carregando dados financeiros...</p>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, flexWrap: 'wrap', gap: 12 }}>
         <div>

@@ -58,7 +58,7 @@
 
 .search-input-wrapper input:focus {
   border-color: var(--gold);
-  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 .search-input-wrapper svg {
@@ -89,7 +89,7 @@
 
 .search-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(212, 175, 55, 0.3);
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
 }
 
 .search-button:disabled {
@@ -113,7 +113,7 @@
 
 .search-result-card:hover {
   border-color: var(--gold);
-  box-shadow: 0 12px 30px rgba(212, 175, 55, 0.1);
+  box-shadow: 0 12px 30px rgba(37, 99, 235, 0.1);
 }
 
 .result-header {
@@ -175,7 +175,7 @@
 }
 
 .movement-item {
-  background: rgba(212, 175, 55, 0.02);
+  background: rgba(37, 99, 235, 0.02);
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 12px;

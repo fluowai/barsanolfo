@@ -172,7 +172,7 @@
 
 .template-item:hover {
   border-color: var(--gold);
-  background: rgba(212, 175, 55, 0.03);
+  background: rgba(37, 99, 235, 0.03);
 }
 
 .template-item strong {
@@ -448,7 +448,7 @@
 
 .instance-card.selected {
   border-color: var(--gold);
-  box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
 }
 
 .instance-header {
@@ -598,7 +598,7 @@
 
 .contact-item.selected {
   border-color: var(--gold);
-  background: rgba(212, 175, 55, 0.05);
+  background: rgba(37, 99, 235, 0.05);
 }
 
 .contact-avatar {

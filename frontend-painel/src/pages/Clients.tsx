@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { clientsApi } from '../services/api';
 import {
   Users, Plus, Search, Edit, Trash2, Eye, Phone, Mail, FileText,
   Calendar, X, MapPin, User, Briefcase, Building2, Tag, Clock,
@@ -190,264 +191,7 @@ const formatCurrency = (value: number): string => {
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 };
 
-const generateMockClients = (): Client[] => [
-  {
-    id: '1', name: 'Ana Costa Silva', type: 'PF', email: 'ana.costa@email.com',
-    phone: '(11) 98765-4321', whatsapp: '(11) 98765-4321', cpfCnpj: '123.456.789-00',
-    rg: '12.345.678-9', birthDate: '1985-06-15', maritalStatus: 'Casado(a)',
-    profession: 'Médica', address: 'Av. Paulista, 1000', city: 'São Paulo', state: 'SP',
-    notes: 'Cliente indica outros médicos. Preferência por atendimento presencial.',
-    tags: [{ id: 't1', name: 'Premium', color: '#E4C23A' }, { id: 't2', name: 'Indicador', color: '#10B981' }],
-    status: 'active', responsibleName: 'Dra. Fernanda Lima', responsibleId: '1',
-    lawyerName: 'Dr. Ricardo Santos', lawyerId: '2',
-    createdAt: '2025-08-10T09:00:00', updatedAt: '2026-05-09T14:00:00',
-    cases: [
-      { id: 'c1', number: '0001234-56.2026.8.26.0100', title: 'Ação de Indenização - Erro Médico', type: 'Cível', status: 'active', value: 150000, court: 'TJSP', assignedTo: 'Dr. Ricardo Santos', createdAt: '2026-01-15T10:00:00', updatedAt: '2026-05-08T16:00:00' },
-      { id: 'c2', number: '0005678-90.2026.8.26.0100', title: 'Revisão de Contrato de Plano de Saúde', type: 'Consumidor', status: 'active', value: 45000, court: 'TJSP', assignedTo: 'Dr. Ricardo Santos', createdAt: '2026-03-20T11:00:00', updatedAt: '2026-05-05T09:00:00' },
-    ],
-    documents: [
-      { id: 'd1', name: 'RG.pdf', category: 'Documento Pessoal', status: 'verified', size: '2.3 MB', uploadedAt: '2026-01-15T10:30:00', uploadedBy: 'Ana Costa' },
-      { id: 'd2', name: 'CPF.pdf', category: 'Documento Pessoal', status: 'verified', size: '1.1 MB', uploadedAt: '2026-01-15T10:31:00', uploadedBy: 'Ana Costa' },
-      { id: 'd3', name: 'Contrato_Social.pdf', category: 'Contrato', status: 'pending', size: '4.5 MB', uploadedAt: '2026-03-20T14:00:00', uploadedBy: 'Dra. Fernanda Lima' },
-    ],
-    contracts: [
-      { id: 'ct1', title: 'Honorários Advocatícios - Indenização', value: 15000, startDate: '2026-01-15', status: 'active', type: 'Sucesso' },
-      { id: 'ct2', title: 'Assessoria Mensal - Pessoa Física', value: 1200, startDate: '2026-02-01', status: 'active', type: 'Mensal' },
-    ],
-    financial: {
-      totalPaid: 15000, totalPending: 2400, totalOverdue: 0,
-      transactions: [
-        { id: 'f1', description: 'Sinal - Honorários Indenização', value: 5000, type: 'income', status: 'paid', date: '2026-01-20', category: 'Honorários' },
-        { id: 'f2', description: 'Mensalidade Fev/2026', value: 1200, type: 'income', status: 'paid', date: '2026-02-05', category: 'Mensalidade' },
-        { id: 'f3', description: 'Mensalidade Mar/2026', value: 1200, type: 'income', status: 'paid', date: '2026-03-05', category: 'Mensalidade' },
-        { id: 'f4', description: 'Mensalidade Abr/2026', value: 1200, type: 'income', status: 'pending', date: '2026-04-05', category: 'Mensalidade' },
-        { id: 'f5', description: 'Mensalidade Mai/2026', value: 1200, type: 'income', status: 'pending', date: '2026-05-05', category: 'Mensalidade' },
-      ]
-    },
-    tasks: [
-      { id: 'tk1', title: 'Revisar petição inicial', description: 'Verificar documentos anexados', status: 'in_progress', priority: 'high', dueDate: '2026-05-15', assignedTo: 'Dr. Ricardo Santos', createdAt: '2026-05-08T16:00:00' },
-      { id: 'tk2', title: 'Agendar reunião com cliente', description: 'Discutir andamento do processo', status: 'pending', priority: 'medium', dueDate: '2026-05-20', assignedTo: 'Dra. Fernanda Lima', createdAt: '2026-05-09T10:00:00' },
-    ],
-    activities: [
-      { id: 'a1', type: 'case_created', description: 'Processo 0001234-56.2026.8.26.0100 foi criado', author: 'Sistema', createdAt: '2026-01-15T10:00:00' },
-      { id: 'a2', type: 'document_uploaded', description: 'RG.pdf foi enviado', author: 'Ana Costa', createdAt: '2026-01-15T10:30:00' },
-      { id: 'a3', type: 'contract_signed', description: 'Contrato de Honorários assinado', author: 'Ana Costa', createdAt: '2026-01-15T11:00:00' },
-      { id: 'a4', type: 'payment_received', description: 'Pagamento de R$ 5.000 recebido', author: 'Sistema', createdAt: '2026-01-20T09:00:00' },
-      { id: 'a5', type: 'status_change', description: 'Status alterado para Ativo', author: 'Dra. Fernanda Lima', createdAt: '2026-01-20T15:00:00' },
-    ]
-  },
-  {
-    id: '2', name: 'Roberto Almeida', type: 'PF', email: 'roberto.almeida@email.com',
-    phone: '(21) 99876-5432', cpfCnpj: '234.567.890-11', rg: '23.456.789-0',
-    birthDate: '1978-11-22', maritalStatus: 'Divorciado(a)', profession: 'Empresário',
-    address: 'Rua das Flores, 500', city: 'Rio de Janeiro', state: 'RJ',
-    notes: 'Cliente de alto poder aquisitivo. Prefere contato por WhatsApp.',
-    tags: [{ id: 't3', name: 'VIP', color: '#E4C23A' }],
-    status: 'active', responsibleName: 'Dr. Ricardo Santos', responsibleId: '2',
-    lawyerName: 'Dra. Fernanda Lima', lawyerId: '1',
-    createdAt: '2025-09-05T08:30:00', updatedAt: '2026-05-08T11:00:00',
-    cases: [
-      { id: 'c3', number: '0009012-34.2026.8.19.0001', title: 'Ação de Cobrança', type: 'Cível', status: 'active', value: 350000, court: 'TJRJ', assignedTo: 'Dra. Fernanda Lima', createdAt: '2026-02-10T09:00:00', updatedAt: '2026-05-08T11:00:00' },
-    ],
-    documents: [
-      { id: 'd4', name: 'CNH.pdf', category: 'Documento Pessoal', status: 'verified', size: '1.8 MB', uploadedAt: '2026-02-10T10:00:00', uploadedBy: 'Roberto Almeida' },
-    ],
-    contracts: [
-      { id: 'ct3', title: 'Honorários Advocatícios - Cobrança', value: 35000, startDate: '2026-02-10', status: 'active', type: 'Sucesso' },
-    ],
-    financial: {
-      totalPaid: 10000, totalPending: 25000, totalOverdue: 0,
-      transactions: [
-        { id: 'f6', description: 'Sinal - Honorários Cobrança', value: 10000, type: 'income', status: 'paid', date: '2026-02-15', category: 'Honorários' },
-      ]
-    },
-    tasks: [], activities: [
-      { id: 'a6', type: 'case_created', description: 'Processo 0009012-34.2026.8.19.0001 criado', author: 'Sistema', createdAt: '2026-02-10T09:00:00' },
-    ]
-  },
-  {
-    id: '3', name: 'Empresa Alfa Ltda', type: 'PJ', email: 'contato@alfa.com.br',
-    phone: '(11) 3456-7890', cpfCnpj: '12.345.678/0001-90',
-    address: 'Av. Brigadeiro Faria Lima, 2000', city: 'São Paulo', state: 'SP',
-    notes: 'Empresa de tecnologia. 50 funcionários.',
-    tags: [{ id: 't4', name: 'Empresarial', color: '#3B82F6' }, { id: 't5', name: 'Tecnologia', color: '#8B5CF6' }],
-    status: 'active', responsibleName: 'Dra. Juliana Costa', responsibleId: '3',
-    lawyerName: 'Dr. Paulo Oliveira', lawyerId: '4',
-    createdAt: '2024-03-01T09:00:00', updatedAt: '2026-05-10T08:00:00',
-    cases: [
-      { id: 'c4', number: '0003456-78.2026.8.26.0100', title: 'Revisão de Contratos Comerciais', type: 'Empresarial', status: 'active', value: 80000, court: 'TJSP', assignedTo: 'Dr. Paulo Oliveira', createdAt: '2026-01-05T10:00:00', updatedAt: '2026-05-10T08:00:00' },
-      { id: 'c5', number: '0007890-12.2026.8.26.0100', title: 'Defesa em Ação Trabalhista', type: 'Trabalhista', status: 'active', value: 120000, court: 'TRT-2', assignedTo: 'Dra. Juliana Costa', createdAt: '2026-03-15T09:00:00', updatedAt: '2026-05-09T16:00:00' },
-    ],
-    documents: [
-      { id: 'd5', name: 'Contrato_Social_Alfa.pdf', category: 'Documento Societário', status: 'verified', size: '3.2 MB', uploadedAt: '2024-03-01T10:00:00', uploadedBy: 'Admin' },
-      { id: 'd6', name: 'CNPJ_Cartao.pdf', category: 'Documento Fiscal', status: 'verified', size: '0.5 MB', uploadedAt: '2024-03-01T10:05:00', uploadedBy: 'Admin' },
-    ],
-    contracts: [
-      { id: 'ct4', title: 'Assessoria Jurídica Empresarial Mensal', value: 5000, startDate: '2024-03-01', status: 'active', type: 'Mensal' },
-    ],
-    financial: {
-      totalPaid: 125000, totalPending: 10000, totalOverdue: 0,
-      transactions: [
-        { id: 'f7', description: 'Mensalidade Mar/2024', value: 5000, type: 'income', status: 'paid', date: '2024-03-05', category: 'Mensalidade' },
-        { id: 'f8', description: 'Mensalidade Abr/2026', value: 5000, type: 'income', status: 'pending', date: '2026-04-05', category: 'Mensalidade' },
-        { id: 'f9', description: 'Mensalidade Mai/2026', value: 5000, type: 'income', status: 'pending', date: '2026-05-05', category: 'Mensalidade' },
-      ]
-    },
-    tasks: [
-      { id: 'tk3', title: 'Preparar defesa trabalhista', status: 'in_progress', priority: 'high', dueDate: '2026-05-18', assignedTo: 'Dra. Juliana Costa', createdAt: '2026-05-09T16:00:00' },
-    ],
-    activities: [
-      { id: 'a7', type: 'case_created', description: 'Processo 0003456-78.2026.8.26.0100 criado', author: 'Sistema', createdAt: '2026-01-05T10:00:00' },
-      { id: 'a8', type: 'contract_signed', description: 'Contrato de Assessoria Mensal renovado', author: 'Empresa Alfa', createdAt: '2026-01-31T17:00:00' },
-    ]
-  },
-  {
-    id: '4', name: 'Maria Santos Oliveira', type: 'PF', email: 'maria.santos@email.com',
-    phone: '(31) 98765-1234', whatsapp: '(31) 98765-1234', cpfCnpj: '345.678.901-22',
-    rg: '34.567.890-1', birthDate: '1990-03-08', maritalStatus: 'Casado(a)',
-    profession: 'Professora', address: 'Rua da Bahia, 300', city: 'Belo Horizonte', state: 'MG',
-    notes: 'Cliente em dificuldades financeiras. Necessário renegociar.',
-    tags: [{ id: 't6', name: 'Renegociação', color: '#EF4444' }],
-    status: 'overdue', responsibleName: 'Dra. Fernanda Lima', responsibleId: '1',
-    lawyerName: 'Dra. Fernanda Lima', lawyerId: '1',
-    createdAt: '2024-06-15T14:00:00', updatedAt: '2026-05-01T09:00:00',
-    cases: [
-      { id: 'c6', number: '0002345-67.2026.8.13.0001', title: 'Ação de Divórcio Consensual', type: 'Família', status: 'active', value: 20000, court: 'TJMG', assignedTo: 'Dra. Fernanda Lima', createdAt: '2026-01-20T14:00:00', updatedAt: '2026-04-28T10:00:00' },
-    ],
-    documents: [
-      { id: 'd7', name: 'RG_Maria.pdf', category: 'Documento Pessoal', status: 'verified', size: '1.5 MB', uploadedAt: '2026-01-20T15:00:00', uploadedBy: 'Maria Santos' },
-    ],
-    contracts: [
-      { id: 'ct5', title: 'Honorários - Divórcio', value: 5000, startDate: '2026-01-20', status: 'active', type: 'Parcelado' },
-    ],
-    financial: {
-      totalPaid: 1000, totalPending: 1500, totalOverdue: 2500,
-      transactions: [
-        { id: 'f10', description: '1ª Parcela - Honorários', value: 1000, type: 'income', status: 'paid', date: '2026-02-05', category: 'Honorários' },
-        { id: 'f11', description: '2ª Parcela - Honorários', value: 1000, type: 'income', status: 'overdue', date: '2026-03-05', category: 'Honorários' },
-        { id: 'f12', description: '3ª Parcela - Honorários', value: 1000, type: 'income', status: 'overdue', date: '2026-04-05', category: 'Honorários' },
-        { id: 'f13', description: 'Custas Processuais', value: 1500, type: 'expense', status: 'pending', date: '2026-04-10', category: 'Custas' },
-      ]
-    },
-    tasks: [
-      { id: 'tk4', title: 'Negociar parcelas em atraso', status: 'pending', priority: 'high', dueDate: '2026-05-12', assignedTo: 'Dra. Fernanda Lima', createdAt: '2026-05-01T09:00:00' },
-    ],
-    activities: [
-      { id: 'a9', type: 'payment_overdue', description: 'Parcela de honorários em atraso (30 dias)', author: 'Sistema', createdAt: '2026-04-05T00:00:00' },
-    ]
-  },
-  {
-    id: '5', name: 'Dr. Carlos Pereira', type: 'PF', email: 'carlos.pereira@email.com',
-    phone: '(41) 99988-7766', cpfCnpj: '456.789.012-33',
-    birthDate: '1965-09-12', maritalStatus: 'Casado(a)', profession: 'Advogado',
-    address: 'Rua XV de Novembro, 800', city: 'Curitiba', state: 'PR',
-    notes: 'Colega de profissão. Desconto especial combinado.',
-    tags: [{ id: 't7', name: 'Parceiro', color: '#8B5CF6' }, { id: 't8', name: 'Desconto', color: '#10B981' }],
-    status: 'active', responsibleName: 'Dra. Juliana Costa', responsibleId: '3',
-    lawyerName: 'Dr. Paulo Oliveira', lawyerId: '4',
-    createdAt: '2025-11-01T10:00:00', updatedAt: '2026-05-09T10:00:00',
-    cases: [
-      { id: 'c7', number: '0006789-01.2026.8.16.0001', title: 'Consultoria em Direito Societário', type: 'Empresarial', status: 'active', value: 30000, court: 'TJPR', assignedTo: 'Dr. Paulo Oliveira', createdAt: '2026-04-01T10:00:00', updatedAt: '2026-05-09T10:00:00' },
-    ],
-    documents: [
-      { id: 'd8', name: 'OAB_Carteira.pdf', category: 'Profissional', status: 'verified', size: '0.8 MB', uploadedAt: '2025-11-01T11:00:00', uploadedBy: 'Carlos Pereira' },
-    ],
-    contracts: [
-      { id: 'ct6', title: 'Consultoria Jurídica - Projeto Específico', value: 8000, startDate: '2026-04-01', endDate: '2026-06-30', status: 'active', type: 'Prazo' },
-    ],
-    financial: {
-      totalPaid: 4000, totalPending: 4000, totalOverdue: 0,
-      transactions: [
-        { id: 'f14', description: '1ª Parcela Consultoria', value: 4000, type: 'income', status: 'paid', date: '2026-04-10', category: 'Honorários' },
-      ]
-    },
-    tasks: [], activities: []
-  },
-  {
-    id: '6', name: 'Construtora Beta S.A.', type: 'PJ', email: 'financeiro@construtorabeta.com.br',
-    phone: '(11) 4004-5678', cpfCnpj: '98.765.432/0001-10',
-    address: 'Av. Engenheiro Luiz Carlos Berrini, 1500', city: 'São Paulo', state: 'SP',
-    notes: 'Cliente inativo - contratos encerrados em 2025. Pode retornar.',
-    tags: [{ id: 't9', name: 'Inativo', color: '#6B7280' }],
-    status: 'inactive', responsibleName: 'Dr. Paulo Oliveira', responsibleId: '4',
-    lawyerName: 'Dr. Ricardo Santos', lawyerId: '2',
-    createdAt: '2023-05-10T09:00:00', updatedAt: '2025-12-20T17:00:00',
-    cases: [
-      { id: 'c8', number: '0001112-23.2024.8.26.0100', title: 'Ação de Despejo', type: 'Cível', status: 'closed', value: 95000, court: 'TJSP', assignedTo: 'Dr. Ricardo Santos', createdAt: '2024-02-01T09:00:00', updatedAt: '2025-08-15T16:00:00' },
-    ],
-    documents: [
-      { id: 'd9', name: 'Contrato_Social_Beta.pdf', category: 'Documento Societário', status: 'verified', size: '4.1 MB', uploadedAt: '2023-05-10T10:00:00', uploadedBy: 'Admin' },
-    ],
-    contracts: [
-      { id: 'ct7', title: 'Assessoria Jurídica Empresarial (Encerrado)', value: 3000, startDate: '2023-06-01', endDate: '2025-12-31', status: 'closed', type: 'Mensal' },
-    ],
-    financial: {
-      totalPaid: 96000, totalPending: 0, totalOverdue: 0,
-      transactions: [
-        { id: 'f15', description: 'Última mensalidade', value: 3000, type: 'income', status: 'paid', date: '2025-12-05', category: 'Mensalidade' },
-      ]
-    },
-    tasks: [], activities: []
-  },
-  {
-    id: '7', name: 'Juliana Oliveira', type: 'PF', email: 'juliana.oliveira@email.com',
-    phone: '(51) 98877-6655', whatsapp: '(51) 98877-6655', cpfCnpj: '567.890.123-44',
-    birthDate: '1995-12-28', maritalStatus: 'Solteiro(a)', profession: 'Designer',
-    address: 'Rua Padre Chagas, 200', city: 'Porto Alegre', state: 'RS',
-    notes: 'Lead convertida recentemente. Coletando documentos.',
-    tags: [{ id: 't10', name: 'Em Captação', color: '#F59E0B' }],
-    status: 'onboarding', responsibleName: 'Dra. Mariana Torres', responsibleId: '5',
-    lawyerName: 'Dra. Mariana Torres', lawyerId: '5',
-    createdAt: '2026-05-01T09:00:00', updatedAt: '2026-05-10T10:00:00',
-    cases: [],
-    documents: [],
-    contracts: [
-      { id: 'ct8', title: 'Contrato de Honorários - Preliminar', value: 3000, startDate: '2026-05-01', status: 'active', type: 'Fixado' },
-    ],
-    financial: {
-      totalPaid: 1000, totalPending: 2000, totalOverdue: 0,
-      transactions: [
-        { id: 'f16', description: 'Sinal - Honorários', value: 1000, type: 'income', status: 'paid', date: '2026-05-02', category: 'Honorários' },
-      ]
-    },
-    tasks: [
-      { id: 'tk5', title: 'Solicitar documentos pendentes', status: 'pending', priority: 'high', dueDate: '2026-05-14', assignedTo: 'Dra. Mariana Torres', createdAt: '2026-05-10T10:00:00' },
-      { id: 'tk6', title: 'Abrir primeiro processo', status: 'pending', priority: 'medium', assignedTo: 'Dra. Mariana Torres', createdAt: '2026-05-10T10:00:00' },
-    ],
-    activities: [
-      { id: 'a10', type: 'client_created', description: 'Cliente cadastrado no sistema', author: 'Dra. Mariana Torres', createdAt: '2026-05-01T09:00:00' },
-      { id: 'a11', type: 'contract_signed', description: 'Contrato preliminar assinado', author: 'Juliana Oliveira', createdAt: '2026-05-01T10:00:00' },
-    ]
-  },
-  {
-    id: '8', name: 'Escritório Gamma Advocacia', type: 'PJ', email: 'contato@gammalaw.com.br',
-    phone: '(61) 3225-9988', cpfCnpj: '45.678.901/0001-23',
-    address: 'SHS Quadra 6, Bloco A', city: 'Brasília', state: 'DF',
-    notes: 'Contrato encerrado. Todos os processos arquivados.',
-    tags: [{ id: 't11', name: 'Encerrado', color: '#6B7280' }],
-    status: 'closed', responsibleName: 'Dr. Eduardo Martins', responsibleId: '6',
-    lawyerName: 'Dra. Juliana Costa', lawyerId: '3',
-    createdAt: '2022-02-01T08:00:00', updatedAt: '2026-04-30T18:00:00',
-    cases: [
-      { id: 'c9', number: '0003334-45.2022.8.07.0001', title: 'Mandado de Segurança', type: 'Tributário', status: 'closed', value: 50000, court: 'TJDFT', assignedTo: 'Dra. Juliana Costa', createdAt: '2022-06-01T10:00:00', updatedAt: '2024-10-30T17:00:00' },
-    ],
-    documents: [
-      { id: 'd10', name: 'Procuração_Gamma.pdf', category: 'Documento Societário', status: 'verified', size: '1.2 MB', uploadedAt: '2022-02-01T09:00:00', uploadedBy: 'Admin' },
-    ],
-    contracts: [
-      { id: 'ct9', title: 'Assessoria Jurídica (Encerrado)', value: 4000, startDate: '2022-02-01', endDate: '2026-04-30', status: 'closed', type: 'Mensal' },
-    ],
-    financial: {
-      totalPaid: 204000, totalPending: 0, totalOverdue: 0,
-      transactions: [
-        { id: 'f17', description: 'Última mensalidade', value: 4000, type: 'income', status: 'paid', date: '2026-04-05', category: 'Mensalidade' },
-      ]
-    },
-    tasks: [], activities: [
-      { id: 'a12', type: 'status_change', description: 'Status alterado para Encerrado', author: 'Dr. Eduardo Martins', createdAt: '2026-04-30T18:00:00' },
-    ]
-  },
-];
+
 
 export default function Clients() {
   const [clients, setClients] = useState<Client[]>([]);
@@ -468,10 +212,18 @@ export default function Clients() {
   });
 
   useEffect(() => {
-    setTimeout(() => {
-      setClients(generateMockClients());
-      setLoading(false);
-    }, 400);
+    (async () => {
+      try {
+        setLoading(true);
+        const res = await clientsApi.list();
+        const list = (res as any).clients || (res as any).data || [];
+        setClients(Array.isArray(list) ? list : []);
+      } catch (err) {
+        console.error('Erro ao carregar clientes:', err);
+      } finally {
+        setLoading(false);
+      }
+    })();
   }, []);
 
   const filteredClients = clients.filter(c => {
@@ -487,41 +239,16 @@ export default function Clients() {
     return matchesSearch && matchesStatus && matchesResponsible;
   });
 
-  const handleCreateClient = () => {
+  const handleCreateClient = async () => {
     if (!formData.name || !formData.phone) return;
-    const tags = formData.tags
-      ? formData.tags.split(',').filter(Boolean).map((t, i) => ({ id: `t${Date.now()}_${i}`, name: t.trim(), color: '#6B7280' }))
-      : [];
-    const newClient: Client = {
-      id: String(Date.now()),
-      name: formData.name,
-      type: formData.type,
-      email: formData.email,
-      phone: formData.phone,
-      whatsapp: formData.whatsapp || undefined,
-      cpfCnpj: formData.cpfCnpj,
-      rg: formData.rg || undefined,
-      birthDate: formData.birthDate || undefined,
-      maritalStatus: formData.maritalStatus || undefined,
-      profession: formData.profession || undefined,
-      address: formData.address || undefined,
-      city: formData.city || undefined,
-      state: formData.state || undefined,
-      notes: formData.notes || undefined,
-      tags,
-      status: 'active',
-      responsibleName: formData.responsibleName || 'Não atribuído',
-      responsibleId: undefined,
-      lawyerName: formData.lawyerName || undefined,
-      lawyerId: undefined,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      cases: [], documents: [], contracts: [], financial: { totalPaid: 0, totalPending: 0, totalOverdue: 0, transactions: [] }, tasks: [], activities: [
-        { id: `a${Date.now()}`, type: 'client_created', description: 'Cliente cadastrado no sistema', author: formData.responsibleName || 'Sistema', createdAt: new Date().toISOString() }
-      ],
-    };
-    setClients([newClient, ...clients]);
-    handleCloseForm();
+    try {
+      const res = await clientsApi.create(formData);
+      const created = (res as any).client || (res as any).data || res;
+      if (created) setClients([created, ...clients]);
+      handleCloseForm();
+    } catch (err: any) {
+      alert(err.message || 'Erro ao criar cliente');
+    }
   };
 
   const handleEditClient = (client: Client) => {
@@ -538,32 +265,26 @@ export default function Clients() {
     setShowFormModal(true);
   };
 
-  const handleUpdateClient = () => {
+  const handleUpdateClient = async () => {
     if (!editingClient || !formData.name || !formData.phone) return;
-    const tags = formData.tags
-      ? formData.tags.split(',').filter(Boolean).map((t, i) => ({ id: `${Date.now()}_${i}`, name: t.trim(), color: '#6B7280' }))
-      : [];
-    const updated = clients.map(c =>
-      c.id === editingClient.id
-        ? {
-            ...c, name: formData.name, type: formData.type, email: formData.email,
-            phone: formData.phone, whatsapp: formData.whatsapp || undefined,
-            cpfCnpj: formData.cpfCnpj, rg: formData.rg || undefined,
-            birthDate: formData.birthDate || undefined, maritalStatus: formData.maritalStatus || undefined,
-            profession: formData.profession || undefined, address: formData.address || undefined,
-            city: formData.city || undefined, state: formData.state || undefined,
-            notes: formData.notes || undefined, tags, responsibleName: formData.responsibleName || 'Não atribuído',
-            lawyerName: formData.lawyerName || undefined, updatedAt: new Date().toISOString(),
-          }
-        : c
-    );
-    setClients(updated);
-    handleCloseForm();
+    try {
+      const res = await clientsApi.update(editingClient.id, formData);
+      const updated = (res as any).client || (res as any).data || res;
+      if (updated) setClients(clients.map(c => c.id === editingClient.id ? { ...c, ...updated } : c));
+      handleCloseForm();
+    } catch (err: any) {
+      alert(err.message || 'Erro ao atualizar cliente');
+    }
   };
 
-  const handleDeleteClient = (id: string) => {
-    setClients(clients.filter(c => c.id !== id));
-    if (selectedClient?.id === id) setSelectedClient(null);
+  const handleDeleteClient = async (id: string) => {
+    try {
+      await clientsApi.delete(id);
+      setClients(clients.filter(c => c.id !== id));
+      if (selectedClient?.id === id) setSelectedClient(null);
+    } catch (err: any) {
+      alert(err.message || 'Erro ao excluir cliente');
+    }
   };
 
   const handleCloseForm = () => {

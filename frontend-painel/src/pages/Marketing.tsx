@@ -1,4 +1,5 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { marketingApi } from '../services/api';
 import {
   Calendar, Plus, Search, Filter, X, Edit3, Trash2, Eye,
   CheckCircle2, AlertTriangle, Clock, BarChart3, Users,
@@ -65,14 +66,7 @@ const CONTENT_TYPES: ContentItem[] = [
   { id: 'c12', title: 'Webinar: LGPD para Escritórios de Advocacia', type: 'video', status: 'AGENDADO', scheduledFor: '2026-05-28', publishedAt: '', author: 'Dr. Ricardo Santos', channel: 'YouTube', tags: 'LGPD,webinar,dados', notes: 'Link da transmissão será enviado', ethicalAlert: false, ethicalAlertMessage: '' },
 ];
 
-const MOCK_CAMPAIGNS: Campaign[] = [
-  { id: 'cmp1', name: 'Campanha Tráfego Google - Trabalhista', status: 'ATIVA', channel: 'Google Ads', budget: 5000, leads: 48, conversions: 12, spent: 3200, startDate: '2026-04-01', endDate: '2026-06-30', description: 'Campanha de anúncios Google para leads trabalhistas' },
-  { id: 'cmp2', name: 'Campanha Instagram - Família', status: 'ATIVA', channel: 'Instagram', budget: 3000, leads: 35, conversions: 8, spent: 1800, startDate: '2026-04-15', endDate: '2026-06-15', description: 'Conteúdo orgânico e impulsionado para direito de família' },
-  { id: 'cmp3', name: 'Campanha LinkedIn - Empresarial', status: 'PAUSADA', channel: 'LinkedIn', budget: 4000, leads: 22, conversions: 5, spent: 2500, startDate: '2026-03-01', endDate: '2026-05-30', description: 'Campanha de conteúdo B2B para departamentos jurídicos' },
-  { id: 'cmp4', name: 'Campanha E-mail Marketing - Abril', status: 'CONCLUIDA', channel: 'E-mail', budget: 1500, leads: 18, conversions: 6, spent: 1500, startDate: '2026-04-01', endDate: '2026-04-30', description: 'Newsletter mensal para base de contatos' },
-  { id: 'cmp5', name: 'Campanha Facebook - Consumidor', status: 'RASCUNHO', channel: 'Facebook', budget: 2500, leads: 0, conversions: 0, spent: 0, startDate: '2026-06-01', endDate: '2026-07-31', description: 'Campanha para direitos do consumidor' },
-  { id: 'cmp6', name: 'Campanha YouTube - Conteúdo Educativo', status: 'ATIVA', channel: 'YouTube', budget: 3500, leads: 15, conversions: 4, spent: 1200, startDate: '2026-04-20', endDate: '2026-08-20', description: 'Série de vídeos educativos sobre direito' },
-];
+
 
 const STATUS_CONFIG: Record<PostStatus, { label: string; color: string; bg: string }> = {
   RASCUNHO: { label: 'Rascunho', color: '#6B7280', bg: 'rgba(107,114,128,0.12)' },
@@ -103,8 +97,24 @@ function formatCurrency(value: number): string {
 
 export default function Marketing() {
   const [content, setContent] = useState<ContentItem[]>(CONTENT_TYPES);
-  const [campaigns] = useState<Campaign[]>(MOCK_CAMPAIGNS);
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+
+  useEffect(() => {
+    (async () => {
+      try {
+        setLoading(true);
+        const res = await marketingApi.campaigns.list();
+        const list = (res as any).campaigns || (res as any).data || [];
+        setCampaigns(Array.isArray(list) ? list : []);
+      } catch (err) {
+        console.error('Erro ao carregar campanhas:', err);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
   const [filterStatus, setFilterStatus] = useState('');
   const [filterChannel, setFilterChannel] = useState('');
   const [activeTab, setActiveTab] = useState<'content' | 'campaigns' | 'analytics'>('content');
@@ -338,6 +348,9 @@ export default function Marketing() {
 
       {activeTab === 'campaigns' && (
         <div>
+          {loading ? (
+            <div style={{ textAlign: 'center', padding: 48, color: 'var(--text-tertiary)' }}>Carregando campanhas...</div>
+          ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 24 }}>
             {campaigns.map(cmp => {
               const spentPct = cmp.budget > 0 ? Math.round((cmp.spent / cmp.budget) * 100) : 0;
@@ -378,7 +391,8 @@ export default function Marketing() {
               );
             })}
           </div>
-        </div>
+        )}
+      </div>
       )}
 
       {activeTab === 'analytics' && (

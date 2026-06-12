@@ -67,7 +67,7 @@ function App() {
         justifyContent: 'center',
         height: '100vh',
         background: '#1a1a1a',
-        color: '#d4af37',
+        color: '#3b82f6',
         fontFamily: 'system-ui, sans-serif'
       }}>
         Carregando...
@@ -86,7 +86,7 @@ function App() {
   return (
     <ErrorBoundary>
       <MobileMenuProvider>
-        <BrowserRouter basename="/painel">
+        <BrowserRouter basename="/painel" future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <Routes>
             <Route path="/" element={<Layout />}>
               <Route index element={<Dashboard />} />

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
 import { NAV_ITEMS } from '../constants';
@@ -17,10 +16,9 @@ const Header: React.FC = () => {
   }, []);
 
   return (
-    <header className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-[#0a0a0a]/95 backdrop-blur-md py-4 shadow-2xl' : 'bg-transparent py-4'}`}>
+    <header className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-white/95 backdrop-blur-md py-3 shadow-sm' : 'bg-transparent py-4'}`}>
       <div className="container mx-auto px-6 flex justify-between items-start relative">
-        {/* Mobile Toggle (Left) */}
-        <button className="md:hidden text-white relative z-50 flex items-center gap-2 mt-2" onClick={() => setIsOpen(!isOpen)}>
+        <button className="md:hidden text-slate-800 relative z-50 flex items-center gap-2 mt-2" onClick={() => setIsOpen(!isOpen)}>
           {isOpen ? (
             <>
               <X size={28} />
@@ -31,41 +29,37 @@ const Header: React.FC = () => {
           )}
         </button>
 
-        {/* Logo (Center on Mobile, Left on Desktop) */}
         <div className="absolute left-1/2 -translate-x-1/2 md:relative md:left-0 md:translate-x-0 transition-all mt-1">
           <Logo className="" />
         </div>
 
-        {/* Placeholder/Balancer for Mobile Right Side */}
         <div className="w-7 md:hidden"></div>
 
-        {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-8 mt-6">
           {NAV_ITEMS.map((item) => (
             <a
               key={item.href}
               href={item.href}
-              className="text-sm font-medium uppercase tracking-widest text-white/80 hover:text-[#d4af37] transition-colors"
+              className="text-sm font-medium uppercase tracking-widest text-slate-600 hover:text-primary-600 transition-colors"
             >
               {item.label}
             </a>
           ))}
           <a
             href="#contato"
-            className="px-6 py-2 gold-bg text-black font-bold text-xs uppercase tracking-widest rounded-sm hover:brightness-110 transition-all transform hover:-translate-y-1"
+            className="px-6 py-2.5 bg-primary-600 text-white font-semibold text-xs uppercase tracking-widest rounded-md hover:bg-primary-700 transition-all hover:-translate-y-0.5 shadow-sm"
           >
             Falar agora
           </a>
         </nav>
       </div>
 
-      {/* Mobile Nav */}
-      <div className={`fixed inset-0 bg-black/95 z-40 flex flex-col items-center justify-center gap-8 transition-transform duration-500 ${isOpen ? 'translate-x-0' : 'translate-x-full'} md:hidden`}>
+      <div className={`fixed inset-0 bg-white/95 z-40 flex flex-col items-center justify-center gap-8 transition-transform duration-500 ${isOpen ? 'translate-x-0' : 'translate-x-full'} md:hidden`}>
         {NAV_ITEMS.map((item) => (
           <a
             key={item.href}
             href={item.href}
-            className="text-2xl font-serif text-white hover:text-[#d4af37]"
+            className="text-2xl font-serif text-slate-800 hover:text-primary-600"
             onClick={() => setIsOpen(false)}
           >
             {item.label}
@@ -73,7 +67,7 @@ const Header: React.FC = () => {
         ))}
         <a
           href="#contato"
-          className="mt-4 px-10 py-4 gold-bg text-black font-bold uppercase tracking-widest rounded-sm"
+          className="mt-4 px-10 py-4 bg-primary-600 text-white font-bold uppercase tracking-widest rounded-md"
           onClick={() => setIsOpen(false)}
         >
           Agendar Consulta

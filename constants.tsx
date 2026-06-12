@@ -136,7 +136,7 @@ export const TEAM: TeamMember[] = [
     image: '/assets/prof-maria-jose.jpg',
   },
   {
-    name: 'Dra. Amanda Barsanulfo Martins de Oliveira Brandão',
+    name: 'Dra. Amanda Martins de Oliveira Brandão',
     role: 'Sócia | OAB/GO 69.838',
     bio: 'Advogada formada pela Universo, pós-graduada em Direito do Trabalho. Atua nas áreas trabalhista e cível com foco em negociações complexas e defesa de direitos.',
     image: '/assets/prof-amanda.jpg.jpeg',
@@ -147,8 +147,8 @@ export const TEAM: TeamMember[] = [
 // STORAGE KEYS
 // ============================================
 export const STORAGE_KEYS = {
-  AUTH_TOKEN: 'barsa_auth_token',
-  REFRESH_TOKEN: 'barsa_refresh_token',
-  USER: 'barsa_user',
-  THEME: 'barsa_theme',
+  AUTH_TOKEN: 'woojuris_auth_token',
+  REFRESH_TOKEN: 'woojuris_refresh_token',
+  USER: 'woojuris_user',
+  THEME: 'woojuris_theme',
 } as const;

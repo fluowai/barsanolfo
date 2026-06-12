@@ -9,7 +9,7 @@ const Logo: React.FC<{ className?: string; imgClassName?: string }> = ({
     <div className={className}>
       <img 
         src="/assets/logo.png" 
-        alt="Barsanulfo & Martins Logo" 
+        alt="Woojuris Logo" 
         className={`${imgClassName} object-contain`}
       />
     </div>

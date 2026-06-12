@@ -1,6 +1,6 @@
 # 🎉 IMPLEMENTAÇÃO CONCLUÍDA - RESUMO FINAL
 
-## Barsa Advocacia - Sistema Integrado
+## Woojuris - Sistema Integrado
 
 **Data:** 14/01/2026  
 **Hora:** 10:35  
@@ -117,7 +117,7 @@ GET    /dashboard          - Dashboard HTML
 ## 📊 ESTRUTURA DE ARQUIVOS CRIADA
 
 ```
-site barsa/
+woojuris/
 ├── 📁 backend/
 │   ├── 📁 src/
 │   │   ├── 📁 routes/

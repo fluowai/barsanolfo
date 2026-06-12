@@ -126,3 +126,34 @@ export const teamApi = {
   update: (id: string, data: any) => api.put(`/api/team/${id}`, data),
   delete: (id: string) => api.delete(`/api/team/${id}`),
 };
+
+export const financialApi = {
+  dashboard: () => api.get('/api/financial/dashboard'),
+  invoices: {
+    list: () => api.get('/api/invoices'),
+    create: (data: any) => api.post('/api/invoices', data),
+    pay: (id: string) => api.patch(`/api/invoices/${id}/pay`, {}),
+    cancel: (id: string) => api.patch(`/api/invoices/${id}/cancel`, {}),
+    remove: (id: string) => api.delete(`/api/invoices/${id}`),
+  },
+  expenses: {
+    list: () => api.get('/api/expenses'),
+    create: (data: any) => api.post('/api/expenses', data),
+    remove: (id: string) => api.delete(`/api/expenses/${id}`),
+  },
+};
+
+export const marketingApi = {
+  campaigns: {
+    list: () => api.get('/api/marketing/campaigns'),
+    create: (data: any) => api.post('/api/marketing/campaigns', data),
+    update: (id: string, data: any) => api.put(`/api/marketing/campaigns/${id}`, data),
+    delete: (id: string) => api.delete(`/api/marketing/campaigns/${id}`),
+  },
+  calendar: {
+    list: () => api.get('/api/marketing/calendar'),
+    create: (data: any) => api.post('/api/marketing/calendar', data),
+    update: (id: string, data: any) => api.put(`/api/marketing/calendar/${id}`, data),
+    delete: (id: string) => api.delete(`/api/marketing/calendar/${id}`),
+  },
+};

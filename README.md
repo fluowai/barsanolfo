@@ -1,4 +1,4 @@
-# 📚 ÍNDICE GERAL - PROJETO BARSA ADVOCACIA
+# 📚 ÍNDICE GERAL - PROJETO WOOJURIS
 
 ## Sistema Integrado: Site + CRM + Gestão de Escritório
 
@@ -6,7 +6,7 @@
 
 ## 🎯 VISÃO GERAL DO PROJETO
 
-Este projeto visa transformar o site institucional atual do escritório **Barsanulfo & Martins Advogados** em um **sistema completo e integrado** que inclui:
+Este projeto visa transformar o site institucional atual do escritório **Woojuris** em um **sistema completo e integrado** que inclui:
 
 - 🌐 **Site Institucional Editável** (CMS)
 - 📊 **CRM Completo** (Gestão de Leads e Clientes)
@@ -354,7 +354,7 @@ Estimativa: R$ 3.000 - R$ 5.000/mês para:
 
 ## 🎉 MENSAGEM FINAL
 
-Você agora tem **tudo o que precisa** para transformar o escritório Barsanulfo & Martins Advogados em uma **operação digital de ponta**!
+Você agora tem **tudo o que precisa** para transformar o escritório Woojuris em uma **operação digital de ponta**!
 
 ### **Documentação Completa:**
 

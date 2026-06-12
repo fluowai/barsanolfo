@@ -1,4 +1,5 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { contractsApi } from '../services/api';
 import {
   Plus, Search, Filter, X, Eye, Edit3, Trash2, FileText,
   CheckCircle2, Clock, AlertTriangle, Download, Send,
@@ -63,19 +64,7 @@ const CLIENTS = ['João Silva', 'Maria Oliveira', 'Carlos Santos', 'Ana Beatriz'
 const CASES = ['0000832-35.2018.4.01.3202', '1234567-89.2023.8.26.0000', '9876543-21.2024.4.03.6100', '4567890-12.2024.8.26.0100', '7890123-45.2023.8.26.0200'];
 const TEAM = ['Dra. Fernanda Lima', 'Dr. Ricardo Santos', 'Dra. Juliana Costa', 'Dr. Paulo Oliveira'];
 
-const now = new Date();
-const daysAgo = (n: number) => new Date(now.getTime() - n * 86400000).toISOString();
 
-const MOCK_CONTRACTS: Contract[] = [
-  { id: '1', title: 'Honorários Trabalhistas - João Silva', type: 'Êxito', status: 'ASSINADO', client: 'João Silva', caseNumber: '0000832-35.2018.4.01.3202', totalValue: 25000, upfront: 0, installments: 1, contingencyPercent: 20, paymentMethod: 'Transferência Bancária', dueDay: 10, startDate: daysAgo(30), endDate: '', clauses: [{ id: 'cl1', title: 'Objeto', content: 'Prestação de serviços advocatícios em ação trabalhista contra empresa X' }, { id: 'cl2', title: 'Honorários de Êxito', content: '20% sobre o valor efetivamente recebido pelo cliente a título de êxito na ação' }], notes: 'Cliente indicado por antigo cliente', generatedBy: 'Dr. Paulo Oliveira', createdAt: daysAgo(35), timeline: [{ id: 'tl1', date: daysAgo(35), event: 'Criação', description: 'Contrato criado como rascunho', user: 'Dr. Paulo Oliveira' }, { id: 'tl2', date: daysAgo(33), event: 'Gerado', description: 'Contrato gerado oficialmente', user: 'Dr. Paulo Oliveira' }, { id: 'tl3', date: daysAgo(32), event: 'Enviado', description: 'Contrato enviado para assinatura', user: 'Sistema' }, { id: 'tl4', date: daysAgo(30), event: 'Assinado', description: 'Contrato assinado pelo cliente', user: 'João Silva' }], signingDate: daysAgo(30) },
-  { id: '2', title: 'Honorários Familia - Maria Oliveira', type: 'Honorários Fixos', status: 'ASSINADO', client: 'Maria Oliveira', caseNumber: '1234567-89.2023.8.26.0000', totalValue: 12000, upfront: 3000, installments: 6, contingencyPercent: 0, paymentMethod: 'Boleto', dueDay: 5, startDate: daysAgo(20), endDate: '', clauses: [{ id: 'cl3', title: 'Objeto', content: 'Ação de divórcio litigioso c/c partilha de bens e guarda de filhos' }, { id: 'cl4', title: 'Honorários', content: 'Valor fixo de R$ 12.000,00 pagos em 6 parcelas mensais de R$ 2.000,00' }], notes: '', generatedBy: 'Dra. Fernanda Lima', createdAt: daysAgo(25), timeline: [{ id: 'tl5', date: daysAgo(25), event: 'Criação', description: 'Contrato criado', user: 'Dra. Fernanda Lima' }, { id: 'tl6', date: daysAgo(22), event: 'Assinado', description: 'Contrato assinado', user: 'Maria Oliveira' }], signingDate: daysAgo(22) },
-  { id: '3', title: 'Consultoria Empresarial - ABC Ltda', type: 'Recorrência', status: 'ASSINADO', client: 'Empresa ABC Ltda', caseNumber: '7890123-45.2023.8.26.0200', totalValue: 60000, upfront: 20000, installments: 12, contingencyPercent: 0, paymentMethod: 'Transferência Bancária', dueDay: 15, startDate: daysAgo(40), endDate: '', clauses: [{ id: 'cl5', title: 'Objeto', content: 'Assessoria jurídica empresarial mensal' }, { id: 'cl6', title: 'Valor', content: 'R$ 5.000,00 mensais por 12 meses' }], notes: 'Contrato de recorrência anual', generatedBy: 'Dr. Paulo Oliveira', createdAt: daysAgo(45), timeline: [{ id: 'tl7', date: daysAgo(45), event: 'Criação', description: 'Rascunho inicial', user: 'Dr. Paulo Oliveira' }, { id: 'tl8', date: daysAgo(42), event: 'Assinado', description: 'Assinado digitalmente', user: 'Empresa ABC Ltda' }], signingDate: daysAgo(42) },
-  { id: '4', title: 'Honorários Misto - Carlos Santos', type: 'Misto', status: 'ENVIADO', client: 'Carlos Santos', caseNumber: '9876543-21.2024.4.03.6100', totalValue: 35000, upfront: 5000, installments: 10, contingencyPercent: 15, paymentMethod: 'Boleto', dueDay: 20, startDate: daysAgo(10), endDate: '', clauses: [{ id: 'cl7', title: 'Objeto', content: 'Ação indenizatória por danos materiais e morais' }, { id: 'cl8', title: 'Honorários Mix', content: 'R$ 5.000 upfront + 10x R$ 3.000 + 15% do êxito' }], notes: 'Aguardando assinatura do cliente', generatedBy: 'Dr. Ricardo Santos', createdAt: daysAgo(15), timeline: [{ id: 'tl9', date: daysAgo(15), event: 'Criação', description: 'Criado como rascunho', user: 'Dr. Ricardo Santos' }, { id: 'tl10', date: daysAgo(12), event: 'Gerado', description: 'Contrato gerado', user: 'Dr. Ricardo Santos' }, { id: 'tl11', date: daysAgo(10), event: 'Enviado', description: 'Enviado para cliente', user: 'Sistema' }], signingDate: '' },
-  { id: '5', title: 'Consulta Avulsa - Ana Beatriz', type: 'Consulta', status: 'ASSINADO', client: 'Ana Beatriz', caseNumber: '4567890-12.2024.8.26.0100', totalValue: 800, upfront: 800, installments: 1, contingencyPercent: 0, paymentMethod: 'PIX', dueDay: 0, startDate: daysAgo(5), endDate: '', clauses: [{ id: 'cl9', title: 'Objeto', content: 'Consulta jurídica sobre direito do consumidor' }, { id: 'cl10', title: 'Valor', content: 'R$ 800,00 pagos antecipadamente' }], notes: 'Consulta única', generatedBy: 'Dra. Juliana Costa', createdAt: daysAgo(7), timeline: [{ id: 'tl12', date: daysAgo(7), event: 'Criação', description: 'Contrato criado', user: 'Dra. Juliana Costa' }, { id: 'tl13', date: daysAgo(5), event: 'Assinado', description: 'Assinado e pago', user: 'Ana Beatriz' }], signingDate: daysAgo(5) },
-  { id: '6', title: 'Honorários Contingência - Empresa ABC', type: 'Êxito', status: 'RASCUNHO', client: 'Empresa ABC Ltda', caseNumber: '7890123-45.2023.8.26.0200', totalValue: 200000, upfront: 0, installments: 1, contingencyPercent: 25, paymentMethod: 'Transferência Bancária', dueDay: 30, startDate: '', endDate: '', clauses: [{ id: 'cl11', title: 'Objeto', content: 'Recuperação de créditos tributários' }, { id: 'cl12', title: 'Honorários', content: '25% sobre o total recuperado' }], notes: 'Rascunho em elaboração', generatedBy: 'Dr. Paulo Oliveira', createdAt: daysAgo(2), timeline: [{ id: 'tl14', date: daysAgo(2), event: 'Criação', description: 'Rascunho criado', user: 'Dr. Paulo Oliveira' }], signingDate: '' },
-  { id: '7', title: 'Honorários Fixos - Roberto Almeida', type: 'Honorários Fixos', status: 'CANCELADO', client: 'Roberto Almeida', caseNumber: '', totalValue: 15000, upfront: 0, installments: 5, contingencyPercent: 0, paymentMethod: 'Boleto', dueDay: 10, startDate: daysAgo(60), endDate: daysAgo(30), clauses: [{ id: 'cl13', title: 'Objeto', content: 'Defesa em ação de cobrança' }, { id: 'cl14', title: 'Honorários', content: 'R$ 15.000 em 5 parcelas' }], notes: 'Cancelado a pedido do cliente', generatedBy: 'Dr. Ricardo Santos', createdAt: daysAgo(65), timeline: [{ id: 'tl15', date: daysAgo(65), event: 'Criação', description: 'Contrato criado', user: 'Dr. Ricardo Santos' }, { id: 'tl16', date: daysAgo(60), event: 'Assinado', description: 'Assinado', user: 'Roberto Almeida' }, { id: 'tl17', date: daysAgo(30), event: 'Cancelado', description: 'Cancelado a pedido do cliente', user: 'Dr. Ricardo Santos' }], signingDate: daysAgo(60) },
-  { id: '8', title: 'Consultoria Trabalhista - Recorrência', type: 'Recorrência', status: 'GERADO', client: 'Fernanda Costa', caseNumber: '', totalValue: 24000, upfront: 4000, installments: 12, contingencyPercent: 0, paymentMethod: 'Transferência Bancária', dueDay: 5, startDate: '', endDate: '', clauses: [{ id: 'cl15', title: 'Objeto', content: 'Assessoria trabalhista preventiva mensal' }, { id: 'cl16', title: 'Valor', content: 'R$ 2.000,00 mensais por 12 meses' }], notes: 'Cliente demonstrou interesse, aguardando envio', generatedBy: 'Dra. Juliana Costa', createdAt: daysAgo(1), timeline: [{ id: 'tl18', date: daysAgo(1), event: 'Criação', description: 'Contrato gerado', user: 'Dra. Juliana Costa' }], signingDate: '' },
-];
 
 function formatDate(dateStr: string): string {
   if (!dateStr) return '—';
@@ -98,8 +87,24 @@ function StatusBadge({ status }: { status: ContractStatus }) {
 }
 
 export default function Contracts() {
-  const [contracts, setContracts] = useState<Contract[]>(MOCK_CONTRACTS);
+  const [contracts, setContracts] = useState<Contract[]>([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+
+  useEffect(() => {
+    (async () => {
+      try {
+        setLoading(true);
+        const res = await contractsApi.list();
+        const list = (res as any).contracts || (res as any).data || [];
+        setContracts(Array.isArray(list) ? list : []);
+      } catch (err) {
+        console.error('Erro ao carregar contratos:', err);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
   const [filterStatus, setFilterStatus] = useState('');
   const [filterType, setFilterType] = useState('');
   const [filterClient, setFilterClient] = useState('');
@@ -206,7 +211,10 @@ export default function Contracts() {
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 24 }}>
+      {loading ? (
+        <div style={{ textAlign: 'center', padding: 48, color: 'var(--text-tertiary)' }}>Carregando contratos...</div>
+      ) : (
+      <><div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 24 }}>
         <div className="stat-card"><div className="stat-label">Total</div><div className="stat-value" style={{ color: 'var(--gold-primary)' }}>{stats.total}</div></div>
         <div className="stat-card"><div className="stat-label">Ativos</div><div className="stat-value" style={{ color: '#10B981' }}>{stats.ativos}</div></div>
         <div className="stat-card"><div className="stat-label">Rascunhos</div><div className="stat-value" style={{ color: '#6B7280' }}>{stats.rascunhos}</div></div>
@@ -288,6 +296,7 @@ export default function Contracts() {
           </tbody>
         </table>
       </div>
+      </>)}
 
       {selectedContract && (
         <>

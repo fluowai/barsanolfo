@@ -5,7 +5,7 @@ import { PrismaClient } from '@prisma/client';
 
 const router = Router();
 const prisma = new PrismaClient();
-const JWT_SECRET = process.env.JWT_SECRET || 'barsa-secret-key-2024';
+const JWT_SECRET = process.env.JWT_SECRET || 'woojuris-secret-key-2024';
 
 function sseAuth(req: any, res: any, next: any) {
   const token = req.query.token as string;

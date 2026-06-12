@@ -1,4 +1,5 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
+import { leadsApi } from '../services/api';
 import {
   Scale, Phone, Calendar, Clock, AlertTriangle, ChevronRight,
   CheckCircle, XCircle, FileText, UserPlus, Briefcase,
@@ -197,71 +198,6 @@ const AREA_QUESTIONS: Record<LegalArea, { id: string; question: string; type: 'y
   ],
 };
 
-const MOCK_LEADS: Lead[] = [
-  {
-    id: '1', name: 'Carlos Alberto Mendes', phone: '(11) 99999-1101',
-    legalArea: 'CRIMINAL', urgency: 'URGENT', createdAt: '2026-05-10T08:15:00',
-    description: 'Preso em flagrante por tráfico de drogas. Já passou por audiência de custódia. Família busca advogado criminalista urgente.',
-    triages: [
-      {
-        id: 't1', leadId: '1', legalArea: 'CRIMINAL',
-        answers: [
-          { question: 'O cliente foi preso?', answer: 'Sim' },
-          { question: 'Está em flagrante?', answer: 'Sim' },
-        ],
-        summary: 'Cliente preso em flagrante por tráfico. Audiência de custódia já realizada.',
-        urgencyClassification: 'Urgente - Necessita ação imediata',
-        riskLevel: 'Alto - Prisão preventiva possível',
-        suggestedSteps: ['Solicitar relaxamento da prisão', 'Verificar legalidade do flagrante', 'Impetrar HC se necessário'],
-        documentsChecklist: ['BO', 'Auto de Prisão em Flagrante', 'Documentos pessoais'],
-        status: 'COMPLETED', internalNote: '', createdAt: '2026-05-10T09:00:00', completedAt: '2026-05-10T09:30:00',
-      },
-    ],
-  },
-  {
-    id: '2', name: 'Ana Paula Oliveira', phone: '(21) 98888-2202',
-    legalArea: 'FAMILIA', urgency: 'HIGH', createdAt: '2026-05-09T14:30:00',
-    description: 'Divórcio litigioso com partilha de bens. Casal tem dois filhos menores. Necessita definição de guarda e pensão.',
-    triages: [],
-  },
-  {
-    id: '3', name: 'Roberto Souza Lima', phone: '(31) 97777-3303',
-    legalArea: 'TRABALHISTA', urgency: 'NORMAL', createdAt: '2026-05-08T10:00:00',
-    description: 'Reclamação trabalhista após 8 anos de empresa. FGTS não depositado, verbas rescisórias pendentes.',
-    triages: [],
-  },
-  {
-    id: '4', name: 'Maria José Santos', phone: '(41) 96666-4404',
-    legalArea: 'PREVIDENCIARIO', urgency: 'HIGH', createdAt: '2026-05-07T16:45:00',
-    description: 'Aposentadoria por idade rural negada pelo INSS. Cliente com 62 anos, trabalhadora rural.',
-    triages: [],
-  },
-  {
-    id: '5', name: 'Fernando Costa', phone: '(51) 95555-5505',
-    legalArea: 'CIVEL', urgency: 'NORMAL', createdAt: '2026-05-06T11:20:00',
-    description: 'Ação de cobrança de R$ 50.000,00 referente a contrato de prestação de serviços não pago.',
-    triages: [],
-  },
-  {
-    id: '6', name: 'Juliana Martins Rocha', phone: '(61) 94444-6606',
-    legalArea: 'CRIMINAL', urgency: 'URGENT', createdAt: '2026-05-10T07:00:00',
-    description: 'Mandado de prisão preventiva expedido. Cliente se apresentou voluntariamente. Necessidade de revogação.',
-    triages: [],
-  },
-  {
-    id: '7', name: 'Lucas Pereira', phone: '(71) 93333-7707',
-    legalArea: 'CONSUMIDOR', urgency: 'NORMAL', createdAt: '2026-05-05T09:10:00',
-    description: 'Produto com defeito comprado há 3 meses. Fornecedor se recusa a trocar ou devolver o valor.',
-    triages: [],
-  },
-  {
-    id: '8', name: 'Patrícia Albuquerque', phone: '(81) 92222-8808',
-    legalArea: 'TRIBUTARIO', urgency: 'HIGH', createdAt: '2026-05-04T13:55:00',
-    description: 'Execução fiscal de IPTU no valor de R$ 120.000,00. Empresa corre risco de penhora.',
-    triages: [],
-  },
-];
-
 const generateSummary = (area: LegalArea, answers: Record<string, string>): {
   summary: string;
   urgency: string;
@@ -415,7 +351,23 @@ const generateSummary = (area: LegalArea, answers: Record<string, string>): {
 };
 
 const TriagePage: React.FC = () => {
-  const [leads] = useState<Lead[]>(MOCK_LEADS);
+  const [leads, setLeads] = useState<Lead[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        setLoading(true);
+        const res = await leadsApi.list();
+        const list = (res as any).leads || (res as any).data || [];
+        setLeads(Array.isArray(list) ? list : []);
+      } catch (err) {
+        console.error('Erro ao carregar leads:', err);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [areaFilter, setAreaFilter] = useState<LegalArea | ''>('');
@@ -549,7 +501,9 @@ const TriagePage: React.FC = () => {
 
       {showToast}
 
-      {currentStep === 'list' && (
+      {loading ? (
+        <div style={{ textAlign: 'center', padding: 48, color: 'var(--text-tertiary)', fontSize: 16 }}>Carregando leads...</div>
+      ) : currentStep === 'list' && (
         <>
           <div className="page-header" style={{
             display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start',

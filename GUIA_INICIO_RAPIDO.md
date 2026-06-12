@@ -183,8 +183,8 @@ Acesse `http://localhost:5173` e teste o formulário!
 
 ```bash
 # Criar projeto raiz
-mkdir barsa-advocacia-system
-cd barsa-advocacia-system
+mkdir woojuris-system
+cd woojuris-system
 
 # Criar subpastas
 mkdir frontend
@@ -246,7 +246,7 @@ npx prisma init
 Editar `backend/.env`:
 
 ```env
-DATABASE_URL="postgresql://usuario:senha@localhost:5432/barsa_advocacia"
+DATABASE_URL="postgresql://usuario:senha@localhost:5432/woojuris"
 JWT_SECRET="sua_chave_secreta_super_segura_aqui"
 PORT=3000
 

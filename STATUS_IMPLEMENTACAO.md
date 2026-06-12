@@ -1,6 +1,6 @@
 # ✅ STATUS DA IMPLEMENTAÇÃO
 
-## Barsa Advocacia - Sistema Integrado
+## Woojuris - Sistema Integrado
 
 **Data:** 07/04/2026  
 **Versão:** 1.1.0  
@@ -50,7 +50,7 @@
 ## 📁 ESTRUTURA DO PROJETO
 
 ```
-site barsa/
+woojuris/
 ├── backend/
 │   ├── src/
 │   │   ├── routes/
@@ -115,7 +115,7 @@ site barsa/
 
 ### Usuário Admin Padrão
 
-- **Email:** `admin@barsaadvocacia.com.br`
+- **Email:** `admin@woojuris.com.br`
 - **Senha:** `admin123`
 
 ---
@@ -135,7 +135,7 @@ npm run dev
 1. Backend: http://localhost:5032
 2. Site: http://localhost:5032
 3. Painel: http://localhost:5032/painel
-4. Login: `admin@barsaadvocacia.com.br` / `admin123`
+4. Login: `admin@woojuris.com.br` / `admin123`
 
 ---
 

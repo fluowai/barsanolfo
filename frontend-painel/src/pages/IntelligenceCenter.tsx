@@ -8,7 +8,7 @@ import {
   ArrowDown, ExternalLink, Landmark, CreditCard, UserCheck, UserX,
   Ban, FileSignature, CalendarCheck, Flag,
 } from 'lucide-react';
-import './Dashboard.css';
+import './IntelligenceCenter.css';
 
 type DashboardTab = 'executive' | 'commercial' | 'procedural' | 'financial' | 'productivity' | 'clients' | 'alerts' | 'copilot';
 
@@ -558,7 +558,7 @@ function CopilotDashboard() {
 }
 function Send(props: any) { return <MessageSquare {...props} />; }
 
-export default function Dashboard() {
+export default function IntelligenceCenter() {
   const [activeTab, setActiveTab] = useState<DashboardTab>('executive');
   const [data, setData] = useState<Record<string, any>>({});
   const [loading, setLoading] = useState(true);

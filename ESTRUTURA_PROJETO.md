@@ -3,7 +3,7 @@
 ## 🏗️ Arquitetura de Pastas
 
 ```
-barsa-advocacia-system/
+woojuris/
 │
 ├── 📁 frontend/                    # Aplicação React
 │   ├── 📁 public/
@@ -235,7 +235,7 @@ barsa-advocacia-system/
 
 ```json
 {
-  "name": "barsa-advocacia-frontend",
+  "name": "woojuris-frontend",
   "version": "1.0.0",
   "type": "module",
   "scripts": {
@@ -277,7 +277,7 @@ barsa-advocacia-system/
 
 ```json
 {
-  "name": "barsa-advocacia-backend",
+  "name": "woojuris-backend",
   "version": "1.0.0",
   "type": "module",
   "scripts": {
@@ -745,8 +745,8 @@ export const useAuth = create<AuthState>()(
 
 ```bash
 # Clone ou crie o projeto
-mkdir barsa-advocacia-system
-cd barsa-advocacia-system
+mkdir woojuris
+cd woojuris
 
 # Frontend
 mkdir frontend

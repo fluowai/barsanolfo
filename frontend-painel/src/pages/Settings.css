@@ -48,7 +48,7 @@
 
 .settings-tab:hover {
   color: var(--text);
-  background: rgba(212, 175, 55, 0.05);
+  background: rgba(37, 99, 235, 0.05);
 }
 
 .settings-tab.active {
@@ -111,7 +111,7 @@
 .settings-form-group textarea:focus {
   outline: none;
   border-color: var(--gold);
-  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 .settings-form-actions {
@@ -139,7 +139,7 @@
 
 .btn-save:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(212, 175, 55, 0.3);
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
 }
 
 .btn-cancel {
@@ -191,7 +191,7 @@
 }
 
 .settings-table tbody tr:hover {
-  background: rgba(212, 175, 55, 0.02);
+  background: rgba(37, 99, 235, 0.02);
 }
 
 .settings-table-actions {

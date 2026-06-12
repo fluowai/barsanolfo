@@ -1,9 +1,9 @@
-# Script de inicialização do Barsa Advocacia
+# Script de inicialização do Woojuris
 # Execute com: Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope CurrentUser; .\iniciar.ps1
 
 Write-Host ""
 Write-Host "=========================================" -ForegroundColor Cyan
-Write-Host "🚀 INICIANDO BARSA ADVOCACIA" -ForegroundColor Green
+Write-Host "🚀 INICIANDO WOOJURIS" -ForegroundColor Green
 Write-Host "=========================================" -ForegroundColor Cyan
 Write-Host ""
 

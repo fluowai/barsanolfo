@@ -1,4 +1,4 @@
-# 🚀 DEPLOYMENT PARA PRODUÇÃO - BARSA ADVOCACIA
+# 🚀 DEPLOYMENT PARA PRODUÇÃO - WOOJURIS
 
 ## ⚠️ CHECKLIST PRÉ-DEPLOYMENT
 
@@ -42,7 +42,7 @@ NODE_ENV=production
 LOG_LEVEL=info
 
 # DATABASE - PostgreSQL (RECOMENDADO)
-DATABASE_URL=postgresql://user:password@host:5432/barsa_db
+DATABASE_URL=postgresql://user:password@host:5432/woojuris_db
 
 # OU DATABASE - SQLite (NÃO RECOMENDADO PARA PRODUÇÃO)
 # DATABASE_URL=file:./dev.db
@@ -65,7 +65,7 @@ SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
 SMTP_USER=seu-email@gmail.com
 SMTP_PASS=senha-app-google
-SMTP_FROM=noreply@barsaadvocacia.com.br
+SMTP_FROM=noreply@woojuris.com.br
 
 # CORS
 ALLOWED_ORIGINS=https://seu-site.com,https://seu-painel.com
@@ -80,7 +80,7 @@ VERCEL_ENV=production
 
 ### Build da Imagem
 ```bash
-docker build -t barsa-advocacia:latest .
+docker build -t woojuris:latest .
 ```
 
 ### Executar Localmente
@@ -88,7 +88,7 @@ docker build -t barsa-advocacia:latest .
 docker run -p 5032:5032 \
   -e JWT_SECRET=seu-secret-gerado \
   -e DATABASE_URL=sua-database-url \
-  barsa-advocacia:latest
+  woojuris:latest
 ```
 
 ### Com Docker Compose

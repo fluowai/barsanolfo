@@ -20,8 +20,8 @@
   left: -50%;
   width: 200%;
   height: 200%;
-  background: radial-gradient(circle at 30% 30%, rgba(212, 175, 55, 0.08) 0%, transparent 50%),
-              radial-gradient(circle at 70% 70%, rgba(212, 175, 55, 0.05) 0%, transparent 50%);
+  background: radial-gradient(circle at 30% 30%, rgba(37, 99, 235, 0.08) 0%, transparent 50%),
+              radial-gradient(circle at 70% 70%, rgba(37, 99, 235, 0.05) 0%, transparent 50%);
   animation: float 20s ease-in-out infinite;
 }
 
@@ -135,7 +135,7 @@
 .login-button {
   padding: var(--space-4);
   background: var(--primary-gradient);
-  color: #1a1a1a;
+  color: #ffffff;
   border: none;
   border-radius: var(--radius-md);
   font-size: var(--font-size-base);
@@ -152,7 +152,7 @@
 
 .login-button:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(212, 175, 55, 0.35);
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
 }
 
 .login-button:active:not(:disabled) {
@@ -167,7 +167,7 @@
 .login-error {
   padding: var(--space-3) var(--space-4);
   background: var(--danger-bg);
-  border: 1px solid var(--danger-border);
+  border: 1px solid rgba(239, 68, 68, 0.2);
   border-radius: var(--radius-md);
   color: var(--danger);
   font-size: var(--font-size-sm);

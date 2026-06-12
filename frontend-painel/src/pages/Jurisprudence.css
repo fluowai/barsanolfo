@@ -157,7 +157,7 @@
 
 .court-badge {
   padding: 4px 12px;
-  background: rgba(212, 175, 55, 0.1);
+  background: rgba(37, 99, 235, 0.1);
   border-radius: 20px;
   color: var(--gold);
   font-size: 12px;
@@ -181,7 +181,7 @@
 
 .result-card:hover {
   border-color: var(--gold);
-  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.1);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
 }
 
 .result-header {
@@ -197,7 +197,7 @@
 
 .court-tag {
   padding: 3px 10px;
-  background: rgba(212, 175, 55, 0.15);
+  background: rgba(37, 99, 235, 0.15);
   border-radius: 4px;
   color: var(--gold);
   font-size: 11px;
@@ -236,7 +236,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 12px 20px;
-  background: rgba(212, 175, 55, 0.02);
+  background: rgba(37, 99, 235, 0.02);
   border-top: 1px solid var(--border);
 }
 

@@ -1,4 +1,5 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { hearingsApi } from '../services/api';
 import {
   Plus, Search, Calendar, List, Filter, X, Eye, Edit3, Trash2,
   CheckCircle2, AlertTriangle, Clock, ChevronLeft, ChevronRight,
@@ -47,27 +48,6 @@ const CASE_LIST = ['0000832-35.2018.4.01.3202', '1234567-89.2023.8.26.0000', '98
 
 const now = new Date();
 const today = now.toISOString().split('T')[0];
-const daysFromNow = (n: number) => new Date(now.getTime() + n * 86400000).toISOString().split('T')[0];
-const hoursAgo = (h: number) => new Date(now.getTime() - h * 3600000).toISOString();
-const daysAgo = (n: number) => new Date(now.getTime() - n * 86400000).toISOString().split('T')[0];
-
-const MOCK_HEARINGS: Hearing[] = [
-  { id: '1', title: 'Audiência de Conciliação - Silva', type: 'Audiência', date: daysFromNow(2), startTime: '09:00', endTime: '10:30', location: 'Fórum João Mendes - Sala 301', meetingLink: '', client: 'João Silva', caseNumber: '0000832-35.2018.4.01.3202', responsible: 'Dra. Fernanda Lima', participants: 'João Silva, Dr. Ricardo Santos (adv. parte contrária)', description: 'Audiência de conciliação referente a ação trabalhista.', notes: '', reminder: '30min antes', status: 'AGENDADO', createdAt: daysAgo(7) },
-  { id: '2', title: 'Reunião com Cliente - Oliveira', type: 'Reunião Cliente', date: daysFromNow(1), startTime: '14:00', endTime: '15:00', location: 'Sala de Reuniões 1', meetingLink: 'https://meet.google.com/abc-defg-hij', client: 'Maria Oliveira', caseNumber: '1234567-89.2023.8.26.0000', responsible: 'Dr. Ricardo Santos', participants: 'Maria Oliveira, Dr. Ricardo Santos', description: 'Apresentar estratégia de defesa para ação indenizatória.', notes: '', reminder: '1h antes', status: 'CONFIRMADO', createdAt: daysAgo(5) },
-  { id: '3', title: 'Sessão de Julgamento - TRF1', type: 'Sessão Julgamento', date: daysFromNow(5), startTime: '13:00', endTime: '18:00', location: 'TRF1 - Sala de Sessões', meetingLink: '', client: 'Carlos Santos', caseNumber: '9876543-21.2024.4.03.6100', responsible: 'Dra. Fernanda Lima', participants: 'Desembargadores da 3ª Turma', description: 'Julgamento de apelação cível.', notes: '', reminder: '1 dia antes', status: 'AGENDADO', createdAt: hoursAgo(48) },
-  { id: '4', title: 'Sustentação Oral - Recurso Especial', type: 'Sustentação Oral', date: daysFromNow(10), startTime: '10:00', endTime: '10:30', location: 'STJ - Plenário Virtual', meetingLink: 'https://stj.jus.br/sala-virtual/12345', client: 'Empresa ABC Ltda', caseNumber: '7890123-45.2023.8.26.0200', responsible: 'Dr. Paulo Oliveira', participants: 'Ministro Relator', description: 'Sustentação oral em recurso especial.', notes: '', reminder: '1 dia antes', status: 'AGENDADO', createdAt: hoursAgo(24) },
-  { id: '5', title: 'Reunião Interna - Estratégia', type: 'Reunião Interna', date: today, startTime: '11:00', endTime: '12:00', location: 'Sala de Reuniões 2', meetingLink: '', client: 'Interno', caseNumber: '', responsible: 'Dra. Juliana Costa', participants: 'Equipe trabalhista', description: 'Definir estratégia para casos trabalhistas do mês.', notes: '', reminder: '15min antes', status: 'CONFIRMADO', createdAt: daysAgo(3) },
-  { id: '6', title: 'Diligência - Cartório 3º Ofício', type: 'Diligência', date: daysFromNow(1), startTime: '08:00', endTime: '17:00', location: 'Cartório 3º Ofício - Centro', meetingLink: '', client: 'Ana Beatriz', caseNumber: '4567890-12.2024.8.26.0100', responsible: 'Secretaria', participants: '', description: 'Protocolo de documentos e cópias.', notes: '', reminder: '30min antes', status: 'AGENDADO', createdAt: daysAgo(2) },
-  { id: '7', title: 'Videoconferência com Cliente', type: 'Videoconferência', date: today, startTime: '15:30', endTime: '16:00', location: 'Online', meetingLink: 'https://zoom.us/j/123456789', client: 'Roberto Almeida', caseNumber: '', responsible: 'Dr. Ricardo Santos', participants: 'Roberto Almeida', description: 'Esclarecer dúvidas sobre o andamento processual.', notes: '', reminder: '15min antes', status: 'CONFIRMADO', createdAt: daysAgo(1) },
-  { id: '8', title: 'Despacho com Juiz', type: 'Despacho', date: daysAgo(1), startTime: '14:00', endTime: '14:20', location: 'Fórum Central - Gabinete Juiz', meetingLink: '', client: 'João Silva', caseNumber: '0000832-35.2018.4.01.3202', responsible: 'Dra. Fernanda Lima', participants: 'Juiz Dr. Alberto, Dra. Fernanda Lima', description: 'Despachar sobre pedido de tutela de urgência.', notes: 'Juiz deferiu tutela. Anotar nos autos.', reminder: '1h antes', status: 'REALIZADO', createdAt: daysAgo(10) },
-  { id: '9', title: 'Audiência de Instrução - Ação Civil', type: 'Audiência', date: daysFromNow(3), startTime: '13:00', endTime: '17:00', location: 'Fórum Regional - Vara Cível', meetingLink: '', client: 'Fernanda Costa', caseNumber: '', responsible: 'Dra. Juliana Costa', participants: 'Testemunhas: Pedro Alves, Maria Souza', description: 'Oitiva de testemunhas em ação civil.', notes: '', reminder: '1 dia antes', status: 'AGENDADO', createdAt: daysAgo(4) },
-  { id: '10', title: 'Protocolo - Petição Inicial', type: 'Protocolo', date: daysAgo(2), startTime: '09:00', endTime: '09:30', location: 'Protocolo Eletrônico', meetingLink: '', client: 'Empresa ABC Ltda', caseNumber: '7890123-45.2023.8.26.0200', responsible: 'Secretaria', participants: '', description: 'Protocolo de petição inicial de ação de cobrança.', notes: 'Protocolado com sucesso. Número gerado: 7890123-45.2023.8.26.0200', reminder: '15min antes', status: 'REALIZADO', createdAt: daysAgo(14) },
-  { id: '11', title: 'Audiência de Mediação', type: 'Audiência', date: daysFromNow(7), startTime: '10:00', endTime: '12:00', location: 'CEJUSC - Fórum Central', meetingLink: '', client: 'Ana Beatriz', caseNumber: '4567890-12.2024.8.26.0100', responsible: 'Dr. Paulo Oliveira', participants: 'Mediador: Dr. Carlos, partes envolvidas', description: 'Sessão de mediação pré-processual.', notes: '', reminder: '1 dia antes', status: 'REMARCADO', createdAt: daysAgo(6) },
-  { id: '12', title: 'Reunião - Novo Cliente Corporativo', type: 'Reunião Cliente', date: daysFromNow(4), startTime: '16:00', endTime: '17:30', location: 'Sala VIP', meetingLink: '', client: 'Empresa ABC Ltda', caseNumber: '', responsible: 'Dr. Paulo Oliveira', participants: 'CEO, Diretor Jurídico, Dr. Paulo', description: 'Reunião de prospecção para contrato de assessoria empresarial.', notes: '', reminder: '1h antes', status: 'AGENDADO', createdAt: hoursAgo(12) },
-  { id: '13', title: 'Audiência Trabalhista - Reclamatória', type: 'Audiência', date: daysFromNow(8), startTime: '09:30', endTime: '11:30', location: 'TRT - 2ª Vara do Trabalho', meetingLink: '', client: 'João Silva', caseNumber: '0000832-35.2018.4.01.3202', responsible: 'Dra. Fernanda Lima', participants: 'Reclamante, Testemunhas', description: 'Audiência de instrução em reclamatória trabalhista.', notes: '', reminder: '1 dia antes', status: 'AGENDADO', createdAt: daysAgo(3) },
-  { id: '14', title: 'Sustentação Oral - Agravo', type: 'Sustentação Oral', date: daysAgo(3), startTime: '14:00', endTime: '14:20', location: 'Tribunal de Justiça', meetingLink: '', client: 'Maria Oliveira', caseNumber: '1234567-89.2023.8.26.0000', responsible: 'Dr. Ricardo Santos', participants: 'Relator Des. Mendes', description: 'Sustentação oral em agravo de instrumento.', notes: 'Realizada. Julgado favorável.', reminder: '1h antes', status: 'REALIZADO', createdAt: daysAgo(15) },
-  { id: '15', title: 'Reunião de Alinhamento Semanal', type: 'Reunião Interna', date: daysFromNow(6), startTime: '09:00', endTime: '10:00', location: 'Auditório', meetingLink: '', client: 'Interno', caseNumber: '', responsible: 'Dra. Juliana Costa', participants: 'Todos os advogados e estagiários', description: 'Alinhamento semanal de casos e prazos.', notes: '', reminder: '15min antes', status: 'AGENDADO', createdAt: daysAgo(1) },
-];
 
 function formatDate(dateStr: string): string {
   return new Date(dateStr + 'T12:00:00').toLocaleDateString('pt-BR');
@@ -97,8 +77,24 @@ function StatusBadge({ status }: { status: HearingStatus }) {
 }
 
 export default function Hearings() {
-  const [hearings, setHearings] = useState<Hearing[]>(MOCK_HEARINGS);
+  const [hearings, setHearings] = useState<Hearing[]>([]);
+  const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<ViewMode>('list');
+
+  useEffect(() => {
+    (async () => {
+      try {
+        setLoading(true);
+        const res = await hearingsApi.list();
+        const list = (res as any).hearings || (res as any).data || [];
+        setHearings(Array.isArray(list) ? list : []);
+      } catch (err) {
+        console.error('Erro ao carregar audiências:', err);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
   const [search, setSearch] = useState('');
   const [filterType, setFilterType] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
@@ -235,7 +231,10 @@ export default function Hearings() {
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 24 }}>
+      {loading ? (
+        <div style={{ textAlign: 'center', padding: 48, color: 'var(--text-tertiary)' }}>Carregando audiências...</div>
+      ) : (
+      <><div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 24 }}>
         <div className="stat-card">
           <div className="stat-label">Total</div>
           <div className="stat-value" style={{ color: 'var(--gold-primary)' }}>{stats.total}</div>
@@ -397,6 +396,7 @@ export default function Hearings() {
           </div>
         </div>
       )}
+      </>)}
 
       {selectedHearing && (
         <>

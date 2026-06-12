@@ -66,7 +66,7 @@
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                    SISTEMA INTEGRADO                        │
-│                 Barsanulfo & Martins Advogados              │
+│                       Woojuris                             │
 └─────────────────────────────────────────────────────────────┘
                               │
         ┌─────────────────────┼─────────────────────┐
@@ -319,7 +319,7 @@ LGPD e OAB desde o início
 
 ## 🎉 CONCLUSÃO
 
-Este projeto transformará o escritório **Barsanulfo & Martins Advogados** em uma **operação digital de ponta**, com:
+Este projeto transformará o escritório **Woojuris** em uma **operação digital de ponta**, com:
 
 - 🚀 **Eficiência operacional** aumentada em 70%
 - 💰 **ROI de 234%** no primeiro ano

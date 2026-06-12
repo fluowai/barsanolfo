@@ -1,8 +1,8 @@
 export const STORAGE_KEYS = {
-  AUTH_TOKEN: 'barsa_auth_token',
-  REFRESH_TOKEN: 'barsa_refresh_token',
-  USER: 'barsa_user',
-  THEME: 'barsa_theme',
+  AUTH_TOKEN: 'woojuris_auth_token',
+  REFRESH_TOKEN: 'woojuris_refresh_token',
+  USER: 'woojuris_user',
+  THEME: 'woojuris_theme',
 } as const;
 
 export const API_BASE_URL = '';

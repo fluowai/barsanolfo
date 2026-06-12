@@ -4,7 +4,7 @@ description: Plano completo para transformar o site em sistema CRM + Gestão de 
 
 # 🎯 PLANO COMPLETO: SISTEMA INTEGRADO PARA ESCRITÓRIO DE ADVOCACIA
 
-## Barsanulfo & Martins Advogados - CRM + Site + Gestão
+## Woojuris - CRM + Site + Gestão
 
 ---
 

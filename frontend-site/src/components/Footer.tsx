@@ -5,12 +5,12 @@ import { NAV_ITEMS } from '../constants';
 
 const Footer: React.FC = () => {
   return (
-    <footer className="bg-black pt-20 pb-10 border-t border-white/5">
+    <footer className="bg-gray-900 pt-20 pb-10 border-t border-gray-800">
       <div className="container mx-auto px-6">
         <div className="grid md:grid-cols-4 gap-12 mb-16">
           <div className="col-span-1 md:col-span-1 space-y-6">
             <Logo />
-            <p className="text-white/40 text-sm leading-relaxed">
+            <p className="text-gray-400 text-sm leading-relaxed">
               Escritório especializado em Direito do Trabalho, defendendo os interesses de quem constrói o futuro com as próprias mãos.
             </p>
           </div>
@@ -20,7 +20,7 @@ const Footer: React.FC = () => {
             <ul className="space-y-4">
               {NAV_ITEMS.map(item => (
                 <li key={item.href}>
-                  <a href={item.href} className="text-white/40 hover:text-[#d4af37] transition-colors text-sm">{item.label}</a>
+                  <a href={item.href} className="text-gray-400 hover:text-[#d4af37] transition-colors text-sm">{item.label}</a>
                 </li>
               ))}
             </ul>
@@ -29,26 +29,26 @@ const Footer: React.FC = () => {
           <div>
             <h4 className="text-white font-bold uppercase tracking-widest text-xs mb-8">Áreas de Foco</h4>
             <ul className="space-y-4">
-              <li><a href="#atuacao" className="text-white/40 hover:text-[#d4af37] transition-colors text-sm">Rescisão Indireta</a></li>
-              <li><a href="#atuacao" className="text-white/40 hover:text-[#d4af37] transition-colors text-sm">Horas Extras</a></li>
-              <li><a href="#atuacao" className="text-white/40 hover:text-[#d4af37] transition-colors text-sm">Dano Moral</a></li>
-              <li><a href="#atuacao" className="text-white/40 hover:text-[#d4af37] transition-colors text-sm">Acidente de Trabalho</a></li>
+              <li><a href="#atuacao" className="text-gray-400 hover:text-[#d4af37] transition-colors text-sm">Rescisão Indireta</a></li>
+              <li><a href="#atuacao" className="text-gray-400 hover:text-[#d4af37] transition-colors text-sm">Horas Extras</a></li>
+              <li><a href="#atuacao" className="text-gray-400 hover:text-[#d4af37] transition-colors text-sm">Dano Moral</a></li>
+              <li><a href="#atuacao" className="text-gray-400 hover:text-[#d4af37] transition-colors text-sm">Acidente de Trabalho</a></li>
             </ul>
           </div>
 
           <div>
             <h4 className="text-white font-bold uppercase tracking-widest text-xs mb-8">Informações</h4>
-            <p className="text-white/40 text-sm mb-4">OAB/SP: 000.000</p>
-            <p className="text-white/40 text-sm mb-4">CNPJ: 00.000.000/0001-00</p>
+            <p className="text-gray-400 text-sm mb-4">OAB/SP: 000.000</p>
+            <p className="text-gray-400 text-sm mb-4">CNPJ: 00.000.000/0001-00</p>
             <p className="text-[#d4af37] text-sm font-bold">Atendimento 24h via WhatsApp para Emergências.</p>
           </div>
         </div>
         
-        <div className="pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
-          <p className="text-white/20 text-[10px] uppercase tracking-widest">
-            © 2024 Barsanulfo & Martins Advogados Associados. Todos os direitos reservados.
+        <div className="pt-10 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center gap-6">
+          <p className="text-gray-500 text-[10px] uppercase tracking-widest">
+            © 2024 Woojuris. Todos os direitos reservados.
           </p>
-          <div className="flex gap-8 text-white/20 text-[10px] uppercase tracking-widest">
+          <div className="flex gap-8 text-gray-500 text-[10px] uppercase tracking-widest">
             <a href="#" className="hover:text-white transition-colors">Termos de Uso</a>
             <a href="#" className="hover:text-white transition-colors">Política de Privacidade</a>
           </div>

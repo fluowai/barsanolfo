@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "========================================="
-echo "🚀 INICIANDO BARSA ADVOCACIA"
+echo "🚀 INICIANDO WOOJURIS"
 echo "========================================="
 
 # Terminal 1: Backend

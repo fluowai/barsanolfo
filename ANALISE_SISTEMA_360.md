@@ -1,4 +1,4 @@
-# 🏛️ SISTEMA BARSA 360° - ANÁLISE COMPLETA
+# 🏛️ WOOJURIS - ANÁLISE COMPLETA DO SISTEMA
 
 ## Visão Geral
 
@@ -329,7 +329,7 @@ eliminando trabalho manual e automatizando processos jurídicos.
 
 ---
 
-**Documento:** Sistema Barsa 360°  
+**Documento:** Sistema Woojuris  
 **Versão:** 1.0  
 **Data:** 07/04/2026  
 **Prioridade:** CRÍTICA - Transformar custo em ativo

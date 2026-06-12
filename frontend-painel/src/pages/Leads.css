@@ -46,7 +46,7 @@
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(212, 175, 55, 0.3);
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
 }
 
 /* Filters Bar */
@@ -74,7 +74,7 @@
 
 .search-box:focus-within {
   border-color: var(--gold);
-  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 .search-box input {
@@ -104,7 +104,7 @@
 
 .filter-group:focus-within {
   border-color: var(--gold);
-  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 .filter-group select {
@@ -154,7 +154,7 @@
 }
 
 .leads-table tbody tr:hover {
-  background: rgba(212, 175, 55, 0.02);
+  background: rgba(37, 99, 235, 0.02);
 }
 
 .lead-name {
@@ -190,12 +190,12 @@
 .type-badge {
   display: inline-block;
   padding: 6px 12px;
-  background: rgba(212, 175, 55, 0.15);
+  background: rgba(37, 99, 235, 0.15);
   color: var(--gold);
   border-radius: 8px;
   font-size: 12px;
   font-weight: 600;
-  border: 1px solid rgba(212, 175, 55, 0.3);
+  border: 1px solid rgba(37, 99, 235, 0.3);
 }
 
 .status-badge {
@@ -230,7 +230,7 @@
 .btn-icon:hover {
   border-color: var(--gold);
   color: var(--gold);
-  background: rgba(212, 175, 55, 0.05);
+  background: rgba(37, 99, 235, 0.05);
 }
 
 .btn-icon.btn-danger {

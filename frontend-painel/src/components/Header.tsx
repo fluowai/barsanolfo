@@ -42,7 +42,7 @@ export default function Header() {
         <button className="menu-toggle" onClick={openMenu} aria-label="Abrir menu">
           <Menu size={20} />
         </button>
-        <h1 className="header-title">Painel de Controle</h1>
+        <h1 className="header-title">Woojuris</h1>
       </div>
 
         <div className="header-right">

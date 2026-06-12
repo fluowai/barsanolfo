@@ -35,13 +35,10 @@ const Team: React.FC = () => {
     <section 
       ref={sectionRef}
       id="equipe" 
-      className="py-24 bg-gradient-to-b from-[#0a0a0a] via-[#0d0d0d] to-[#0a0a0a] relative overflow-hidden"
+      className="py-24 bg-gray-50 relative overflow-hidden"
     >
       {/* Background decorative elements */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-1/4 left-0 w-96 h-96 bg-[#d4af37]/5 rounded-full blur-[100px]" />
-        <div className="absolute bottom-1/4 right-0 w-80 h-80 bg-[#d4af37]/3 rounded-full blur-[120px]" />
-      </div>
+
 
       <div className="container mx-auto px-6 relative z-10">
         {/* Header Section */}
@@ -49,22 +46,19 @@ const Team: React.FC = () => {
           <div className="max-w-2xl space-y-4">
             <div className="flex items-center gap-3">
               <div className="w-12 h-[2px] bg-gradient-to-r from-[#d4af37] to-transparent" />
-              <h4 className="text-[#d4af37] font-bold uppercase tracking-[0.3em] text-xs">
+              <h4 className="text-[#b8860b] font-bold uppercase tracking-[0.3em] text-xs">
                 Nossa Equipe
               </h4>
             </div>
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight text-gray-900">
               Corpo Jurídico de{' '}
-              <span className="relative inline-block">
-                <span className="bg-gradient-to-r from-[#d4af37] via-[#f4e4a3] to-[#d4af37] bg-clip-text text-transparent">
-                  Elite
-                </span>
-                <span className="absolute -bottom-2 left-0 w-full h-[3px] bg-gradient-to-r from-[#d4af37] via-[#f4e4a3] to-[#d4af37] rounded-full" />
+              <span className="gold-gradient">
+                Elite
               </span>
             </h2>
           </div>
-          <p className="text-white/50 max-w-sm text-base leading-relaxed md:text-right">
-            Combinamos <span className="text-white/80 font-medium">inteligência jurídica</span> com um 
+          <p className="text-gray-500 max-w-sm text-base leading-relaxed md:text-right">
+            Combinamos <span className="text-gray-700 font-medium">inteligência jurídica</span> com um 
             olhar humanizado sobre as relações de trabalho.
           </p>
         </div>
@@ -76,19 +70,16 @@ const Team: React.FC = () => {
               key={index} 
               className={`
                 group relative flex flex-col lg:flex-row rounded-2xl overflow-hidden
-                bg-gradient-to-br from-[#1a1a1a] to-[#141414]
-                border border-white/[0.06] hover:border-[#d4af37]/30
-                shadow-[0_8px_32px_rgba(0,0,0,0.4)]
-                hover:shadow-[0_16px_48px_rgba(212,175,55,0.15)]
+                bg-white
+                border border-gray-200 hover:border-[#d4af37]/30
+                shadow-lg
+                hover:shadow-xl
                 transition-all duration-500 ease-out
                 transform ${visibleCards.includes(index) ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'}
               `}
               style={{ transitionDelay: `${index * 100}ms` }}
             >
-              {/* Shine effect on hover */}
-              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none">
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.03] to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
-              </div>
+
 
               {/* Image Container */}
               <div className="lg:w-[45%] relative overflow-hidden">
@@ -100,7 +91,7 @@ const Team: React.FC = () => {
                       transition-all duration-700 ease-out group-hover:scale-105" 
                   />
                   {/* Image overlay gradient */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a1a] via-transparent to-transparent lg:bg-gradient-to-r lg:from-transparent lg:via-transparent lg:to-[#1a1a1a]" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-gray-900/30 via-transparent to-transparent lg:bg-gradient-to-r lg:from-transparent lg:via-transparent lg:to-gray-900/30" />
                 </div>
               </div>
 
@@ -108,16 +99,16 @@ const Team: React.FC = () => {
               <div className="lg:w-[55%] p-6 lg:p-8 flex flex-col justify-center space-y-5 relative z-10">
                 {/* Name & Role */}
                 <div className="space-y-2">
-                  <h3 className="text-xl lg:text-2xl font-bold font-serif text-white group-hover:text-white transition-colors">
+                  <h3 className="text-xl lg:text-2xl font-bold font-serif text-gray-900 group-hover:text-gray-900 transition-colors">
                     {member.name}
                   </h3>
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="inline-block px-3 py-1 rounded-full text-[10px] uppercase tracking-widest font-bold
-                      bg-[#d4af37]/10 text-[#d4af37] border border-[#d4af37]/20">
+                      bg-[#d4af37]/10 text-[#b8860b] border border-[#d4af37]/20">
                       {member.role.split(' | ')[0]}
                     </span>
                     {member.role.includes('|') && (
-                      <span className="text-white/40 text-xs font-mono">
+                      <span className="text-gray-400 text-xs font-mono">
                         {member.role.split(' | ')[1]}
                       </span>
                     )}
@@ -125,18 +116,18 @@ const Team: React.FC = () => {
                 </div>
 
                 {/* Bio */}
-                <p className="text-white/50 text-sm leading-relaxed group-hover:text-white/60 transition-colors">
+                <p className="text-gray-500 text-sm leading-relaxed group-hover:text-gray-600 transition-colors">
                   {member.bio}
                 </p>
 
                 {/* Action Buttons */}
-                <div className="flex items-center gap-3 pt-4 border-t border-white/[0.06]">
+                <div className="flex items-center gap-3 pt-4 border-t border-gray-200">
                   <a 
                     href="#" 
                     className="flex items-center gap-2 px-4 py-2.5 rounded-lg
-                      bg-white/[0.03] hover:bg-[#d4af37]/10
-                      border border-white/[0.06] hover:border-[#d4af37]/30
-                      text-white/50 hover:text-[#d4af37]
+                      bg-gray-100 hover:bg-[#d4af37]/10
+                      border border-gray-200 hover:border-[#d4af37]/30
+                      text-gray-500 hover:text-[#d4af37]
                       transition-all duration-300 group/btn"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -148,9 +139,9 @@ const Team: React.FC = () => {
                   <a 
                     href="#" 
                     className="flex items-center gap-2 px-4 py-2.5 rounded-lg
-                      bg-white/[0.03] hover:bg-[#0077B5]/10
-                      border border-white/[0.06] hover:border-[#0077B5]/30
-                      text-white/50 hover:text-[#0077B5]
+                      bg-gray-100 hover:bg-[#0077B5]/10
+                      border border-gray-200 hover:border-[#0077B5]/30
+                      text-gray-500 hover:text-[#0077B5]
                       transition-all duration-300 group/btn"
                   >
                     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
@@ -161,13 +152,7 @@ const Team: React.FC = () => {
                 </div>
               </div>
 
-              {/* Corner accent */}
-              <div className="absolute top-0 right-0 w-24 h-24 overflow-hidden pointer-events-none">
-                <div className="absolute top-0 right-0 w-[200%] h-[200%] 
-                  bg-gradient-to-bl from-[#d4af37]/10 to-transparent 
-                  opacity-0 group-hover:opacity-100 transition-opacity duration-500
-                  transform rotate-45 translate-x-1/2 -translate-y-1/2" />
-              </div>
+
             </div>
           ))}
         </div>

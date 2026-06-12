@@ -224,7 +224,7 @@ trackEvent("form_submit", { form_type: "contact", lead_type: formData.type });
 
   <!-- SEO Básico -->
   <title>
-    Barsanulfo & Martins Advogados | Especialistas em Direito do Trabalho
+    Woojuris | Especialistas em Direito do Trabalho
   </title>
   <meta
     name="description"
@@ -234,13 +234,13 @@ trackEvent("form_submit", { form_type: "contact", lead_type: formData.type });
     name="keywords"
     content="advogado trabalhista, direito do trabalho, rescisão indireta, horas extras, assédio moral, São Paulo"
   />
-  <meta name="author" content="Barsanulfo & Martins Advogados" />
+  <meta name="author" content="Woojuris" />
 
   <!-- Open Graph (Facebook, LinkedIn) -->
   <meta property="og:type" content="website" />
   <meta
     property="og:title"
-    content="Barsanulfo & Martins Advogados | Direito do Trabalho"
+    content="Woojuris | Direito do Trabalho"
   />
   <meta
     property="og:description"
@@ -251,7 +251,7 @@ trackEvent("form_submit", { form_type: "contact", lead_type: formData.type });
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Barsanulfo & Martins Advogados" />
+  <meta name="twitter:title" content="Woojuris" />
   <meta
     name="twitter:description"
     content="Especialistas em Direito do Trabalho"
@@ -275,7 +275,7 @@ export const SchemaOrg = () => {
   const schema = {
     "@context": "https://schema.org",
     "@type": "LegalService",
-    name: "Barsanulfo & Martins Advogados Associados",
+    name: "Woojuris",
     description: "Escritório especializado em Direito do Trabalho",
     url: "https://bmadvogados.com.br",
     telephone: "+55-11-98765-4321",
@@ -491,7 +491,7 @@ function App() {
 
 <img
   src="..."
-  alt="Dra. Amanda Barsanulfo, advogada trabalhista com 10 anos de experiência"
+  alt="Dra. Amanda Martins, advogada trabalhista com 10 anos de experiência"
 />
 
 // Skip to content
@@ -600,7 +600,7 @@ const posts = [
     excerpt:
       "Entenda quando você pode pedir rescisão indireta e quais são seus direitos.",
     date: "2024-01-15",
-    author: "Dra. Amanda Barsanulfo",
+    author: "Dra. Amanda Martins",
     image: "/blog/rescisao.jpg",
     slug: "direitos-rescisao-indireta",
   },

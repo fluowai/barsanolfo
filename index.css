@@ -4,7 +4,7 @@
 
 @layer base {
   body {
-    @apply bg-[#050505] text-white antialiased;
+    @apply bg-white text-slate-900 antialiased;
   }
 }
 
@@ -20,22 +20,21 @@
   }
 }
 
-/* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #050505;
+  background: #f1f5f9;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #d4af37;
+  background: #cbd5e1;
   border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #b8962d;
+  background: #94a3b8;
 }
 
 @keyframes fade-in {

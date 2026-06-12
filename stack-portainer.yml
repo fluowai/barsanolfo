@@ -1,0 +1,78 @@
+version: "3.8"
+
+services:
+  # ============================================
+  # Woojuris - Servidor Principal (API + Frontend Site + Painel)
+  app:
+    image: ghcr.io/woojuris/app:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+      PORT: 5032
+      ALLOWED_ORIGINS: "https://woojuris.com.br,https://www.woojuris.com.br,https://app.woojuris.com.br"
+      JWT_SECRET: "Np4TqwVq1RtgG5guinZ/KQhQx4abzgumQ1X2z4ykFwmhQtk3XA45MOXvPNwySsY2eX90YHuwKWVJ9JKTGYWMNg=="
+      DATABASE_URL: "postgresql://postgres.mhfsputtyytpgfjkzkdq:qoypvRj7VICtEE8J@aws-1-sa-east-1.pooler.supabase.com:6543/postgres?sslmode=require"
+      SUPABASE_URL: "https://mhfsputtyytpgfjkzkdq.supabase.co"
+      SUPABASE_SERVICE_ROLE_KEY: "Np4TqwVq1RtgG5guinZ/KQhQx4abzgumQ1X2z4ykFwmhQtk3XA45MOXvPNwySsY2eX90YHuwKWVJ9JKTGYWMNg=="
+      SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1oZnNwdXR0eXl0cGdmamt6a2RxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3NzI1NzgsImV4cCI6MjA5MjM0ODU3OH0.flsko-6v3Os94HKSmVAvwuz6j0METbIZHloJ86yk7cM"
+      DATAJUD_API_KEY: "${DATAJUD_API_KEY}"
+      GEMINI_API_KEY: "${GEMINI_API_KEY}"
+      GROQ_API_KEY: "${GROQ_API_KEY}"
+      OPENAI_API_KEY: "${OPENAI_API_KEY}"
+      ASAAS_API_KEY: "${ASAAS_API_KEY}"
+      ASAAS_BASE_URL: "https://www.asaas.com/api/v3"
+      WHATSAPP_INTERNAL_TOKEN: "${WHATSAPP_INTERNAL_TOKEN:-k7Pq9zLm2A8xR4vT6nY1cE5bH3sW0dJ}"
+      LOG_LEVEL: info
+    volumes:
+      - whatsapp_sessions:/app/backend/whatsapp-sessions
+      - uploads_data:/app/uploads
+    networks:
+      - woopanel1
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 3
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: stop-first
+      labels:
+        - "traefik.enable=true"
+        - "traefik.docker.network=woopanel1"
+        - "traefik.http.routers.woojuris.rule=Host(`woojuris.com.br`) || Host(`www.woojuris.com.br`)"
+        - "traefik.http.routers.woojuris.entrypoints=websecure"
+        - "traefik.http.routers.woojuris.tls.certresolver=letsencryptresolver"
+        - "traefik.http.routers.woojuris.priority=1"
+        - "traefik.http.routers.woojuris.service=woojuris"
+        - "traefik.http.services.woojuris.loadbalancer.server.port=5032"
+        - "traefik.http.routers.woojuris.middlewares=woojuris_secHeaders"
+
+        # Roteador específico para o painel (subdomínio app)
+        - "traefik.http.routers.woojuris_painel.rule=Host(`app.woojuris.com.br`)"
+        - "traefik.http.routers.woojuris_painel.entrypoints=websecure"
+        - "traefik.http.routers.woojuris_painel.tls.certresolver=letsencryptresolver"
+        - "traefik.http.routers.woojuris_painel.priority=10"
+        - "traefik.http.routers.woojuris_painel.service=woojuris"
+        - "traefik.http.routers.woojuris_painel.middlewares=woojuris_secHeaders"
+
+        # Middleware de headers de segurança
+        - "traefik.http.middlewares.woojuris_secHeaders.headers.customFrameOptionsValue=SAMEORIGIN"
+        - "traefik.http.middlewares.woojuris_secHeaders.headers.contentTypeNosniff=true"
+        - "traefik.http.middlewares.woojuris_secHeaders.headers.browserXssFilter=true"
+        - "traefik.http.middlewares.woojuris_secHeaders.headers.referrerPolicy=strict-origin-when-cross-origin"
+
+volumes:
+  whatsapp_sessions:
+    driver: local
+  uploads_data:
+    driver: local
+
+networks:
+  woopanel1:
+    external: true
+    name: woopanel1

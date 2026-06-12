@@ -8,7 +8,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: barsa-api
+    container_name: woojuris-api
     restart: unless-stopped
     environment:
       NODE_ENV: development
@@ -34,33 +34,33 @@ services:
       retries: 3
       start_period: 40s
     networks:
-      - barsa-network
+      - woojuris-network
 
   # ============================================
   # PostgreSQL (Opcional - Descomente para usar em produção)
   # ============================================
   # postgres:
   #   image: postgres:15-alpine
-  #   container_name: barsa-postgres
+  #   container_name: woojuris-postgres
   #   restart: unless-stopped
   #   environment:
-  #     POSTGRES_USER: barsa
+  #     POSTGRES_USER: woojuris
   #     POSTGRES_PASSWORD: ${DB_PASSWORD:-change-me}
-  #     POSTGRES_DB: barsa_db
+  #     POSTGRES_DB: woojuris_db
   #   volumes:
   #     - postgres_data:/var/lib/postgresql/data
   #   ports:
   #     - "5432:5432"
   #   networks:
-  #     - barsa-network
+  #     - woojuris-network
   #   healthcheck:
-  #     test: ["CMD-SHELL", "pg_isready -U barsa"]
+  #     test: ["CMD-SHELL", "pg_isready -U woojuris"]
   #     interval: 10s
   #     timeout: 5s
   #     retries: 5
 
 networks:
-  barsa-network:
+  woojuris-network:
     driver: bridge
 
 # volumes:

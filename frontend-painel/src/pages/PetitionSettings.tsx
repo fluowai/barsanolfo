@@ -197,7 +197,7 @@ export default function PetitionSettings() {
                 <label>Nome do Escritório</label>
                 <input 
                   type="text"
-                  placeholder="Barsanulfo & Martins Advogados"
+                  placeholder="Woojuris"
                   value={config.footerName || ''}
                   onChange={(e) => setConfig({ ...config, footerName: e.target.value })}
                 />
@@ -239,7 +239,7 @@ export default function PetitionSettings() {
                   <label>Email</label>
                   <input 
                     type="email"
-                    placeholder="contato@barsaadvocacia.com.br"
+                    placeholder="contato@woojuris.com.br"
                     value={config.footerEmail || ''}
                     onChange={(e) => setConfig({ ...config, footerEmail: e.target.value })}
                   />
@@ -248,7 +248,7 @@ export default function PetitionSettings() {
                   <label>Website</label>
                   <input 
                     type="text"
-                    placeholder="www.barsaadvocacia.com.br"
+                    placeholder="www.woojuris.com.br"
                     value={config.footerWebsite || ''}
                     onChange={(e) => setConfig({ ...config, footerWebsite: e.target.value })}
                   />

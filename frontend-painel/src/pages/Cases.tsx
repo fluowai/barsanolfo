@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Search, Plus, Eye, Edit, Trash2, X, FileText, Calendar, Database, AlertCircle,
   Scale, Users, UserCheck, TrendingUp, DollarSign, CheckCircle, Clock,
@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import './Cases.css';
 import { CASE_STATUS } from '../constants';
+import { casesApi, clientsApi } from '../services/api';
 
 /* ───────────── INTERFACES ───────────── */
 
@@ -137,18 +138,7 @@ interface LegalCase {
   history: CaseHistory[];
 }
 
-/* ───────────── MOCK DATA ───────────── */
-
-const CLIENTS = [
-  { id: 'c1', name: 'Maria Silva Santos' },
-  { id: 'c2', name: 'João Pereira Costa' },
-  { id: 'c3', name: 'Empresa XYZ Ltda' },
-  { id: 'c4', name: 'Ana Carolina Souza' },
-  { id: 'c5', name: 'Carlos Alberto Mendes' },
-  { id: 'c6', name: 'Patricia Rocha Lima' },
-  { id: 'c7', name: 'Tech Solutions ME' },
-  { id: 'c8', name: 'Fernanda Alves' },
-];
+/* ───────────── FORM CONFIG ───────────── */
 
 const TEAM_MEMBERS = [
   { id: 't1', name: 'Dra. Fernanda Lima' },
@@ -186,347 +176,6 @@ const COURTS_BRANCH: Record<string, string[]> = {
   'TJRJ': ['Foro Central', 'Foro Regional da Barra', 'Foro Regional de Nova Iguaçu'],
   'TRT-2': ['1ª Vara do Trabalho', '2ª Vara do Trabalho', '3ª Vara do Trabalho'],
 };
-
-const generateMockCases = (): LegalCase[] => [
-  {
-    id: '1', cnjNumber: '0000832-35.2018.4.01.3202', internalTitle: 'Reclamação Trabalhista - Assédio Moral',
-    clientId: 'c1', clientName: 'Maria Silva Santos', court: 'TRT-2', courtBranch: '1ª Vara do Trabalho',
-    district: 'São Paulo', state: 'SP', proceduralClass: 'Reclamação Trabalhista', legalArea: 'Direito do Trabalho',
-    subject: 'Assédio Moral - Rescisão Indireta', activePole: 'Maria Silva Santos', passivePole: 'Empresa ABC Ltda',
-    opposingParty: 'Empresa ABC Ltda', responsibleLawyer: 'Dra. Fernanda Lima', internName: 'João Oliveira',
-    phase: 'Conhecimento', status: 'ACTIVE', causeValue: 250000, successProbability: 80, riskLevel: 'medio',
-    caseStrategy: 'Ações: 1. Instruir com provas materiais do assédio. 2. Juntar testemunhas. 3. Pedir rescisão indireta com verbas rescisórias.',
-    nextAction: 'Audiência de instrução dia 15/06', distributionDate: '2018-03-15', visibleToClient: true,
-    lastMovement: 'Designada audiência de instrução', lastMovementDate: '2026-05-02T10:30:00',
-    createdAt: '2018-03-15T09:00:00', updatedAt: '2026-05-02T10:30:00',
-    movements: [
-      { id: 'm1', date: '2026-05-02T10:30:00', description: 'Designada audiência de instrução para 15/06/2026', type: 'despacho', visibleToClient: true },
-      { id: 'm2', date: '2026-04-20T14:00:00', description: 'Juntada contestação pela reclamada', type: 'peticao', visibleToClient: true },
-      { id: 'm3', date: '2026-04-05T09:15:00', description: 'Audiência inicial realizada - não houve acordo', type: 'outro', visibleToClient: true },
-      { id: 'm4', date: '2026-03-10T11:00:00', description: 'Notificação da reclamada para contestar', type: 'intimacao', visibleToClient: true },
-    ],
-    deadlines: [
-      { id: 'd1', title: 'Contestar recurso', date: '2026-06-01', type: 'Contrarrazões', status: 'pending' },
-      { id: 'd2', title: 'Prazo para audiência', date: '2026-06-15', type: 'Audiência', status: 'pending' },
-    ],
-    hearings: [
-      { id: 'h1', title: 'Audiência de Instrução', date: '2026-06-15', time: '14:00', type: 'Instrução', local: '1ª VT - São Paulo', status: 'scheduled' },
-    ],
-    tasks: [
-      { id: 'ta1', title: 'Preparar testemunhas', description: 'Revisar depoimento com 3 testemunhas', dueDate: '2026-06-10', priority: 'high', status: 'pending', assignee: 'Dra. Fernanda Lima' },
-      { id: 'ta2', title: 'Elaborar memoriais', description: 'Preparar memoriais finais', dueDate: '2026-06-20', priority: 'medium', status: 'pending', assignee: 'João Oliveira' },
-    ],
-    documents: [
-      { id: 'doc1', name: 'Contrato Social Reclamada.pdf', type: 'PDF', uploadedAt: '2026-04-10', size: '1.2 MB' },
-      { id: 'doc2', name: 'Holerites.pdf', type: 'PDF', uploadedAt: '2026-03-20', size: '3.5 MB' },
-      { id: 'doc3', name: 'ATG - Assédio Moral.docx', type: 'DOCX', uploadedAt: '2026-03-15', size: '245 KB' },
-    ],
-    finances: [
-      { id: 'f1', description: 'Honorários Contrato', type: 'income', value: 15000, date: '2018-03-20', status: 'paid' },
-      { id: 'f2', description: 'Custas Processuais', type: 'expense', value: 2500, date: '2018-03-25', status: 'paid' },
-    ],
-    history: [
-      { id: 'hi1', action: 'Criado', user: 'Dra. Fernanda Lima', date: '2018-03-15T09:00:00', description: 'Processo cadastrado no sistema' },
-      { id: 'hi2', action: 'Movimentação adicionada', user: 'João Oliveira', date: '2026-05-02T10:30:00', description: 'Audiência designada' },
-    ],
-  },
-  {
-    id: '2', cnjNumber: '0012345-67.2020.8.26.0100', internalTitle: 'Divórcio Litigioso c/ Guarda',
-    clientId: 'c2', clientName: 'João Pereira Costa', court: 'TJSP', courtBranch: 'Foro Central',
-    district: 'São Paulo', state: 'SP', proceduralClass: 'Divórcio Litigioso', legalArea: 'Direito de Família',
-    subject: 'Divórcio, Guarda Compartilhada, Pensão', activePole: 'João Pereira Costa', passivePole: 'Ana Costa',
-    opposingParty: 'Ana Costa', responsibleLawyer: 'Dr. Ricardo Santos', internName: '',
-    phase: 'Sentença', status: 'ACTIVE', causeValue: 150000, successProbability: 60, riskLevel: 'alto',
-    caseStrategy: 'Negociação de guarda compartilhada. Caso complexo devido à alta conflituosidade entre as partes.',
-    nextAction: 'Aguardar sentença do juiz', distributionDate: '2020-05-20', visibleToClient: true,
-    lastMovement: 'Conclusos para sentença', lastMovementDate: '2026-05-08T16:00:00',
-    createdAt: '2020-05-20T10:00:00', updatedAt: '2026-05-08T16:00:00',
-    movements: [
-      { id: 'm2-1', date: '2026-05-08T16:00:00', description: 'Conclusos para sentença', type: 'despacho', visibleToClient: true },
-      { id: 'm2-2', date: '2026-04-25T09:30:00', description: 'Audiência de conciliação realizada sem acordo', type: 'outro', visibleToClient: true },
-      { id: 'm2-3', date: '2026-04-10T14:00:00', description: 'Perícia psicológica das crianças juntada', type: 'peticao', visibleToClient: false },
-    ],
-    deadlines: [
-      { id: 'd2-1', title: 'Prazo para embargos', date: '2026-06-20', type: 'Embargos', status: 'pending' },
-    ],
-    hearings: [
-      { id: 'h2-1', title: 'Audiência de Conciliação', date: '2026-04-25', time: '14:30', type: 'Conciliação', local: 'Fórum Central - SP', status: 'realized' },
-    ],
-    tasks: [
-      { id: 'ta2-1', title: 'Analisar sentença', description: 'Assim que publicada, analisar e orientar cliente', dueDate: '2026-06-30', priority: 'high', status: 'pending', assignee: 'Dr. Ricardo Santos' },
-    ],
-    documents: [
-      { id: 'doc2-1', name: 'Petição Inicial.pdf', type: 'PDF', uploadedAt: '2020-05-20', size: '890 KB' },
-      { id: 'doc2-2', name: 'Laudo Psicológico.pdf', type: 'PDF', uploadedAt: '2026-04-10', size: '2.1 MB' },
-    ],
-    finances: [
-      { id: 'f2-1', description: 'Honorários Contrato', type: 'income', value: 12000, date: '2020-05-25', status: 'paid' },
-      { id: 'f2-2', description: 'Honorários Complementares', type: 'income', value: 8000, date: '2026-01-10', status: 'pending' },
-      { id: 'f2-3', description: 'Perícia Psicológica', type: 'expense', value: 3500, date: '2026-03-01', status: 'paid' },
-    ],
-    history: [
-      { id: 'hi2-1', action: 'Criado', user: 'Dr. Ricardo Santos', date: '2020-05-20T10:00:00', description: 'Processo cadastrado' },
-    ],
-  },
-  {
-    id: '3', cnjNumber: '0034567-89.2022.4.03.6100', internalTitle: 'Execução Fiscal - IPI',
-    clientId: 'c7', clientName: 'Tech Solutions ME', court: 'TRF-3', courtBranch: 'Foro Central',
-    district: 'São Paulo', state: 'SP', proceduralClass: 'Execução Fiscal', legalArea: 'Direito Tributário',
-    subject: 'Execução Fiscal - Cobrança de IPI', activePole: 'Fazenda Nacional', passivePole: 'Tech Solutions ME',
-    opposingParty: 'Fazenda Nacional', responsibleLawyer: 'Dr. Paulo Oliveira', internName: 'Lucas Santos',
-    phase: 'Execução', status: 'ACTIVE', causeValue: 850000, successProbability: 40, riskLevel: 'alto',
-    caseStrategy: 'Buscar parcelamento da dívida. Alternativa: embargar execução com fundamento em prescrição de parte dos créditos.',
-    nextAction: 'Apresentar embargos à execução', distributionDate: '2022-08-10', visibleToClient: true,
-    lastMovement: 'Citação da executada', lastMovementDate: '2026-05-05T11:20:00',
-    createdAt: '2022-08-10T08:00:00', updatedAt: '2026-05-05T11:20:00',
-    movements: [
-      { id: 'm3-1', date: '2026-05-05T11:20:00', description: 'Citação da executada via mandado', type: 'intimacao', visibleToClient: true },
-      { id: 'm3-2', date: '2026-04-18T15:00:00', description: 'Expedido mandado de citação', type: 'despacho', visibleToClient: true },
-    ],
-    deadlines: [
-      { id: 'd3-1', title: 'Prazo para embargos', date: '2026-05-25', type: 'Embargos', status: 'pending' },
-    ],
-    hearings: [],
-    tasks: [
-      { id: 'ta3-1', title: 'Elaborar embargos', description: 'Preparar petição de embargos à execução fiscal', dueDate: '2026-05-22', priority: 'high', status: 'pending', assignee: 'Dr. Paulo Oliveira' },
-      { id: 'ta3-2', title: 'Reunir documentos', description: 'Coletar comprovantes de pagamento', dueDate: '2026-05-18', priority: 'medium', status: 'pending', assignee: 'Lucas Santos' },
-    ],
-    documents: [
-      { id: 'doc3-1', name: 'CDA.pdf', type: 'PDF', uploadedAt: '2022-08-10', size: '450 KB' },
-      { id: 'doc3-2', name: 'Comprovantes Pagamento.pdf', type: 'PDF', uploadedAt: '2026-04-20', size: '2.8 MB' },
-    ],
-    finances: [
-      { id: 'f3-1', description: 'Honorários Mensais', type: 'income', value: 5000, date: '2026-05-01', status: 'paid' },
-    ],
-    history: [
-      { id: 'hi3-1', action: 'Criado', user: 'Dr. Paulo Oliveira', date: '2022-08-10T08:00:00', description: 'Processo cadastrado' },
-    ],
-  },
-  {
-    id: '4', cnjNumber: '0056789-01.2023.8.13.0024', internalTitle: 'Ação Indenizatória - Veículo com Defeito',
-    clientId: 'c4', clientName: 'Ana Carolina Souza', court: 'TJMG', courtBranch: 'Foro de Belo Horizonte',
-    district: 'Belo Horizonte', state: 'MG', proceduralClass: 'Ação Indenizatória', legalArea: 'Direito do Consumidor',
-    subject: 'Vícios Ocultos - Veículo zero km', activePole: 'Ana Carolina Souza', passivePole: 'Concessionária XYZ Ltda',
-    opposingParty: 'Concessionária XYZ Ltda', responsibleLawyer: 'Dra. Fernanda Lima', internName: '',
-    phase: 'Conhecimento', status: 'ACTIVE', causeValue: 120000, successProbability: 75, riskLevel: 'medio',
-    caseStrategy: 'Ação indenizatória por vícios ocultos. Pedido de danos materiais + morais. Perícia já requerida.',
-    nextAction: 'Acompanhar perícia', distributionDate: '2023-06-01', visibleToClient: true,
-    lastMovement: 'Perito nomeado aguardando agendamento', lastMovementDate: '2026-05-07T09:00:00',
-    createdAt: '2023-06-01T11:00:00', updatedAt: '2026-05-07T09:00:00',
-    movements: [
-      { id: 'm4-1', date: '2026-05-07T09:00:00', description: 'Nomeado perito judicial para inspeção veicular', type: 'despacho', visibleToClient: true },
-      { id: 'm4-2', date: '2026-04-22T13:00:00', description: 'Juntada defesa da concessionária', type: 'peticao', visibleToClient: true },
-    ],
-    deadlines: [
-      { id: 'd4-1', title: 'Indicar assistente técnico', date: '2026-05-20', type: 'Indicação', status: 'pending' },
-    ],
-    hearings: [],
-    tasks: [
-      { id: 'ta4-1', title: 'Indicar assistente técnico', description: 'Escolher engenheiro mecânico para perícia', dueDate: '2026-05-18', priority: 'high', status: 'pending', assignee: 'Dra. Fernanda Lima' },
-    ],
-    documents: [
-      { id: 'doc4-1', name: 'Nota Fiscal Veículo.pdf', type: 'PDF', uploadedAt: '2023-06-01', size: '320 KB' },
-      { id: 'doc4-2', name: 'Laudo Oficina Autorizada.pdf', type: 'PDF', uploadedAt: '2023-05-20', size: '1.1 MB' },
-    ],
-    finances: [
-      { id: 'f4-1', description: 'Honorários Contrato', type: 'income', value: 8000, date: '2023-06-10', status: 'paid' },
-      { id: 'f4-2', description: 'Honorários Éxito (20%)', type: 'income', value: 0, date: '', status: 'pending' },
-    ],
-    history: [],
-  },
-  {
-    id: '5', cnjNumber: '0078901-23.2024.4.01.3202', internalTitle: 'Aposentadoria Especial - Negativa INSS',
-    clientId: 'c5', clientName: 'Carlos Alberto Mendes', court: 'TRF-1', courtBranch: 'Foro Central',
-    district: 'Brasília', state: 'DF', proceduralClass: 'Ação Previdenciária', legalArea: 'Direito Previdenciário',
-    subject: 'Aposentadoria Especial - Negativa Administrativa', activePole: 'Carlos Alberto Mendes', passivePole: 'INSS',
-    opposingParty: 'INSS', responsibleLawyer: 'Dr. Paulo Oliveira', internName: '',
-    phase: 'Conhecimento', status: 'ACTIVE', causeValue: 360000, successProbability: 85, riskLevel: 'baixo',
-    caseStrategy: 'Comprovar atividade especial com PPP e LTCAT. Jurisprudência consolidada favorável ao segurado.',
-    nextAction: 'Aguardar perícia médica judicial', distributionDate: '2024-01-20', visibleToClient: true,
-    lastMovement: 'Designada perícia médica', lastMovementDate: '2026-05-01T14:00:00',
-    createdAt: '2024-01-20T09:30:00', updatedAt: '2026-05-01T14:00:00',
-    movements: [
-      { id: 'm5-1', date: '2026-05-01T14:00:00', description: 'Designada perícia médica judicial para 20/06', type: 'despacho', visibleToClient: true },
-      { id: 'm5-2', date: '2026-04-15T10:00:00', description: 'Apresentada réplica à contestação do INSS', type: 'peticao', visibleToClient: true },
-      { id: 'm5-3', date: '2026-03-28T08:30:00', description: 'Contestação do INSS juntada', type: 'intimacao', visibleToClient: true },
-    ],
-    deadlines: [
-      { id: 'd5-1', title: 'Perícia médica', date: '2026-06-20', type: 'Perícia', status: 'pending' },
-    ],
-    hearings: [],
-    tasks: [
-      { id: 'ta5-1', title: 'Preparar cliente para perícia', description: 'Orientar sobre documentos e procedimento', dueDate: '2026-06-18', priority: 'medium', status: 'pending', assignee: 'Dr. Paulo Oliveira' },
-    ],
-    documents: [
-      { id: 'doc5-1', name: 'PPP Completo.pdf', type: 'PDF', uploadedAt: '2024-01-20', size: '4.2 MB' },
-      { id: 'doc5-2', name: 'LTCAT.pdf', type: 'PDF', uploadedAt: '2024-01-20', size: '3.8 MB' },
-      { id: 'doc5-3', name: 'CNIS Atualizado.pdf', type: 'PDF', uploadedAt: '2024-01-25', size: '560 KB' },
-    ],
-    finances: [
-      { id: 'f5-1', description: 'Honorários Contrato', type: 'income', value: 5000, date: '2024-01-25', status: 'paid' },
-    ],
-    history: [],
-  },
-  {
-    id: '6', cnjNumber: '0090123-45.2021.8.21.0001', internalTitle: 'Cobrança Indevida - Negativação SPC',
-    clientId: 'c6', clientName: 'Patricia Rocha Lima', court: 'TJRS', courtBranch: 'Foro Central',
-    district: 'Porto Alegre', state: 'RS', proceduralClass: 'Ação Declaratória c/c Indenizatória', legalArea: 'Direito do Consumidor',
-    subject: 'Cobrança Indevida e Negativação Indevida', activePole: 'Patricia Rocha Lima', passivePole: 'Banco Nacional S.A.',
-    opposingParty: 'Banco Nacional S.A.', responsibleLawyer: 'Dr. Ricardo Santos', internName: 'Marina Lima',
-    phase: 'Recursal', status: 'CLOSED', causeValue: 60000, successProbability: 95, riskLevel: 'baixo',
-    caseStrategy: 'Ação julgada procedente. Ré interpôs apelação. Preparar contrarrazões.',
-    nextAction: 'Aguardar julgamento do recurso', distributionDate: '2021-09-10', visibleToClient: true,
-    lastMovement: 'Apelação do banco distribuída ao TJ', lastMovementDate: '2026-04-30T16:45:00',
-    createdAt: '2021-09-10T14:00:00', updatedAt: '2026-04-30T16:45:00',
-    movements: [
-      { id: 'm6-1', date: '2026-04-30T16:45:00', description: 'Apelação do Banco Nacional distribuída ao TJRS', type: 'intimacao', visibleToClient: true },
-      { id: 'm6-2', date: '2026-03-15T11:30:00', description: 'Sentença de procedência publicada - R$ 30.000 danos morais', type: 'sentenca', visibleToClient: true },
-      { id: 'm6-3', date: '2026-03-01T09:00:00', description: 'Alegações finais apresentadas', type: 'peticao', visibleToClient: true },
-    ],
-    deadlines: [
-      { id: 'd6-1', title: 'Contrarrazões de apelação', date: '2026-05-20', type: 'Contrarrazões', status: 'pending' },
-    ],
-    hearings: [
-      { id: 'h6-1', title: 'Audiência de Instrução e Julgamento', date: '2026-02-20', time: '13:30', type: 'Instrução', local: 'Fórum de Porto Alegre', status: 'realized' },
-    ],
-    tasks: [
-      { id: 'ta6-1', title: 'Elaborar contrarrazões', description: 'Responder apelação do banco', dueDate: '2026-05-18', priority: 'high', status: 'pending', assignee: 'Dr. Ricardo Santos' },
-    ],
-    documents: [
-      { id: 'doc6-1', name: 'Sentença 1º Grau.pdf', type: 'PDF', uploadedAt: '2026-03-15', size: '420 KB' },
-      { id: 'doc6-2', name: 'Apelação Banco.pdf', type: 'PDF', uploadedAt: '2026-04-30', size: '680 KB' },
-      { id: 'doc6-3', name: 'Extratos e Comprovantes.pdf', type: 'PDF', uploadedAt: '2021-09-10', size: '1.5 MB' },
-    ],
-    finances: [
-      { id: 'f6-1', description: 'Honorários Contrato', type: 'income', value: 6000, date: '2021-09-15', status: 'paid' },
-      { id: 'f6-2', description: 'Honorários Éxito (20%)', type: 'income', value: 6000, date: '2026-03-20', status: 'paid' },
-      { id: 'f6-3', description: 'Custas Processuais', type: 'expense', value: 1800, date: '2021-09-12', status: 'paid' },
-    ],
-    history: [],
-  },
-  {
-    id: '7', cnjNumber: '0012345-67.2025.8.26.0100', internalTitle: 'Defesa Criminal - Furto Qualificado',
-    clientId: 'c2', clientName: 'João Pereira Costa', court: 'TJSP', courtBranch: 'Foro Regional I',
-    district: 'São Paulo', state: 'SP', proceduralClass: 'Ação Penal', legalArea: 'Direito Penal',
-    subject: 'Furto Qualificado (Art. 155, §4º)', activePole: 'Ministério Público', passivePole: 'João Pereira Costa',
-    opposingParty: 'Ministério Público Estadual', responsibleLawyer: 'Dr. Ricardo Santos', internName: '',
-    phase: 'Instrução', status: 'ACTIVE', causeValue: 0, successProbability: 50, riskLevel: 'alto',
-    caseStrategy: 'Defesa técnica baseada em negativa de autoria. Buscar absolvição por insuficiência de provas.',
-    nextAction: 'Oitiva de testemunhas de defesa', distributionDate: '2025-01-15', visibleToClient: false,
-    lastMovement: 'Audiência de instrução redesignada', lastMovementDate: '2026-05-03T13:00:00',
-    createdAt: '2025-01-15T09:00:00', updatedAt: '2026-05-03T13:00:00',
-    movements: [
-      { id: 'm7-1', date: '2026-05-03T13:00:00', description: 'Audiência de instrução redesignada para 10/07', type: 'despacho', visibleToClient: false },
-      { id: 'm7-2', date: '2026-04-10T15:00:00', description: 'Réplica do MP à defesa prévia', type: 'peticao', visibleToClient: false },
-    ],
-    deadlines: [
-      { id: 'd7-1', title: 'Audiência de Instrução', date: '2026-07-10', type: 'Audiência', status: 'pending' },
-    ],
-    hearings: [
-      { id: 'h7-1', title: 'Audiência de Instrução', date: '2026-07-10', time: '13:30', type: 'Instrução', local: 'Foro Regional I - SP', status: 'scheduled' },
-    ],
-    tasks: [
-      { id: 'ta7-1', title: 'Preparar testemunhas de defesa', description: 'Alinhar depoimento de 2 testemunhas', dueDate: '2026-06-15', priority: 'high', status: 'pending', assignee: 'Dr. Ricardo Santos' },
-    ],
-    documents: [
-      { id: 'doc7-1', name: 'Defesa Prévia.pdf', type: 'PDF', uploadedAt: '2025-02-01', size: '750 KB' },
-      { id: 'doc7-2', name: 'Procuração.pdf', type: 'PDF', uploadedAt: '2025-01-15', size: '180 KB' },
-    ],
-    finances: [
-      { id: 'f7-1', description: 'Honorários Contrato', type: 'income', value: 20000, date: '2025-01-20', status: 'paid' },
-    ],
-    history: [],
-  },
-  {
-    id: '8', cnjNumber: '0034567-89.2026.8.13.0024', internalTitle: 'Ação de Alimentos - Guarda',
-    clientId: 'c8', clientName: 'Fernanda Alves', court: 'TJMG', courtBranch: 'Foro de Belo Horizonte',
-    district: 'Belo Horizonte', state: 'MG', proceduralClass: 'Ação de Alimentos', legalArea: 'Direito de Família',
-    subject: 'Guarda Unilateral e Pensão Alimentícia', activePole: 'Fernanda Alves', passivePole: 'Pedro Alves',
-    opposingParty: 'Pedro Alves', responsibleLawyer: 'Dra. Fernanda Lima', internName: '',
-    phase: 'Pré-Processual', status: 'ACTIVE', causeValue: 60000, successProbability: 90, riskLevel: 'baixo',
-    caseStrategy: 'Acordo extrajudicial preferível. Caso de alta probabilidade de acordo. Guarda unilateral com pensão de 30% dos rendimentos.',
-    nextAction: 'Enviar minuta de acordo para parte contrária', distributionDate: '2026-04-01', visibleToClient: true,
-    lastMovement: 'Minuta de acordo enviada para parte contrária', lastMovementDate: '2026-05-06T17:00:00',
-    createdAt: '2026-04-01T10:00:00', updatedAt: '2026-05-06T17:00:00',
-    movements: [
-      { id: 'm8-1', date: '2026-05-06T17:00:00', description: 'Minuta de acordo enviada ao patrono da parte contrária', type: 'peticao', visibleToClient: true },
-      { id: 'm8-2', date: '2026-04-25T10:30:00', description: 'Reunião de conciliação com ambas as partes', type: 'outro', visibleToClient: true },
-    ],
-    deadlines: [],
-    hearings: [],
-    tasks: [
-      { id: 'ta8-1', title: 'Acompanhar proposta de acordo', description: 'Ligar para advogado da parte contrária', dueDate: '2026-05-15', priority: 'high', status: 'pending', assignee: 'Dra. Fernanda Lima' },
-    ],
-    documents: [
-      { id: 'doc8-1', name: 'Minuta de Acordo.docx', type: 'DOCX', uploadedAt: '2026-05-06', size: '120 KB' },
-      { id: 'doc8-2', name: 'Certidão de Nascimento.pdf', type: 'PDF', uploadedAt: '2026-04-01', size: '200 KB' },
-    ],
-    finances: [],
-    history: [],
-  },
-  {
-    id: '9', cnjNumber: '0056789-01.2023.8.19.0001', internalTitle: 'Contrato de Locação - Cobrança',
-    clientId: 'c3', clientName: 'Empresa XYZ Ltda', court: 'TJRJ', courtBranch: 'Foro Central',
-    district: 'Rio de Janeiro', state: 'RJ', proceduralClass: 'Ação de Cobrança', legalArea: 'Direito Civil',
-    subject: 'Cobrança de aluguéis atrasados', activePole: 'Empresa XYZ Ltda', passivePole: 'Locatário',
-    opposingParty: 'José Oliveira ME', responsibleLawyer: 'Dra. Juliana Costa', internName: 'Marina Lima',
-    phase: 'Execução', status: 'SUSPENDED', causeValue: 95000, successProbability: 30, riskLevel: 'medio',
-    caseStrategy: 'Execução de título extrajudicial. Devedor não localizado. Avaliar medida de busca e apreensão de bens.',
-    nextAction: 'Tentar localização de bens via INFOJUD', distributionDate: '2023-11-05', visibleToClient: true,
-    lastMovement: 'Suspensão por não localização do devedor', lastMovementDate: '2026-04-10T15:30:00',
-    createdAt: '2023-11-05T09:00:00', updatedAt: '2026-04-10T15:30:00',
-    movements: [
-      { id: 'm9-1', date: '2026-04-10T15:30:00', description: 'Processo suspenso - devedor não localizado', type: 'despacho', visibleToClient: true },
-      { id: 'm9-2', date: '2026-03-20T11:00:00', description: 'Mandado de citação negativo', type: 'intimacao', visibleToClient: true },
-    ],
-    deadlines: [],
-    hearings: [],
-    tasks: [
-      { id: 'ta9-1', title: 'Pesquisar bens', description: 'Acessar INFOJUD para localizar bens do devedor', dueDate: '2026-06-01', priority: 'medium', status: 'pending', assignee: 'Dra. Juliana Costa' },
-    ],
-    documents: [
-      { id: 'doc9-1', name: 'Contrato de Locação.pdf', type: 'PDF', uploadedAt: '2023-11-05', size: '500 KB' },
-      { id: 'doc9-2', name: 'Comprovantes de Dívida.pdf', type: 'PDF', uploadedAt: '2023-11-05', size: '1.8 MB' },
-    ],
-    finances: [
-      { id: 'f9-1', description: 'Honorários Contrato', type: 'income', value: 7000, date: '2023-11-10', status: 'paid' },
-    ],
-    history: [],
-  },
-  {
-    id: '10', cnjNumber: '0078901-23.2022.8.08.0024', internalTitle: 'Recuperação de Créditos Tributários',
-    clientId: 'c3', clientName: 'Empresa XYZ Ltda', court: 'TJES', courtBranch: 'Foro Central',
-    district: 'Vitória', state: 'ES', proceduralClass: 'Mandado de Segurança', legalArea: 'Direito Tributário',
-    subject: 'Recuperação de créditos de ICMS', activePole: 'Empresa XYZ Ltda', passivePole: 'SEFAZ-ES',
-    opposingParty: 'SEFAZ-ES', responsibleLawyer: 'Dr. Paulo Oliveira', internName: 'Lucas Santos',
-    phase: 'Recursal', status: 'ARCHIVED', causeValue: 1200000, successProbability: 55, riskLevel: 'medio',
-    caseStrategy: 'Mandado de Segurança coletivo. Discussão sobre base de cálculo do ICMS. Trânsito em julgado desfavorável.',
-    nextAction: 'Analisar possibilidade de recurso especial', distributionDate: '2022-06-15', visibleToClient: true,
-    lastMovement: 'Arquivamento definitivo', lastMovementDate: '2026-03-01T12:00:00',
-    createdAt: '2022-06-15T09:00:00', updatedAt: '2026-03-01T12:00:00',
-    movements: [
-      { id: 'm10-1', date: '2026-03-01T12:00:00', description: 'Arquivamento definitivo dos autos', type: 'outro', visibleToClient: true },
-      { id: 'm10-2', date: '2026-01-15T10:00:00', description: 'Trânsito em julgado', type: 'sentenca', visibleToClient: true },
-    ],
-    deadlines: [],
-    hearings: [],
-    tasks: [
-      { id: 'ta10-1', title: 'Análise de RE', description: 'Verificar possibilidade de Recurso Especial', dueDate: '2026-06-15', priority: 'low', status: 'completed', assignee: 'Dr. Paulo Oliveira' },
-    ],
-    documents: [
-      { id: 'doc10-1', name: 'Sentença.pdf', type: 'PDF', uploadedAt: '2024-08-20', size: '890 KB' },
-      { id: 'doc10-2', name: 'Acórdão TJ.pdf', type: 'PDF', uploadedAt: '2025-11-10', size: '1.2 MB' },
-    ],
-    finances: [
-      { id: 'f10-1', description: 'Honorários Contrato', type: 'income', value: 15000, date: '2022-06-20', status: 'paid' },
-      { id: 'f10-2', description: 'Custas Processuais', type: 'expense', value: 5000, date: '2022-06-22', status: 'paid' },
-    ],
-    history: [
-      { id: 'hi10-1', action: 'Criado', user: 'Dr. Paulo Oliveira', date: '2022-06-15T09:00:00', description: 'Processo cadastrado' },
-      { id: 'hi10-2', action: 'Status alterado', user: 'Sistema', date: '2026-03-01T12:00:00', description: 'Status alterado para Arquivado' },
-    ],
-  },
-];
 
 /* ───────────── HELPERS ───────────── */
 
@@ -570,7 +219,32 @@ const getRiskColor = (risk: string) => {
 /* ───────────── MAIN COMPONENT ───────────── */
 
 export default function Cases() {
-  const [cases, setCases] = useState<LegalCase[]>(() => generateMockCases() as LegalCase[]);
+  const [cases, setCases] = useState<LegalCase[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [clientOptions, setClientOptions] = useState<{ id: string; name: string }[]>([]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        setLoading(true);
+        const [casesRes, clientsRes] = await Promise.all([
+          casesApi.list(),
+          clientsApi.list(),
+        ]);
+        const caseList = (casesRes as any).cases || (casesRes as any).data || [];
+        setCases(Array.isArray(caseList) ? caseList : []);
+        const clientList = (clientsRes as any).clients || (clientsRes as any).data || [];
+        if (Array.isArray(clientList)) {
+          setClientOptions(clientList.map((c: any) => ({ id: c.id, name: c.name })));
+        }
+      } catch (err) {
+        console.error('Erro ao carregar dados:', err);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
   const [searchTerm, setSearchTerm] = useState('');
   const [activeFilters, setActiveFilters] = useState({
     status: 'ALL', phase: 'ALL', legalArea: 'ALL',
@@ -623,38 +297,31 @@ export default function Cases() {
   };
 
   /* ── CRUD Ops ── */
-  const handleSubmitForm = (e: React.FormEvent) => {
+  const handleSubmitForm = async (e: React.FormEvent) => {
     e.preventDefault();
-    const client = CLIENTS.find(c => c.id === formData.clientId);
-    if (editingCase) {
-      setCases(cases.map(c => c.id === editingCase.id ? {
-        ...c,
-        ...formData,
-        clientName: client?.name || c.clientName,
-        updatedAt: new Date().toISOString(),
-      } : c));
-    } else {
-      const newCase: LegalCase = {
-        id: String(Date.now()),
-        ...formData,
-        clientName: client?.name || '',
-        lastMovement: 'Cadastrado no sistema',
-        lastMovementDate: new Date().toISOString(),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        movements: [],
-        deadlines: [],
-        hearings: [],
-        tasks: [],
-        documents: [],
-        finances: [],
-        history: [],
-      };
-      setCases([newCase, ...cases]);
+    setSubmitting(true);
+    try {
+      if (editingCase) {
+        const res = await casesApi.update(editingCase.id, formData);
+        const updated = (res as any).case || (res as any).data || res;
+        if (updated) {
+          setCases(cases.map(c => c.id === editingCase.id ? { ...c, ...updated } : c));
+        }
+      } else {
+        const res = await casesApi.create(formData);
+        const newCase = (res as any).case || (res as any).data || res;
+        if (newCase) {
+          setCases([newCase, ...cases]);
+        }
+      }
+      setShowFormModal(false);
+      setEditingCase(null);
+      setFormData(emptyForm);
+    } catch (err: any) {
+      alert(err.message || 'Erro ao salvar processo');
+    } finally {
+      setSubmitting(false);
     }
-    setShowFormModal(false);
-    setEditingCase(null);
-    setFormData(emptyForm);
   };
 
   const handleEdit = (c: LegalCase) => {
@@ -688,8 +355,13 @@ export default function Cases() {
     setShowFormModal(true);
   };
 
-  const handleDelete = (id: string) => {
-    setCases(cases.filter(c => c.id !== id));
+  const handleDelete = async (id: string) => {
+    try {
+      await casesApi.delete(id);
+      setCases(cases.filter(c => c.id !== id));
+    } catch (err: any) {
+      alert(err.message || 'Erro ao excluir processo');
+    }
     setShowDeleteConfirm(null);
   };
 
@@ -1097,7 +769,7 @@ export default function Cases() {
                     <label>Cliente</label>
                     <select className="field-control" value={formData.clientId} onChange={e => setFormData({ ...formData, clientId: e.target.value })}>
                       <option value="">Selecione...</option>
-                      {CLIENTS.map(cl => <option key={cl.id} value={cl.id}>{cl.name}</option>)}
+                      {clientOptions.map(cl => <option key={cl.id} value={cl.id}>{cl.name}</option>)}
                     </select>
                   </div>
                   <div className="field-group">

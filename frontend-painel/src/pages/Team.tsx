@@ -197,7 +197,7 @@ const roleLabels: Record<Role, string> = {
 };
 
 const roleColors: Record<Role, string> = {
-  SOCIO: '#D4AF37',
+  SOCIO: '#2563eb',
   ADVOGADO: '#3B82F6',
   ESTAGIARIO: '#10B981',
   SECRETARIA: '#8B5CF6',
@@ -219,7 +219,7 @@ function getInitials(name: string): string {
 }
 
 function avatarColor(name: string): string {
-  const colors = ['#ef4444', '#f97316', '#eab308', '#10b981', '#3b82f6', '#8b5cf6', '#ec4899', '#D4AF37'];
+  const colors = ['#ef4444', '#f97316', '#eab308', '#10b981', '#3b82f6', '#8b5cf6', '#ec4899', '#2563eb'];
   let hash = 0;
   for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
   return colors[Math.abs(hash) % colors.length];
@@ -466,6 +466,10 @@ export default function Team() {
         .confirm-box h3 { margin: 0 0 8px; color: var(--text-primary); }
         .confirm-box p { color: var(--text-secondary); font-size: 14px; margin-bottom: 20px; }
         .confirm-actions { display: flex; gap: 12px; justify-content: center; }
+        .btn-save { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; background: var(--primary-gradient); color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .btn-save:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37,99,235,0.3); }
+        .btn-cancel { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; background: var(--bg-hover); color: var(--text-secondary); border: 1px solid var(--border); border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .btn-cancel:hover { background: var(--bg-secondary); color: var(--text-primary); }
       `}</style>
 
       {/* Page Header */}

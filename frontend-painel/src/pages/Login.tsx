@@ -50,7 +50,7 @@ export default function Login() {
         </div>
         
         <form className="login-form" onSubmit={handleSubmit}>
-          {error && <div className="error-message">{error}</div>}
+          {error && <div className="login-error">{error}</div>}
           
           <div className="form-group">
             <label className="form-label" htmlFor="email">Email</label>
@@ -88,7 +88,7 @@ export default function Login() {
         </form>
         
         <div className="login-footer">
-          <p>Credenciais padrão: admin@barsaadvocacia.com.br / admin123</p>
+          <p>Woojuris - Sistema de Gestão Jurídica</p>
         </div>
       </div>
     </div>
