@@ -5,14 +5,14 @@ WORKDIR /app/backend
 
 # Copiar package.json e instalar dependências
 COPY backend/package*.json ./
-RUN npm ci --production
+RUN npm ci
 
 # Copiar código fonte e compilar
 COPY backend/src ./src
 COPY backend/tsconfig.json ./
 COPY backend/prisma ./prisma
 
-RUN npm run build && npm run prisma:generate
+RUN npm run build && npm run prisma:generate && npm prune --production
 
 # ============================================
 # Build stage - Frontend Painel
