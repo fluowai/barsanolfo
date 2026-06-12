@@ -4,6 +4,8 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
 import path from 'path';
+import bcrypt from 'bcryptjs';
+import { PrismaClient } from '@prisma/client';
 import { createServer } from 'http';
 import { Server as SocketIOServer } from 'socket.io';
 import { httpLogger, logger } from './lib/logger';
@@ -36,6 +38,7 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5032;
 const NODE_ENV = process.env.NODE_ENV || 'development';
+const prisma = new PrismaClient();
 
 app.use(httpLogger);
 
@@ -44,9 +47,10 @@ app.use(helmet.contentSecurityPolicy({
   directives: {
     defaultSrc: ["'self'"],
     scriptSrc: ["'self'", "'unsafe-inline'"],
-    styleSrc: ["'self'", "'unsafe-inline'"],
+    styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
+    styleSrcElem: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
     imgSrc: ["'self'", 'data:', 'https:'],
-    fontSrc: ["'self'", 'data:'],
+    fontSrc: ["'self'", 'data:', 'https://fonts.gstatic.com'],
   },
 }));
 app.use(helmet.hsts({
@@ -208,13 +212,60 @@ setInterval(async () => {
   }
 }, 3600000);
 
-httpServer.listen(PORT, () => {
+async function ensureInitialAdmin() {
+  const adminEmail = process.env.ADMIN_EMAIL || 'admin@woojuris.com.br';
+  const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
+  const organizationName = process.env.ORGANIZATION_NAME || 'Woojuris';
+  const syncPassword = process.env.ADMIN_SYNC_PASSWORD === 'true';
+
+  const existingAdmin = await prisma.user.findUnique({
+    where: { email: adminEmail },
+  });
+
+  if (existingAdmin) {
+    if (syncPassword) {
+      await prisma.user.update({
+        where: { id: existingAdmin.id },
+        data: { passwordHash: await bcrypt.hash(adminPassword, 10), role: 'ADMIN' },
+      });
+      logger.info({ email: adminEmail }, 'Senha do admin inicial sincronizada');
+    }
+    return;
+  }
+
+  const organization = await prisma.organization.findFirst()
+    || await prisma.organization.create({
+      data: { name: organizationName },
+    });
+
+  const passwordHash = await bcrypt.hash(adminPassword, 10);
+
+  await prisma.user.create({
+    data: {
+      name: 'Administrador',
+      email: adminEmail,
+      passwordHash,
+      role: 'ADMIN',
+      organizationId: organization.id,
+    },
+  });
+
+  logger.info({ email: adminEmail }, 'Usuario admin inicial criado');
+}
+
+ensureInitialAdmin()
+  .catch((err) => {
+    logger.error({ err }, 'Erro ao criar usuario admin inicial');
+  })
+  .finally(() => {
+    httpServer.listen(PORT, () => {
   logger.info('Servidor Woojuris iniciando...');
   logger.info(`Site: http://localhost:${PORT}`);
   logger.info(`Painel: http://localhost:${PORT}/painel`);
   logger.info(`Health: http://localhost:${PORT}/api/health`);
   logger.info(`Ambiente: ${NODE_ENV}`);
   logger.info('Servidor rodando com sucesso (com WebSockets)!');
-});
+    });
+  });
 
 export default app;

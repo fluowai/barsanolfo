@@ -12,6 +12,10 @@ services:
       NODE_ENV: production
       PORT: 5032
       ALLOWED_ORIGINS: "https://woojuris.consultio.com.br,http://woojuris.consultio.com.br"
+      ADMIN_EMAIL: "admin@woojuris.com.br"
+      ADMIN_PASSWORD: "admin123"
+      ADMIN_SYNC_PASSWORD: "true"
+      ORGANIZATION_NAME: "Woojuris"
       JWT_SECRET: "Np4TqwVq1RtgG5guinZ/KQhQx4abzgumQ1X2z4ykFwmhQtk3XA45MOXvPNwySsY2eX90YHuwKWVJ9JKTGYWMNg=="
       DATABASE_URL: "postgresql://postgres.mhfsputtyytpgfjkzkdq:qoypvRj7VICtEE8J@aws-1-sa-east-1.pooler.supabase.com:6543/postgres?sslmode=require"
       SUPABASE_URL: "https://mhfsputtyytpgfjkzkdq.supabase.co"
