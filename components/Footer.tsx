@@ -2,60 +2,17 @@ import React from 'react';
 import Logo from './Logo';
 import { NAV_ITEMS } from '../constants';
 
-const Footer: React.FC = () => {
-  return (
-    <footer className="bg-slate-900 pt-20 pb-10">
-      <div className="container mx-auto px-6">
-        <div className="flex flex-col items-center mb-16 text-center">
-          <Logo className="mb-6" />
-          <p className="text-slate-400 text-sm leading-relaxed max-w-lg">
-            Escritório especializado em Direito do Trabalho, defendendo os interesses de quem constrói o futuro com as próprias mãos.
-          </p>
-        </div>
-
-        <div className="grid md:grid-cols-3 gap-12 mb-16">
-          
-          <div>
-            <h4 className="text-white font-bold uppercase tracking-widest text-xs mb-8">Navegação</h4>
-            <ul className="space-y-4">
-              {NAV_ITEMS.map(item => (
-                <li key={item.href}>
-                  <a href={item.href} className="text-slate-400 hover:text-primary-400 transition-colors text-sm">{item.label}</a>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="text-white font-bold uppercase tracking-widest text-xs mb-8">Áreas de Foco</h4>
-            <ul className="space-y-4">
-              <li><a href="#atuacao" className="text-slate-400 hover:text-primary-400 transition-colors text-sm">Rescisão Indireta</a></li>
-              <li><a href="#atuacao" className="text-slate-400 hover:text-primary-400 transition-colors text-sm">Horas Extras</a></li>
-              <li><a href="#atuacao" className="text-slate-400 hover:text-primary-400 transition-colors text-sm">Dano Moral</a></li>
-              <li><a href="#atuacao" className="text-slate-400 hover:text-primary-400 transition-colors text-sm">Acidente de Trabalho</a></li>
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="text-white font-bold uppercase tracking-widest text-xs mb-8">Informações</h4>
-            <p className="text-slate-400 text-sm mb-4">Goiânia - GO</p>
-            <p className="text-slate-400 text-sm mb-4">Rua 16 A, 1078, Setor Aeroporto</p>
-            <p className="text-primary-400 text-sm font-bold">Atendimento: (62) 99904-1023</p>
-          </div>
-        </div>
-        
-        <div className="pt-10 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center gap-6">
-          <p className="text-slate-500 text-[10px] uppercase tracking-widest">
-            © 2024 Woojuris. Todos os direitos reservados.
-          </p>
-          <div className="flex gap-8 text-slate-500 text-[10px] uppercase tracking-widest">
-            <a href="#" className="hover:text-white transition-colors">Termos de Uso</a>
-            <a href="#" className="hover:text-white transition-colors">Política de Privacidade</a>
-          </div>
-        </div>
+const Footer: React.FC = () => (
+  <footer className="bg-[#101714] py-14 text-white">
+    <div className="mx-auto max-w-[1440px] px-5 md:px-10 lg:px-14">
+      <div className="grid gap-12 border-b border-white/15 pb-14 md:grid-cols-[1.3fr_.7fr_.7fr]">
+        <div><Logo light /><p className="mt-7 max-w-md text-sm leading-7 text-white/50">Assessoria jurídica estratégica para empresas, empreendedores e famílias empresárias. Todos os nomes e dados deste modelo são fictícios.</p></div>
+        <div><p className="text-[10px] font-bold uppercase tracking-[.18em] text-[#c9b889]">Navegação</p><div className="mt-6 flex flex-col gap-3">{NAV_ITEMS.map(item => <a key={item.href} href={item.href} className="text-sm text-white/60 hover:text-white">{item.label}</a>)}</div></div>
+        <div><p className="text-[10px] font-bold uppercase tracking-[.18em] text-[#c9b889]">Contato</p><div className="mt-6 space-y-3 text-sm text-white/60"><p>contato@lumeprado.legal</p><p>(11) 4002-2844</p><p>São Paulo · SP</p></div></div>
       </div>
-    </footer>
-  );
-};
+      <div className="flex flex-col gap-4 pt-7 text-[10px] uppercase tracking-[.14em] text-white/35 sm:flex-row sm:justify-between"><p>© 2026 Lume & Prado · Modelo demonstrativo</p><p>Privacidade · Termos</p></div>
+    </div>
+  </footer>
+);
 
 export default Footer;

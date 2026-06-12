@@ -2,50 +2,31 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  body {
-    @apply bg-white text-slate-900 antialiased;
+:root {
+  color: #17211e;
+  background: #f3f1eb;
+  font-family: 'Manrope', sans-serif;
+  font-synthesis: none;
+}
+
+html { scroll-behavior: smooth; }
+body { margin: 0; min-width: 320px; background: #f3f1eb; color: #17211e; }
+h1, h2, h3, .font-serif { font-family: 'Cormorant Garamond', serif; letter-spacing: 0; }
+button, input, select, textarea { font: inherit; }
+
+@layer components {
+  .section-label {
+    @apply text-[10px] font-bold uppercase tracking-[0.22em] text-[#7d6741];
   }
-}
-
-@layer utilities {
-  .mask-fade-bottom {
-    mask-image: linear-gradient(to top, transparent 0%, black 40%);
-    -webkit-mask-image: linear-gradient(to top, transparent 0%, black 40%);
+  .field {
+    @apply flex flex-col gap-2 text-[10px] font-bold uppercase tracking-[0.14em] text-[#68716d];
   }
-
-  .mask-fade-right {
-    mask-image: linear-gradient(to left, transparent 0%, black 40%);
-    -webkit-mask-image: linear-gradient(to left, transparent 0%, black 40%);
+  .field input, .field select, .field textarea {
+    @apply w-full border-0 border-b border-[#adb4af] bg-transparent px-0 py-3 text-sm font-normal normal-case tracking-normal text-[#17211e] outline-none transition focus:border-[#183f35];
   }
+  .field textarea { @apply resize-none; }
 }
 
-::-webkit-scrollbar {
-  width: 10px;
-}
-
-::-webkit-scrollbar-track {
-  background: #f1f5f9;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 5px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
-}
-
-@keyframes fade-in {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.animate-fade-in {
-  animation: fade-in 1s ease-out forwards;
-}
-
-.font-serif {
-  font-family: 'Playfair Display', serif;
-}
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: #e5e8e1; }
+::-webkit-scrollbar-thumb { background: #75847d; }

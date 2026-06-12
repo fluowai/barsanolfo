@@ -1,220 +1,50 @@
-import React, { useState, useEffect } from 'react';
-import { Mail, Phone, MapPin, Send, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
-import { useContactForm } from '../hooks/useContactForm';
-import { API_BASE_URL, API_ENDPOINTS, PROBLEM_TYPES } from '../constants';
-import { ContactFormData } from '../types';
+import React, { useState } from 'react';
+import { ArrowRight, CheckCircle2 } from 'lucide-react';
+import { API_BASE_URL, API_ENDPOINTS } from '../constants';
 
 const Contact: React.FC = () => {
-  const { formData, errors, isValid, handleChange, validate, reset } = useContactForm();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [sent, setSent] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!validate()) {
-      return;
-    }
-
-    setIsSubmitting(true);
-    setSubmitError(null);
-
+  const submit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
+    setLoading(true);
     try {
       const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.CONTACT}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: form.get('name'), email: form.get('email'), phone: form.get('phone'), type: form.get('type'), message: form.get('message') }),
       });
-
-      const data = await response.json();
-
-      if (response.ok && data.success) {
-        setIsSubmitted(true);
-        reset();
-        setTimeout(() => setIsSubmitted(false), 5000);
-      } else {
-        setSubmitError(data.message || 'Erro ao enviar formulário. Tente novamente.');
-      }
-    } catch (error) {
-      setSubmitError('Erro de conexão com o servidor. Verifique se o backend está rodando.');
-      console.error('Erro:', error);
-    } finally {
-      setIsSubmitting(false);
-    }
+      if (response.ok) setSent(true);
+    } finally { setLoading(false); }
   };
 
-  if (isSubmitted) {
-    return (
-      <section id="contato" className="py-24 bg-slate-50 relative scroll-mt-64 md:scroll-mt-80">
-        <div className="container mx-auto px-6">
-          <div className="max-w-4xl mx-auto bg-white p-8 md:p-16 text-center border border-primary-200 shadow-xl rounded-2xl">
-            <div className="flex justify-center mb-6">
-              <CheckCircle2 size={80} className="text-green-500" />
-            </div>
-            <h2 className="text-3xl md:text-4xl font-bold mb-4 font-serif text-slate-900">Mensagem Enviada!</h2>
-            <p className="text-slate-600 text-base md:text-lg mb-8">
-              Agradecemos seu contato. Uma de nossas advogadas entrará em contato em breve para realizar sua triagem.
-            </p>
-            <button 
-              onClick={() => setIsSubmitted(false)}
-              className="bg-primary-600 px-8 py-3 text-white font-semibold uppercase tracking-widest hover:bg-primary-700 transition-all text-xs md:text-sm rounded-lg shadow-sm"
-            >
-              Enviar outra mensagem
-            </button>
+  return (
+    <section id="contato" className="bg-[#c9b889] py-24 md:py-32">
+      <div className="mx-auto grid max-w-[1440px] gap-14 px-5 md:px-10 lg:grid-cols-[.9fr_1.1fr] lg:px-14">
+        <div>
+          <p className="section-label">Primeira conversa</p>
+          <h2 className="mt-8 max-w-xl text-[clamp(2.7rem,5vw,5.5rem)] leading-[.95]">Toda boa estratégia começa com uma pergunta bem feita.</h2>
+          <div className="mt-12 grid gap-5 text-sm sm:grid-cols-2">
+            <div><p className="text-xs uppercase tracking-[.16em] opacity-60">E-mail</p><p className="mt-2 font-semibold">contato@lumeprado.legal</p></div>
+            <div><p className="text-xs uppercase tracking-[.16em] opacity-60">Telefone</p><p className="mt-2 font-semibold">(11) 4002-2844</p></div>
+            <div><p className="text-xs uppercase tracking-[.16em] opacity-60">Endereço</p><p className="mt-2 font-semibold">Alameda Horizonte, 180 · São Paulo</p></div>
+            <div><p className="text-xs uppercase tracking-[.16em] opacity-60">Atendimento</p><p className="mt-2 font-semibold">Brasil e exterior</p></div>
           </div>
         </div>
-      </section>
-    );
-  }
-
-  return (
-    <section id="contato" className="py-24 bg-slate-50 relative scroll-mt-64 md:scroll-mt-80">
-      <div className="container mx-auto px-6">
-        <div className="bg-white shadow-xl overflow-hidden border border-slate-200 rounded-2xl">
-          <div className="flex flex-col lg:flex-row">
-            <div className="lg:w-2/5 bg-primary-700 p-8 md:p-12 text-white">
-              <h2 className="text-3xl md:text-4xl font-bold mb-6 md:mb-8 font-serif">Vamos Resolver Seu Caso?</h2>
-              <p className="text-white/80 mb-8 md:mb-12 text-base md:text-lg">
-                Não deixe seus direitos prescreverem. Entre em contato agora para uma triagem inicial gratuita e sigilosa.
-              </p>
-              
-              <div className="space-y-6 md:space-y-8">
-                <div className="flex items-center gap-4 md:gap-6">
-                  <div className="w-10 h-10 md:w-12 md:h-12 bg-white/20 rounded-xl flex items-center justify-center">
-                    <Phone size={24} />
-                  </div>
-                  <div>
-                    <p className="text-xs uppercase font-bold tracking-widest opacity-60">Ligue para nós</p>
-                    <p className="text-lg md:text-xl font-bold tracking-tighter">(62) 99904-1023</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-center gap-4 md:gap-6">
-                  <div className="w-10 h-10 md:w-12 md:h-12 bg-white/20 rounded-xl flex items-center justify-center">
-                    <Mail size={24} />
-                  </div>
-                  <div>
-                    <p className="text-xs uppercase font-bold tracking-widest opacity-60">E-mail</p>
-                    <p className="text-sm md:text-lg font-bold break-all">contato@woojuris.com.br</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-center gap-4 md:gap-6">
-                  <div className="w-10 h-10 md:w-12 md:h-12 bg-white/20 rounded-xl flex items-center justify-center">
-                    <MapPin size={24} />
-                  </div>
-                  <div>
-                    <p className="text-xs uppercase font-bold tracking-widest opacity-60">Escritório</p>
-                    <p className="text-sm md:text-lg font-bold">Rua 16 A, 1078, Setor Aeroporto, Goiânia - GO</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-12 md:mt-16 pt-8 md:pt-12 border-t border-white/20">
-                <h4 className="font-bold mb-4 uppercase text-xs tracking-widest">Siga-nos</h4>
-                <div className="flex gap-4">
-                  <a href="#" className="w-8 h-8 md:w-10 md:h-10 border border-white/30 rounded-lg flex items-center justify-center hover:bg-white hover:text-primary-700 transition-all cursor-pointer text-xs font-bold">In</a>
-                  <a href="#" className="w-8 h-8 md:w-10 md:h-10 border border-white/30 rounded-lg flex items-center justify-center hover:bg-white hover:text-primary-700 transition-all cursor-pointer text-xs font-bold">Ig</a>
-                  <a href="#" className="w-8 h-8 md:w-10 md:h-10 border border-white/30 rounded-lg flex items-center justify-center hover:bg-white hover:text-primary-700 transition-all cursor-pointer text-xs font-bold">Fb</a>
-                </div>
-              </div>
-            </div>
-
-            <div className="lg:w-3/5 p-8 md:p-12 bg-white">
-              {submitError && (
-                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-3 text-red-600">
-                  <AlertCircle size={20} />
-                  <p className="text-sm">{submitError}</p>
-                </div>
-              )}
-
-              <form className="space-y-6" onSubmit={handleSubmit}>
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <label className="text-xs uppercase font-bold tracking-widest text-slate-500">Nome Completo *</label>
-                    <input 
-                      type="text" 
-                      name="name"
-                      value={formData.name}
-                      onChange={handleChange}
-                      className={`w-full bg-slate-50 border ${errors.name ? 'border-red-400 ring-2 ring-red-100' : 'border-slate-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-100'} p-4 outline-none transition-all rounded-lg text-slate-900 placeholder:text-slate-400`} 
-                      placeholder="Ex: João da Silva" 
-                    />
-                    {errors.name && <p className="text-red-600 text-xs uppercase font-bold tracking-widest">{errors.name}</p>}
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-xs uppercase font-bold tracking-widest text-slate-500">Telefone / WhatsApp *</label>
-                    <input 
-                      type="text" 
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleChange}
-                      className={`w-full bg-slate-50 border ${errors.phone ? 'border-red-400 ring-2 ring-red-100' : 'border-slate-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-100'} p-4 outline-none transition-all rounded-lg text-slate-900 placeholder:text-slate-400`} 
-                      placeholder="(00) 00000-0000" 
-                    />
-                    {errors.phone && <p className="text-red-600 text-xs uppercase font-bold tracking-widest">{errors.phone}</p>}
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <label className="text-xs uppercase font-bold tracking-widest text-slate-500">Seu E-mail *</label>
-                  <input 
-                    type="email" 
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    className={`w-full bg-slate-50 border ${errors.email ? 'border-red-400 ring-2 ring-red-100' : 'border-slate-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-100'} p-4 outline-none transition-all rounded-lg text-slate-900 placeholder:text-slate-400`} 
-                    placeholder="email@exemplo.com" 
-                  />
-                  {errors.email && <p className="text-red-600 text-xs uppercase font-bold tracking-widest">{errors.email}</p>}
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-xs uppercase font-bold tracking-widest text-slate-500">Tipo de Problema *</label>
-                  <select 
-                    name="type"
-                    value={formData.type}
-                    onChange={handleChange}
-                    className={`w-full bg-slate-50 border ${errors.type ? 'border-red-400 ring-2 ring-red-100' : 'border-slate-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-100'} p-4 outline-none transition-all appearance-none text-slate-700 rounded-lg`}
-                  >
-                    {Object.entries(PROBLEM_TYPES).map(([key, val]) => (
-                      <option key={key} value={val.code}>{val.label}</option>
-                    ))}
-                  </select>
-                  {errors.type && <p className="text-red-600 text-xs uppercase font-bold tracking-widest">{errors.type}</p>}
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-xs uppercase font-bold tracking-widest text-slate-500">Descrição Breve *</label>
-                  <textarea 
-                    name="message"
-                    rows={4} 
-                    value={formData.message}
-                    onChange={handleChange}
-                    className={`w-full bg-slate-50 border ${errors.message ? 'border-red-400 ring-2 ring-red-100' : 'border-slate-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-100'} p-4 outline-none transition-all resize-none rounded-lg text-slate-900 placeholder:text-slate-400`} 
-                    placeholder="Conte-nos brevemente o que aconteceu..."
-                  ></textarea>
-                  {errors.message && <p className="text-red-600 text-xs uppercase font-bold tracking-widest">{errors.message}</p>}
-                </div>
-
-                <button 
-                  type="submit" 
-                  disabled={!isValid || isSubmitting}
-                  className={`w-full p-5 text-white font-bold uppercase tracking-[0.2em] flex items-center justify-center gap-3 transition-all shadow-md rounded-xl ${(!isValid || isSubmitting) ? 'bg-slate-300 cursor-not-allowed text-slate-500' : 'bg-primary-600 hover:bg-primary-700 hover:shadow-lg'}`}
-                >
-                  {isSubmitting ? (
-                    <>Processando... <Loader2 className="animate-spin" size={18} /></>
-                  ) : (
-                    <>Enviar Solicitação <Send size={18} /></>
-                  )}
-                </button>
-                <p className="text-xs text-slate-400 text-center uppercase tracking-widest">Seus dados estão 100% seguros sob sigilo profissional.</p>
-              </form>
-            </div>
-          </div>
+        <div className="bg-[#f3f1eb] p-6 md:p-10">
+          {sent ? (
+            <div className="flex min-h-[420px] flex-col items-center justify-center text-center"><CheckCircle2 size={48} className="text-[#183f35]" /><h3 className="mt-6 text-3xl">Mensagem recebida.</h3><p className="mt-3 max-w-sm text-sm leading-7 text-[#68716d]">Nossa equipe retornará em até um dia útil.</p></div>
+          ) : (
+            <form onSubmit={submit} className="grid gap-6 sm:grid-cols-2">
+              <label className="field"><span>Nome</span><input name="name" required /></label>
+              <label className="field"><span>Telefone</span><input name="phone" required /></label>
+              <label className="field sm:col-span-2"><span>E-mail</span><input type="email" name="email" required /></label>
+              <label className="field sm:col-span-2"><span>Assunto</span><select name="type"><option value="empresarial">Direito empresarial</option><option value="societario">Societário e M&A</option><option value="patrimonial">Patrimônio e sucessão</option><option value="contratos">Contratos</option></select></label>
+              <label className="field sm:col-span-2"><span>Como podemos ajudar?</span><textarea name="message" rows={4} required /></label>
+              <button disabled={loading} className="sm:col-span-2 inline-flex items-center justify-between bg-[#183f35] px-6 py-5 text-xs font-bold uppercase tracking-[.15em] text-white disabled:opacity-50">{loading ? 'Enviando...' : 'Enviar mensagem'} <ArrowRight size={18} /></button>
+            </form>
+          )}
         </div>
       </div>
     </section>

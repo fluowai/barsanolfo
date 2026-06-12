@@ -40,6 +40,7 @@ const PORT = process.env.PORT || 5032;
 const NODE_ENV = process.env.NODE_ENV || 'development';
 const prisma = new PrismaClient();
 
+app.set('trust proxy', 1);
 app.use(httpLogger);
 
 app.use(helmet());

@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { Gavel, Scale, Briefcase, Users, FileText, ShieldAlert } from 'lucide-react';
 import { NavItem, Service, TeamMember } from './types';
 
 // ============================================
@@ -59,22 +58,21 @@ export const USER_ROLES = {
 } as const;
 
 export const PROBLEM_TYPES = {
-  rescisao: { label: 'Rescisão Indireta', code: 'rescisao' },
-  horas: { label: 'Horas Extras', code: 'horas' },
-  assedio: { label: 'Assédio Moral', code: 'assedio' },
-  outro: { label: 'Outros Direitos', code: 'outro' },
+  empresarial: { label: 'Direito Empresarial', code: 'empresarial' },
+  societario: { label: 'Societário e M&A', code: 'societario' },
+  patrimonial: { label: 'Patrimônio e Sucessão', code: 'patrimonial' },
+  contratos: { label: 'Contratos Estratégicos', code: 'contratos' },
 } as const;
 
 // ============================================
 // NAVIGATION
 // ============================================
 export const NAV_ITEMS: NavItem[] = [
-  { label: 'Início', href: '#home' },
-  { label: 'O Escritório', href: '#escritorio' },
+  { label: 'Escritório', href: '#escritorio' },
   { label: 'Atuação', href: '#atuacao' },
-  { label: 'Equipe', href: '#equipe' },
+  { label: 'Sócios', href: '#equipe' },
   { label: 'Contato', href: '#contato' },
-  { label: 'Área Restrita', href: '/painel/login' },
+  { label: 'Área do cliente', href: '/painel/login' },
 ];
 
 // ============================================
@@ -82,46 +80,24 @@ export const NAV_ITEMS: NavItem[] = [
 // ============================================
 export const SERVICES: Service[] = [
   {
-    id: 'direitogestante',
-    title: 'Direito da Gestante',
-    description: 'Proteção integral à maternidade, garantindo estabilidade, licença e todos os direitos da mãe trabalhadora.',
-    icon: 'ShieldAlert',
+    id: 'empresarial', title: 'Estratégia empresarial',
+    description: 'Apoio jurídico permanente para decisões de gestão, expansão, governança e mitigação de riscos.', icon: 'Building2',
   },
   {
-    id: 'rescisao',
-    title: 'Rescisão Indireta',
-    description: 'Quando a empresa comete falta grave, garantimos que você saia com todos os seus direitos preservados.',
-    icon: 'ShieldAlert',
+    id: 'societario', title: 'Societário e M&A',
+    description: 'Constituição, reorganização, acordos de sócios, investimentos, aquisições e saídas estruturadas.', icon: 'Network',
   },
   {
-    id: 'horas-extras',
-    title: 'Horas Extras e Intervalos',
-    description: 'Cálculo e cobrança de horas trabalhadas além da jornada e intervalos não concedidos.',
-    icon: 'Briefcase',
+    id: 'contratos', title: 'Contratos estratégicos',
+    description: 'Negociação e desenho de contratos comerciais alinhados à operação e aos objetivos do negócio.', icon: 'FileSignature',
   },
   {
-    id: 'assedio',
-    title: 'Assédio Moral e Sexual',
-    description: 'Defesa incisiva contra abusos no ambiente de trabalho, buscando justiça e reparação.',
-    icon: 'Scale',
+    id: 'patrimonio', title: 'Patrimônio e sucessão',
+    description: 'Planejamento patrimonial e sucessório para famílias empresárias, holdings e ativos relevantes.', icon: 'Landmark',
   },
   {
-    id: 'acidente',
-    title: 'Acidentes de Trabalho',
-    description: 'Assessoria completa para indenizações por danos morais, materiais e estéticos decorrentes do trabalho.',
-    icon: 'Gavel',
-  },
-  {
-    id: 'documentacao',
-    title: 'Vínculo Empregatício',
-    description: 'Reconhecimento de direitos para trabalhadores sem carteira assinada ou com fraude na contratação.',
-    icon: 'FileText',
-  },
-  {
-    id: 'fgts',
-    title: 'FGTS e Verbas Rescisórias',
-    description: 'Garantia de que cada centavo devido na saída da empresa seja devidamente pago.',
-    icon: 'Users',
+    id: 'disputas', title: 'Disputas complexas',
+    description: 'Condução estratégica de conflitos societários, contratuais e empresariais de alta relevância.', icon: 'Scale',
   },
 ];
 
@@ -130,16 +106,14 @@ export const SERVICES: Service[] = [
 // ============================================
 export const TEAM: TeamMember[] = [
   {
-    name: 'Dra. Maria José Martins de Oliveira Almeida',
-    role: 'Sócia | OAB/GO 43.681',
-    bio: 'Advogada há 14 anos, formada pela UFG, especialista em Direito do Trabalho e Previdenciário. Atua com qualidade, proximidade e tecnologia na gestão da advocacia.',
-    image: '/assets/prof-maria-jose.jpg',
+    name: 'Helena Prado', role: 'Sócia · Estratégia empresarial',
+    bio: 'Atua na estruturação de negócios, governança e decisões societárias sensíveis. Combina rigor técnico com uma leitura prática do ambiente empresarial.',
+    image: '/assets/helena-prado.png',
   },
   {
-    name: 'Dra. Amanda Martins de Oliveira Brandão',
-    role: 'Sócia | OAB/GO 69.838',
-    bio: 'Advogada formada pela Universo, pós-graduada em Direito do Trabalho. Atua nas áreas trabalhista e cível com foco em negociações complexas e defesa de direitos.',
-    image: '/assets/prof-amanda.jpg.jpeg',
+    name: 'Caio Lume', role: 'Sócio · Contratos e disputas',
+    bio: 'Conduz negociações, contratos estratégicos e conflitos empresariais. Sua atuação é orientada por clareza, antecipação de riscos e soluções executáveis.',
+    image: '/assets/caio-lume.png',
   },
 ];
 

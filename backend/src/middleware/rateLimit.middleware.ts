@@ -5,10 +5,14 @@ import rateLimit from 'express-rate-limit';
  */
 export const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutos
-  max: 5, // 5 tentativas
-  message: 'Muitas tentativas de login. Tente novamente em 15 minutos.',
+  max: 20,
+  message: {
+    success: false,
+    message: 'Muitas tentativas de login. Aguarde alguns minutos e tente novamente.',
+  },
   standardHeaders: true,
   legacyHeaders: false,
+  skipSuccessfulRequests: true,
   skip: (req) => {
     // Skip rate limiting em modo development
     return process.env.NODE_ENV === 'development';
