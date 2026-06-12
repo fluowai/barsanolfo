@@ -135,11 +135,11 @@ export default function Sidebar() {
   };
 
   const handleViewSite = () => {
-    window.open('http://localhost:5033', '_blank');
+    window.open(window.location.origin, '_blank');
   };
 
   const handlePortalCliente = () => {
-    window.open('http://localhost:5033', '_blank');
+    window.open(window.location.origin, '_blank');
   };
 
   const handleNavClick = () => {
@@ -152,7 +152,7 @@ export default function Sidebar() {
     items.map((item) => {
       if (item.path === '__portal_cliente__') {
         return (
-          <button key={item.path} className="nav-item" onClick={() => { window.open('http://localhost:5033', '_blank'); handleNavClick(); }}>
+          <button key={item.path} className="nav-item" onClick={() => { handlePortalCliente(); handleNavClick(); }}>
             <span className="nav-icon"><ExternalLink size={20} /></span>
             <span className="nav-label">{item.label}</span>
             <ChevronRight size={16} className="nav-arrow" />
@@ -161,7 +161,7 @@ export default function Sidebar() {
       }
       if (item.path === '__ver_site__') {
         return (
-          <button key={item.path} className="nav-item" onClick={() => { window.open('http://localhost:5033', '_blank'); handleNavClick(); }}>
+          <button key={item.path} className="nav-item" onClick={() => { handleViewSite(); handleNavClick(); }}>
             <span className="nav-icon"><ExternalLink size={20} /></span>
             <span className="nav-label">{item.label}</span>
             <ChevronRight size={16} className="nav-arrow" />

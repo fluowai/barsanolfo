@@ -11,7 +11,7 @@ services:
     environment:
       NODE_ENV: production
       PORT: 5032
-      ALLOWED_ORIGINS: "https://woojuris.com.br,https://www.woojuris.com.br,https://app.woojuris.com.br"
+      ALLOWED_ORIGINS: "https://woojuris.consultio.com.br,http://woojuris.consultio.com.br"
       JWT_SECRET: "Np4TqwVq1RtgG5guinZ/KQhQx4abzgumQ1X2z4ykFwmhQtk3XA45MOXvPNwySsY2eX90YHuwKWVJ9JKTGYWMNg=="
       DATABASE_URL: "postgresql://postgres.mhfsputtyytpgfjkzkdq:qoypvRj7VICtEE8J@aws-1-sa-east-1.pooler.supabase.com:6543/postgres?sslmode=require"
       SUPABASE_URL: "https://mhfsputtyytpgfjkzkdq.supabase.co"
@@ -44,7 +44,7 @@ services:
       labels:
         - "traefik.enable=true"
         - "traefik.docker.network=woopanel1"
-        - "traefik.http.routers.woojuris.rule=Host(`woojuris.com.br`) || Host(`www.woojuris.com.br`)"
+        - "traefik.http.routers.woojuris.rule=Host(`woojuris.consultio.com.br`)"
         - "traefik.http.routers.woojuris.entrypoints=websecure"
         - "traefik.http.routers.woojuris.tls.certresolver=letsencryptresolver"
         - "traefik.http.routers.woojuris.priority=1"
@@ -53,7 +53,7 @@ services:
         - "traefik.http.routers.woojuris.middlewares=woojuris_secHeaders"
 
         # Roteador específico para o painel (subdomínio app)
-        - "traefik.http.routers.woojuris_painel.rule=Host(`app.woojuris.com.br`)"
+        - "traefik.http.routers.woojuris_painel.rule=Host(`woojuris.consultio.com.br`) && PathPrefix(`/painel`)"
         - "traefik.http.routers.woojuris_painel.entrypoints=websecure"
         - "traefik.http.routers.woojuris_painel.tls.certresolver=letsencryptresolver"
         - "traefik.http.routers.woojuris_painel.priority=10"

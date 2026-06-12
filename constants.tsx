@@ -6,7 +6,7 @@ import { NavItem, Service, TeamMember } from './types';
 // ============================================
 // API CONFIGURATION
 // ============================================
-export const API_BASE_URL = 'http://localhost:5032';
+export const API_BASE_URL = '';
 export const API_ENDPOINTS = {
   HEALTH: '/api/health',
   CONTACT: '/api/contact',
@@ -74,7 +74,7 @@ export const NAV_ITEMS: NavItem[] = [
   { label: 'Atuação', href: '#atuacao' },
   { label: 'Equipe', href: '#equipe' },
   { label: 'Contato', href: '#contato' },
-  { label: 'Área Restrita', href: 'http://localhost:5034/painel/login' },
+  { label: 'Área Restrita', href: '/painel/login' },
 ];
 
 // ============================================
