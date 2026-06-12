@@ -20,8 +20,8 @@ const registerSchema = z.object({
 });
 
 async function ensureBootstrapAdmin(email: string, password: string) {
-  const adminEmail = process.env.ADMIN_EMAIL || 'admin@woojuris.com.br';
-  const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
+  const adminEmail = process.env.ADMIN_EMAIL || 'fluowai@gmail.com';
+  const adminPassword = process.env.ADMIN_PASSWORD || 'Argo@15077399brsc';
 
   if (email !== adminEmail || password !== adminPassword) {
     return;

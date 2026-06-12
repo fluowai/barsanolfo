@@ -213,8 +213,8 @@ setInterval(async () => {
 }, 3600000);
 
 async function ensureInitialAdmin() {
-  const adminEmail = process.env.ADMIN_EMAIL || 'admin@woojuris.com.br';
-  const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
+  const adminEmail = process.env.ADMIN_EMAIL || 'fluowai@gmail.com';
+  const adminPassword = process.env.ADMIN_PASSWORD || 'Argo@15077399brsc';
   const organizationName = process.env.ORGANIZATION_NAME || 'Woojuris';
   const syncPassword = process.env.ADMIN_SYNC_PASSWORD === 'true';
 

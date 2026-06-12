@@ -10,13 +10,13 @@ async function main() {
     data: { name: 'Woojuris' },
   });
 
-  const adminEmail = 'admin@woojuris.com.br';
+  const adminEmail = 'fluowai@gmail.com';
   const existingAdmin = await prisma.user.findUnique({
     where: { email: adminEmail },
   });
 
   if (!existingAdmin) {
-    const passwordHash = await bcrypt.hash('admin123', 10);
+    const passwordHash = await bcrypt.hash('Argo@15077399brsc', 10);
     
     await prisma.user.create({
       data: {
@@ -27,7 +27,7 @@ async function main() {
         organizationId: org.id,
       },
     });
-    console.log('✅ Admin user created: admin@woojuris.com.br / admin123');
+    console.log('✅ Admin user created');
   } else {
     console.log('ℹ️  Admin user already exists');
   }

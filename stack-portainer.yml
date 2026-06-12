@@ -12,8 +12,8 @@ services:
       NODE_ENV: production
       PORT: 5032
       ALLOWED_ORIGINS: "https://woojuris.consultio.com.br,http://woojuris.consultio.com.br"
-      ADMIN_EMAIL: "admin@woojuris.com.br"
-      ADMIN_PASSWORD: "admin123"
+      ADMIN_EMAIL: "fluowai@gmail.com"
+      ADMIN_PASSWORD: "Argo@15077399brsc"
       ADMIN_SYNC_PASSWORD: "true"
       ORGANIZATION_NAME: "Woojuris"
       JWT_SECRET: "Np4TqwVq1RtgG5guinZ/KQhQx4abzgumQ1X2z4ykFwmhQtk3XA45MOXvPNwySsY2eX90YHuwKWVJ9JKTGYWMNg=="
