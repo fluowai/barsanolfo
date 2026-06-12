@@ -78,7 +78,7 @@ function App() {
   if (!isAuthenticated) {
     return (
       <ErrorBoundary>
-        <Login />
+        <Login onLogin={() => setIsAuthenticated(true)} />
       </ErrorBoundary>
     );
   }

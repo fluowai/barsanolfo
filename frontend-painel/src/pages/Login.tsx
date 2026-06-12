@@ -3,7 +3,11 @@ import Logo from '../components/Logo';
 import { STORAGE_KEYS } from '../constants';
 import './Login.css';
 
-export default function Login() {
+interface LoginProps {
+  onLogin: () => void;
+}
+
+export default function Login({ onLogin }: LoginProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -26,7 +30,7 @@ export default function Login() {
       if (data.success) {
         localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, data.accessToken);
         localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(data.user));
-        window.location.reload();
+        onLogin();
       } else {
         setError(data.message || 'Email ou senha incorretos');
       }
