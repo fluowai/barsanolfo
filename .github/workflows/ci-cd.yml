@@ -4,46 +4,14 @@ on:
   push:
     branches: [main]
 
-env:
-  NODE_VERSION: '18'
-
 jobs:
-  build:
+  docker:
     runs-on: ubuntu-latest
     name: Build e Push Imagem Docker
 
     steps:
       - name: Checkout código
         uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-
-      - name: Instalar dependências do backend
-        working-directory: ./backend
-        run: npm ci
-
-      - name: Instalar dependências do frontend-painel
-        working-directory: ./frontend-painel
-        run: npm ci
-
-      - name: Gerar Prisma Client
-        working-directory: ./backend
-        run: npx prisma generate
-
-      - name: Build backend
-        working-directory: ./backend
-        run: npm run build
-
-      - name: Build frontend-painel
-        working-directory: ./frontend-painel
-        run: npm run build
-
-      - name: Build site principal
-        run: npm ci && npm run build
 
       - name: Login no GitHub Container Registry
         uses: docker/login-action@v3
