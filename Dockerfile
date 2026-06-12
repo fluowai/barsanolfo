@@ -3,6 +3,8 @@ FROM node:20-alpine AS backend-builder
 
 WORKDIR /app/backend
 
+RUN apk add --no-cache openssl
+
 # Install all dependencies because the TypeScript build needs devDependencies.
 COPY backend/package*.json ./
 RUN npm ci --include=dev
@@ -54,7 +56,7 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=5032
 
-RUN apk add --no-cache curl
+RUN apk add --no-cache curl openssl
 
 COPY --from=backend-builder /app/backend/dist ./backend/dist
 COPY --from=backend-builder /app/backend/node_modules ./backend/node_modules
